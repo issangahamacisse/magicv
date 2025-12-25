@@ -1,0 +1,99 @@
+import React, { useState } from 'react';
+import { useCV } from '@/context/CVContext';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Download, ZoomIn, ZoomOut, FileText } from 'lucide-react';
+import ModernTemplate from './ModernTemplate';
+import ClassicTemplate from './ClassicTemplate';
+import CreativeTemplate from './CreativeTemplate';
+import { toast } from 'sonner';
+
+const CVPreview: React.FC = () => {
+  const { cvData } = useCV();
+  const [zoom, setZoom] = useState(100);
+
+  const templateComponents = {
+    modern: ModernTemplate,
+    classic: ClassicTemplate,
+    creative: CreativeTemplate,
+  };
+
+  const TemplateComponent = templateComponents[cvData.theme.template];
+
+  const handleDownload = () => {
+    toast.info("Fonctionnalité Premium", {
+      description: "Connectez-vous pour télécharger votre CV en PDF.",
+      action: {
+        label: "S'inscrire",
+        onClick: () => {},
+      },
+    });
+  };
+
+  return (
+    <div className="h-full flex flex-col bg-muted/30">
+      {/* Toolbar */}
+      <div className="flex-shrink-0 flex items-center justify-between p-3 border-b border-border bg-card">
+        <div className="flex items-center gap-2">
+          <FileText className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Aperçu</span>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {/* Zoom Controls */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setZoom(Math.max(50, zoom - 10))}
+              className="h-8 w-8 p-0"
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <div className="w-24">
+              <Slider
+                value={[zoom]}
+                onValueChange={([value]) => setZoom(value)}
+                min={50}
+                max={150}
+                step={10}
+                className="cursor-pointer"
+              />
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setZoom(Math.min(150, zoom + 10))}
+              className="h-8 w-8 p-0"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <span className="text-xs text-muted-foreground w-10">{zoom}%</span>
+          </div>
+
+          {/* Download Button */}
+          <Button onClick={handleDownload} size="sm" className="gap-2">
+            <Download className="h-4 w-4" />
+            Télécharger
+          </Button>
+        </div>
+      </div>
+
+      {/* Preview Area */}
+      <div className="flex-1 overflow-auto p-6 flex items-start justify-center">
+        <div 
+          className="cv-paper transition-transform origin-top"
+          style={{ 
+            transform: `scale(${zoom / 100})`,
+            width: '210mm',
+            minHeight: '297mm',
+          }}
+        >
+          <TemplateComponent data={cvData} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CVPreview;
