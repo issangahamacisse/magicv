@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { useCV } from '@/context/CVContext';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Download, ZoomIn, ZoomOut, FileText } from 'lucide-react';
 import ModernTemplate from './ModernTemplate';
 import ClassicTemplate from './ClassicTemplate';
 import CreativeTemplate from './CreativeTemplate';
+import MinimalTemplate from './MinimalTemplate';
+import ElegantTemplate from './ElegantTemplate';
+import BoldTemplate from './BoldTemplate';
+import ExecutiveTemplate from './ExecutiveTemplate';
+import TechTemplate from './TechTemplate';
+import ArtisticTemplate from './ArtisticTemplate';
+import CompactTemplate from './CompactTemplate';
+import { Button } from '@/components/ui/button';
+import { ZoomIn, ZoomOut, Download, FileText } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 
 const CVPreview: React.FC = () => {
@@ -16,13 +23,13 @@ const CVPreview: React.FC = () => {
     modern: ModernTemplate,
     classic: ClassicTemplate,
     creative: CreativeTemplate,
-    minimal: ModernTemplate,
-    elegant: ClassicTemplate,
-    bold: CreativeTemplate,
-    executive: ClassicTemplate,
-    tech: ModernTemplate,
-    artistic: CreativeTemplate,
-    compact: ModernTemplate,
+    minimal: MinimalTemplate,
+    elegant: ElegantTemplate,
+    bold: BoldTemplate,
+    executive: ExecutiveTemplate,
+    tech: TechTemplate,
+    artistic: ArtisticTemplate,
+    compact: CompactTemplate,
   };
 
   const TemplateComponent = templateComponents[cvData.theme.template] || ModernTemplate;
