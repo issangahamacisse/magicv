@@ -12,13 +12,20 @@ const CVPreview: React.FC = () => {
   const { cvData } = useCV();
   const [zoom, setZoom] = useState(100);
 
-  const templateComponents = {
+  const templateComponents: Record<string, React.FC<{ data: typeof cvData }>> = {
     modern: ModernTemplate,
     classic: ClassicTemplate,
     creative: CreativeTemplate,
+    minimal: ModernTemplate,
+    elegant: ClassicTemplate,
+    bold: CreativeTemplate,
+    executive: ClassicTemplate,
+    tech: ModernTemplate,
+    artistic: CreativeTemplate,
+    compact: ModernTemplate,
   };
 
-  const TemplateComponent = templateComponents[cvData.theme.template];
+  const TemplateComponent = templateComponents[cvData.theme.template] || ModernTemplate;
 
   const handleDownload = () => {
     toast.info("Fonctionnalité Premium", {
