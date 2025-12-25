@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
-import { CVProvider } from '@/context/CVContext';
 import Header from '@/components/layout/Header';
 import EditorPanel from '@/components/editor/EditorPanel';
 import CVPreview from '@/components/preview/CVPreview';
 import { Helmet } from 'react-helmet-async';
 
-const Index: React.FC = () => {
+const Editor: React.FC = () => {
   const [showMobilePreview, setShowMobilePreview] = useState(false);
 
   return (
-    <CVProvider>
+    <>
       <Helmet>
-        <title>CV Builder - Créez votre CV professionnel en ligne</title>
+        <title>Éditeur de CV - CV Builder</title>
         <meta 
           name="description" 
-          content="Créez un CV professionnel en quelques minutes avec notre éditeur intuitif. Modèles modernes, assistance IA et export PDF gratuit." 
+          content="Créez votre CV professionnel avec notre éditeur intuitif. Modèles modernes et export PDF." 
         />
       </Helmet>
 
@@ -42,8 +41,8 @@ const Index: React.FC = () => {
           </div>
         </main>
       </div>
-    </CVProvider>
+    </>
   );
 };
 
-export default Index;
+export default Editor;
