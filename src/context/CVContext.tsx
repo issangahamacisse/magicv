@@ -40,19 +40,28 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Auto-save with debounce
+  // Auto-save with requestIdleCallback for smooth typing
   useEffect(() => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      setIsSaving(true);
-      localStorage.setItem('cvData', JSON.stringify(cvData));
-      setTimeout(() => {
-        setIsSaving(false);
-      }, 500);
-    }, 1500);
+      // Use requestIdleCallback to avoid blocking typing
+      const saveData = () => {
+        setIsSaving(true);
+        localStorage.setItem('cvData', JSON.stringify(cvData));
+        requestAnimationFrame(() => {
+          setTimeout(() => setIsSaving(false), 300);
+        });
+      };
+
+      if ('requestIdleCallback' in window) {
+        (window as Window).requestIdleCallback(saveData, { timeout: 500 });
+      } else {
+        saveData();
+      }
+    }, 800);
 
     return () => {
       if (saveTimeoutRef.current) {

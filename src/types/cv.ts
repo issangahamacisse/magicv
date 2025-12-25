@@ -66,8 +66,20 @@ export interface CVSection {
   order: number;
 }
 
+export type TemplateId = 
+  | 'modern' 
+  | 'classic' 
+  | 'creative' 
+  | 'minimal' 
+  | 'elegant' 
+  | 'bold' 
+  | 'executive' 
+  | 'tech' 
+  | 'artistic' 
+  | 'compact';
+
 export interface CVTheme {
-  template: 'modern' | 'classic' | 'creative';
+  template: TemplateId;
   accentColor: string;
   fontFamily: 'sans' | 'serif';
   spacing: 'compact' | 'normal' | 'spacious';
