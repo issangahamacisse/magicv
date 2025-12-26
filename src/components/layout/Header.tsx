@@ -1,11 +1,19 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { FileText, User, Sparkles, Menu } from 'lucide-react';
+import { FileText, User, Sparkles, Menu, LogOut } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface HeaderProps {
   onToggleMobilePreview?: () => void;
@@ -13,10 +21,18 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePreview }) => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   return (
     <header className="h-14 border-b border-border bg-card flex items-center justify-between px-4 lg:px-6">
       {/* Logo */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
         <div className="p-2 rounded-lg bg-primary/10">
           <FileText className="h-5 w-5 text-primary" />
         </div>
@@ -40,10 +56,29 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
           <Sparkles className="h-4 w-4" />
           Scanner ATS
         </Button>
-        <Button variant="outline" size="sm" className="gap-2">
-          <User className="h-4 w-4" />
-          Connexion
-        </Button>
+        
+        {user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <User className="h-4 w-4" />
+                {user.email?.split('@')[0]}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleSignOut} className="gap-2">
+                <LogOut className="h-4 w-4" />
+                Déconnexion
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate('/auth')}>
+            <User className="h-4 w-4" />
+            Connexion
+          </Button>
+        )}
+        
         <Button size="sm" className="gap-2">
           Passer Premium
         </Button>
@@ -63,10 +98,19 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
                 <Sparkles className="h-4 w-4" />
                 Scanner ATS
               </Button>
-              <Button variant="outline" className="justify-start gap-2">
-                <User className="h-4 w-4" />
-                Connexion
-              </Button>
+              
+              {user ? (
+                <Button variant="outline" className="justify-start gap-2" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4" />
+                  Déconnexion
+                </Button>
+              ) : (
+                <Button variant="outline" className="justify-start gap-2" onClick={() => navigate('/auth')}>
+                  <User className="h-4 w-4" />
+                  Connexion
+                </Button>
+              )}
+              
               <Button className="justify-start">
                 Passer Premium
               </Button>

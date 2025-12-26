@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Header from '@/components/layout/Header';
-import EditorPanel from '@/components/editor/EditorPanel';
+import EditorTabs from '@/components/editor/EditorTabs';
 import CVPreview from '@/components/preview/CVPreview';
 import { Helmet } from 'react-helmet-async';
 
 const Editor: React.FC = () => {
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const cvPreviewRef = useRef<HTMLDivElement>(null);
 
   return (
     <>
@@ -29,7 +30,7 @@ const Editor: React.FC = () => {
             w-full lg:w-[40%] xl:w-[35%] border-r border-border overflow-hidden
             ${showMobilePreview ? 'hidden lg:block' : 'block'}
           `}>
-            <EditorPanel />
+            <EditorTabs />
           </div>
 
           {/* Preview Panel - Hidden on mobile when editing */}
@@ -37,7 +38,7 @@ const Editor: React.FC = () => {
             flex-1 overflow-hidden
             ${showMobilePreview ? 'block' : 'hidden lg:block'}
           `}>
-            <CVPreview />
+            <CVPreview ref={cvPreviewRef} />
           </div>
         </main>
       </div>
