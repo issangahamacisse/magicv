@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useCV } from '@/context/CVContext';
+import { useAuth } from '@/context/AuthContext';
+import { usePdfExport } from '@/hooks/usePdfExport';
 import ModernTemplate from './ModernTemplate';
 import ClassicTemplate from './ClassicTemplate';
 import CreativeTemplate from './CreativeTemplate';
@@ -11,13 +13,26 @@ import TechTemplate from './TechTemplate';
 import ArtisticTemplate from './ArtisticTemplate';
 import CompactTemplate from './CompactTemplate';
 import { Button } from '@/components/ui/button';
-import { ZoomIn, ZoomOut, Download, FileText } from 'lucide-react';
+import { ZoomIn, ZoomOut, Download, FileText, Loader2, Share2 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
-const CVPreview: React.FC = () => {
+const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
   const { cvData } = useCV();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [zoom, setZoom] = useState(100);
+  const cvRef = useRef<HTMLDivElement>(null);
+  
+  const isPremium = false; // TODO: Check from profile subscription_status
+  const { exportToPdf, isExporting } = usePdfExport({
+    filename: cvData.personalInfo.fullName 
+      ? `CV-${cvData.personalInfo.fullName.replace(/\s+/g, '-')}`
+      : 'mon-cv',
+    addWatermark: !isPremium,
+  });
+
+  useImperativeHandle(ref, () => cvRef.current as HTMLDivElement);
 
   const templateComponents: Record<string, React.FC<{ data: typeof cvData }>> = {
     modern: ModernTemplate,
@@ -34,14 +49,12 @@ const CVPreview: React.FC = () => {
 
   const TemplateComponent = templateComponents[cvData.theme.template] || ModernTemplate;
 
-  const handleDownload = () => {
-    toast.info("Fonctionnalité Premium", {
-      description: "Connectez-vous pour télécharger votre CV en PDF.",
-      action: {
-        label: "S'inscrire",
-        onClick: () => {},
-      },
-    });
+  const handleDownload = async () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    await exportToPdf(cvRef.current);
   };
 
   return (
@@ -55,7 +68,7 @@ const CVPreview: React.FC = () => {
 
         <div className="flex items-center gap-4">
           {/* Zoom Controls */}
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
@@ -85,9 +98,18 @@ const CVPreview: React.FC = () => {
             <span className="text-xs text-muted-foreground w-10">{zoom}%</span>
           </div>
 
+          {/* Share Button */}
+          <Button variant="ghost" size="sm" className="gap-2">
+            <Share2 className="h-4 w-4" />
+          </Button>
+
           {/* Download Button */}
-          <Button onClick={handleDownload} size="sm" className="gap-2">
-            <Download className="h-4 w-4" />
+          <Button onClick={handleDownload} size="sm" className="gap-2" disabled={isExporting}>
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
             Télécharger
           </Button>
         </div>
@@ -96,6 +118,7 @@ const CVPreview: React.FC = () => {
       {/* Preview Area */}
       <div className="flex-1 overflow-auto p-6 flex items-start justify-center">
         <div 
+          ref={cvRef}
           className="cv-paper transition-transform origin-top"
           style={{ 
             transform: `scale(${zoom / 100})`,
@@ -108,6 +131,8 @@ const CVPreview: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+CVPreview.displayName = 'CVPreview';
 
 export default CVPreview;
