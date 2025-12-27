@@ -24,12 +24,11 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
   const [zoom, setZoom] = useState(100);
   const cvRef = useRef<HTMLDivElement>(null);
   
-  const isPremium = false; // TODO: Check from profile subscription_status
   const { exportToPdf, isExporting } = usePdfExport({
     filename: cvData.personalInfo.fullName 
       ? `CV-${cvData.personalInfo.fullName.replace(/\s+/g, '-')}`
       : 'mon-cv',
-    addWatermark: !isPremium,
+    addWatermark: false, // 100% free for now
   });
 
   useImperativeHandle(ref, () => cvRef.current as HTMLDivElement);
