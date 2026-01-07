@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin, GraduationCap, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ const skillLevelDots: Record<string, number> = {
   expert: 4,
 };
 
-const ElegantTemplate: React.FC<TemplateProps> = ({ data }) => {
+const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
 
@@ -31,11 +31,14 @@ const ElegantTemplate: React.FC<TemplateProps> = ({ data }) => {
   }[theme.spacing];
 
   return (
-    <div className={cn(
-      "w-full h-full bg-white",
-      theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-      spacingClass
-    )}>
+    <div 
+      ref={ref}
+      className={cn(
+        "w-full h-full bg-white",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
+        spacingClass
+      )}
+    >
       {/* Elegant Header with accent banner */}
       <header 
         className="px-8 py-6 text-white"
@@ -224,6 +227,8 @@ const ElegantTemplate: React.FC<TemplateProps> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
+
+ElegantTemplate.displayName = 'ElegantTemplate';
 
 export default ElegantTemplate;

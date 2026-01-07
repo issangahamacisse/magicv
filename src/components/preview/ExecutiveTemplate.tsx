@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +12,7 @@ const formatDate = (dateStr: string) => {
   return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 };
 
-const ExecutiveTemplate: React.FC<TemplateProps> = ({ data }) => {
+const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
 
@@ -23,11 +23,14 @@ const ExecutiveTemplate: React.FC<TemplateProps> = ({ data }) => {
   }[theme.spacing];
 
   return (
-    <div className={cn(
-      "w-full h-full bg-white text-gray-800 p-8",
-      theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-      spacingClass
-    )}>
+    <div 
+      ref={ref}
+      className={cn(
+        "w-full h-full bg-white text-gray-800 p-8",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
+        spacingClass
+      )}
+    >
       {/* Executive Header - Luxe style */}
       <header className="text-center mb-8 pb-6 border-b-2 border-gray-200">
         <h1 className="text-3xl font-light tracking-[0.2em] uppercase mb-2" style={{ color: accentColor }}>
@@ -180,6 +183,8 @@ const ExecutiveTemplate: React.FC<TemplateProps> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
+
+ExecutiveTemplate.displayName = 'ExecutiveTemplate';
 
 export default ExecutiveTemplate;

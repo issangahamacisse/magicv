@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +12,7 @@ const formatDate = (dateStr: string) => {
   return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 };
 
-const ClassicTemplate: React.FC<TemplateProps> = ({ data }) => {
+const ClassicTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
 
   const spacingClass = {
@@ -22,11 +22,14 @@ const ClassicTemplate: React.FC<TemplateProps> = ({ data }) => {
   }[theme.spacing];
 
   return (
-    <div className={cn(
-      "w-full h-full p-8 bg-cv-paper text-cv-text",
-      theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-      spacingClass
-    )}>
+    <div 
+      ref={ref}
+      className={cn(
+        "w-full h-full p-8 bg-cv-paper text-cv-text",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
+        spacingClass
+      )}
+    >
       {/* Header */}
       <header className="mb-6">
         <h1 className="text-2xl font-bold text-cv-text mb-1">
@@ -148,6 +151,8 @@ const ClassicTemplate: React.FC<TemplateProps> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
+
+ClassicTemplate.displayName = 'ClassicTemplate';
 
 export default ClassicTemplate;

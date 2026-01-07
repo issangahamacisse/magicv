@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useCV } from '@/context/CVContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,8 @@ import {
   Copy,
   Loader2,
   Cloud,
-  CloudOff
+  CloudOff,
+  ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -31,6 +33,7 @@ interface Resume {
 
 const ProfilePanel: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { resetCV, loadCV, currentResumeId } = useCV();
   const navigate = useNavigate();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +55,7 @@ const ProfilePanel: React.FC = () => {
       .from('profiles')
       .select('full_name, credits_ai')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (!error && data) {
       setProfile(data);
@@ -76,6 +79,15 @@ const ProfilePanel: React.FC = () => {
     setIsLoading(false);
   };
 
+  const handleNewCV = () => {
+    resetCV();
+    fetchResumes(); // Refresh list after creating new
+  };
+
+  const handleOpenCV = async (resumeId: string) => {
+    await loadCV(resumeId);
+  };
+
   const handleDeleteResume = async (id: string) => {
     const { error } = await supabase
       .from('resumes')
@@ -87,6 +99,10 @@ const ProfilePanel: React.FC = () => {
     } else {
       toast.success('CV supprimé');
       setResumes(resumes.filter(r => r.id !== id));
+      // If we deleted the current resume, create a new one
+      if (id === currentResumeId) {
+        resetCV();
+      }
     }
   };
 
@@ -195,7 +211,7 @@ const ProfilePanel: React.FC = () => {
               <FileText className="h-4 w-4" />
               Mes CVs ({resumes.length})
             </h4>
-            <Button size="sm" variant="outline" className="gap-1">
+            <Button size="sm" variant="outline" className="gap-1" onClick={handleNewCV}>
               <Plus className="h-3 w-3" />
               Nouveau
             </Button>
@@ -213,7 +229,10 @@ const ProfilePanel: React.FC = () => {
           ) : (
             <div className="space-y-2">
               {resumes.map((resume) => (
-                <Card key={resume.id} className="p-3">
+                <Card 
+                  key={resume.id} 
+                  className={`p-3 ${resume.id === currentResumeId ? 'ring-2 ring-primary' : ''}`}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{resume.title}</p>
@@ -222,11 +241,23 @@ const ProfilePanel: React.FC = () => {
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
+                      {resume.id !== currentResumeId && (
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-8 w-8"
+                          onClick={() => handleOpenCV(resume.id)}
+                          title="Ouvrir ce CV"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button 
                         size="icon" 
                         variant="ghost" 
                         className="h-8 w-8"
                         onClick={() => handleDuplicateResume(resume)}
+                        title="Dupliquer"
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
@@ -235,6 +266,7 @@ const ProfilePanel: React.FC = () => {
                         variant="ghost" 
                         className="h-8 w-8 text-destructive hover:text-destructive"
                         onClick={() => handleDeleteResume(resume.id)}
+                        title="Supprimer"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

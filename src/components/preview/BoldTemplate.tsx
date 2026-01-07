@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ const skillLevelWidth: Record<string, string> = {
   expert: '100%',
 };
 
-const BoldTemplate: React.FC<TemplateProps> = ({ data }) => {
+const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
 
@@ -31,11 +31,14 @@ const BoldTemplate: React.FC<TemplateProps> = ({ data }) => {
   }[theme.spacing];
 
   return (
-    <div className={cn(
-      "w-full h-full flex bg-white",
-      theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-      spacingClass
-    )}>
+    <div 
+      ref={ref}
+      className={cn(
+        "w-full h-full flex bg-white",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
+        spacingClass
+      )}
+    >
       {/* Bold Sidebar */}
       <aside 
         className="w-[35%] p-6 text-white"
@@ -205,6 +208,8 @@ const BoldTemplate: React.FC<TemplateProps> = ({ data }) => {
       </main>
     </div>
   );
-};
+});
+
+BoldTemplate.displayName = 'BoldTemplate';
 
 export default BoldTemplate;

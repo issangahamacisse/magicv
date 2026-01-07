@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin, Palette, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,7 @@ const formatDate = (dateStr: string) => {
   return date.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
 };
 
-const ArtisticTemplate: React.FC<TemplateProps> = ({ data }) => {
+const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
 
@@ -24,11 +24,14 @@ const ArtisticTemplate: React.FC<TemplateProps> = ({ data }) => {
   }[theme.spacing];
 
   return (
-    <div className={cn(
-      "w-full h-full bg-gradient-to-br from-amber-50 via-white to-rose-50",
-      theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-      spacingClass
-    )}>
+    <div 
+      ref={ref}
+      className={cn(
+        "w-full h-full bg-gradient-to-br from-amber-50 via-white to-rose-50",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
+        spacingClass
+      )}
+    >
       {/* Artistic diagonal header */}
       <div className="relative overflow-hidden">
         <div 
@@ -229,6 +232,8 @@ const ArtisticTemplate: React.FC<TemplateProps> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
+
+ArtisticTemplate.displayName = 'ArtisticTemplate';
 
 export default ArtisticTemplate;

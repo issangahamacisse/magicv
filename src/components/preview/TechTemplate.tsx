@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin, Code, Terminal, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ const skillLevelBars: Record<string, number> = {
   expert: 4,
 };
 
-const TechTemplate: React.FC<TemplateProps> = ({ data }) => {
+const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
 
@@ -31,11 +31,14 @@ const TechTemplate: React.FC<TemplateProps> = ({ data }) => {
   }[theme.spacing];
 
   return (
-    <div className={cn(
-      "w-full h-full bg-slate-900 text-slate-100 flex",
-      theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-      spacingClass
-    )}>
+    <div 
+      ref={ref}
+      className={cn(
+        "w-full h-full bg-slate-900 text-slate-100 flex",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
+        spacingClass
+      )}
+    >
       {/* Sidebar - Dark tech style */}
       <aside className="w-[32%] p-5 bg-slate-950 border-r border-slate-800">
         {/* Terminal-style header */}
@@ -156,7 +159,7 @@ const TechTemplate: React.FC<TemplateProps> = ({ data }) => {
               <h2 className="text-sm font-mono font-bold">experience.log</h2>
             </div>
             <div className="space-y-5">
-              {experience.map((exp, idx) => (
+              {experience.map((exp) => (
                 <div key={exp.id} className="relative pl-4 border-l-2" style={{ borderColor: accentColor }}>
                   <div className="flex justify-between items-start mb-1">
                     <div>
@@ -202,6 +205,8 @@ const TechTemplate: React.FC<TemplateProps> = ({ data }) => {
       </main>
     </div>
   );
-};
+});
+
+TechTemplate.displayName = 'TechTemplate';
 
 export default TechTemplate;
