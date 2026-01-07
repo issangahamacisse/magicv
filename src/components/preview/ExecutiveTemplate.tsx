@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { cn } from '@/lib/utils';
+import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
 interface TemplateProps {
   data: CVData;
@@ -15,12 +16,7 @@ const formatDate = (dateStr: string) => {
 const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
-
-  const spacingClass = {
-    compact: 'text-[9px] leading-tight',
-    normal: 'text-[10px] leading-normal',
-    spacious: 'text-[11px] leading-relaxed',
-  }[theme.spacing];
+  const layout = useAdaptiveLayout(data);
 
   return (
     <div 
@@ -28,19 +24,20 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
       className={cn(
         "w-full h-full bg-white text-gray-800 p-8",
         theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-        spacingClass
+        layout.fontSize,
+        layout.containerClass
       )}
     >
       {/* Executive Header - Luxe style */}
-      <header className="text-center mb-8 pb-6 border-b-2 border-gray-200">
-        <h1 className="text-3xl font-light tracking-[0.2em] uppercase mb-2" style={{ color: accentColor }}>
+      <header className={cn("text-center border-b-2 border-gray-200", layout.shouldDistribute ? "pb-8 mb-auto" : "pb-6 mb-8")}>
+        <h1 className={cn("font-light tracking-[0.2em] uppercase mb-2", layout.headerSize)} style={{ color: accentColor }}>
           {personalInfo.fullName || 'Votre Nom'}
         </h1>
-        <p className="text-sm font-light tracking-[0.15em] uppercase text-gray-500 mb-4">
+        <p className={cn("font-light tracking-[0.15em] uppercase text-gray-500 mb-4", layout.titleSize)}>
           {personalInfo.jobTitle || 'Titre Professionnel'}
         </p>
         
-        <div className="flex items-center justify-center gap-6 text-[9px] text-gray-500">
+        <div className={cn("flex items-center justify-center gap-6 text-gray-500", layout.contentDensity === 'sparse' ? 'text-[10px]' : 'text-[9px]')}>
           {personalInfo.email && <span>{personalInfo.email}</span>}
           {personalInfo.phone && (
             <>
@@ -59,7 +56,7 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
 
       {/* Summary with elegant styling */}
       {personalInfo.summary && (
-        <section className="mb-8 text-center max-w-2xl mx-auto">
+        <section className={cn("text-center max-w-2xl mx-auto", layout.shouldDistribute ? "my-auto" : "mb-8")}>
           <p className="text-gray-600 leading-relaxed font-light italic">
             {personalInfo.summary}
           </p>
@@ -67,19 +64,19 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
       )}
 
       {/* Two column layout */}
-      <div className="grid grid-cols-3 gap-10">
+      <div className={cn("grid grid-cols-3", layout.sectionGap, layout.shouldDistribute ? "flex-grow" : "")}>
         {/* Main Column */}
-        <div className="col-span-2 space-y-8">
+        <div className={cn("col-span-2 flex flex-col", layout.itemGap)}>
           {/* Experience */}
           {experience.length > 0 && (
-            <section>
+            <section className="flex-grow">
               <h2 
-                className="text-xs font-light uppercase tracking-[0.25em] mb-5 pb-2"
+                className={cn("font-light uppercase tracking-[0.25em] mb-5 pb-2", layout.subtitleSize)}
                 style={{ color: accentColor, borderBottom: `1px solid ${accentColor}` }}
               >
                 Expérience Professionnelle
               </h2>
-              <div className="space-y-6">
+              <div className={cn("space-y-6", layout.contentDensity === 'dense' && "space-y-4")}>
                 {experience.map((exp) => (
                   <div key={exp.id}>
                     <div className="mb-2">
@@ -104,14 +101,14 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
 
           {/* Education */}
           {education.length > 0 && (
-            <section>
+            <section className={cn(layout.shouldDistribute ? "" : "mt-4")}>
               <h2 
-                className="text-xs font-light uppercase tracking-[0.25em] mb-5 pb-2"
+                className={cn("font-light uppercase tracking-[0.25em] mb-5 pb-2", layout.subtitleSize)}
                 style={{ color: accentColor, borderBottom: `1px solid ${accentColor}` }}
               >
                 Formation
               </h2>
-              <div className="space-y-4">
+              <div className={cn("space-y-4", layout.contentDensity === 'dense' && "space-y-3")}>
                 {education.map((edu) => (
                   <div key={edu.id}>
                     <div className="flex justify-between items-baseline">
@@ -131,17 +128,17 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-8 border-l border-gray-200 pl-6">
+        <div className={cn("border-l border-gray-200 pl-6 flex flex-col", layout.itemGap)}>
           {/* Skills */}
           {skills.length > 0 && (
-            <section>
+            <section className="flex-grow">
               <h2 
-                className="text-xs font-light uppercase tracking-[0.25em] mb-4 pb-2"
+                className={cn("font-light uppercase tracking-[0.25em] mb-4 pb-2", layout.subtitleSize)}
                 style={{ color: accentColor, borderBottom: `1px solid ${accentColor}` }}
               >
                 Expertise
               </h2>
-              <div className="space-y-2">
+              <div className={cn("space-y-2", layout.contentDensity === 'sparse' && "space-y-3")}>
                 {skills.map((skill) => (
                   <div key={skill.id} className="flex items-center gap-2">
                     <div 
@@ -157,14 +154,14 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
 
           {/* Languages */}
           {languages.length > 0 && (
-            <section>
+            <section className={cn(layout.shouldDistribute ? "" : "mt-4")}>
               <h2 
-                className="text-xs font-light uppercase tracking-[0.25em] mb-4 pb-2"
+                className={cn("font-light uppercase tracking-[0.25em] mb-4 pb-2", layout.subtitleSize)}
                 style={{ color: accentColor, borderBottom: `1px solid ${accentColor}` }}
               >
                 Langues
               </h2>
-              <div className="space-y-2">
+              <div className={cn("space-y-2", layout.contentDensity === 'sparse' && "space-y-3")}>
                 {languages.map((lang) => (
                   <div key={lang.id}>
                     <span className="text-gray-700">{lang.name}</span>

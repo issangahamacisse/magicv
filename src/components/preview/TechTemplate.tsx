@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin, Code, Terminal, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
 interface TemplateProps {
   data: CVData;
@@ -23,12 +24,7 @@ const skillLevelBars: Record<string, number> = {
 const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
-
-  const spacingClass = {
-    compact: 'text-[9px] leading-tight',
-    normal: 'text-[10px] leading-normal',
-    spacious: 'text-[11px] leading-relaxed',
-  }[theme.spacing];
+  const layout = useAdaptiveLayout(data);
 
   return (
     <div 
@@ -36,13 +32,13 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
       className={cn(
         "w-full h-full bg-slate-900 text-slate-100 flex",
         theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-        spacingClass
+        layout.fontSize
       )}
     >
       {/* Sidebar - Dark tech style */}
-      <aside className="w-[32%] p-5 bg-slate-950 border-r border-slate-800">
+      <aside className={cn("w-[32%] p-5 bg-slate-950 border-r border-slate-800 flex flex-col", layout.shouldDistribute && "justify-between")}>
         {/* Terminal-style header */}
-        <div className="mb-6 pb-4 border-b border-slate-800">
+        <div className={cn(layout.shouldDistribute ? "" : "mb-6", "pb-4 border-b border-slate-800")}>
           <div className="flex items-center gap-1.5 mb-3">
             <div className="w-2 h-2 rounded-full bg-red-500" />
             <div className="w-2 h-2 rounded-full bg-yellow-500" />
@@ -51,16 +47,16 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
           <div className="font-mono text-[10px] text-slate-500">
             <span style={{ color: accentColor }}>$</span> whoami
           </div>
-          <h1 className="text-lg font-bold mt-1 font-mono">
+          <h1 className={cn("font-bold mt-1 font-mono", layout.contentDensity === 'sparse' ? 'text-xl' : 'text-lg')}>
             {personalInfo.fullName || 'username'}
           </h1>
-          <p className="text-sm mt-1 font-mono" style={{ color: accentColor }}>
+          <p className={cn("mt-1 font-mono", layout.subtitleSize)} style={{ color: accentColor }}>
             {personalInfo.jobTitle || 'Developer'}
           </p>
         </div>
 
         {/* Contact */}
-        <div className="space-y-2 mb-6 text-[9px]">
+        <div className={cn("space-y-2 text-[9px]", layout.shouldDistribute ? "my-auto" : "mb-6")}>
           {personalInfo.email && (
             <div className="flex items-center gap-2 text-slate-400">
               <Mail className="h-3 w-3" style={{ color: accentColor }} />
@@ -89,12 +85,12 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Skills as code blocks */}
         {skills.length > 0 && (
-          <section className="mb-6">
+          <section className={cn(layout.shouldDistribute ? "my-auto" : "mb-6")}>
             <div className="flex items-center gap-2 mb-3">
               <Code className="h-3 w-3" style={{ color: accentColor }} />
               <h2 className="text-[10px] font-mono font-bold uppercase tracking-wider">skills.tech</h2>
             </div>
-            <div className="space-y-2">
+            <div className={cn("space-y-2", layout.contentDensity === 'sparse' && "space-y-3")}>
               {skills.map((skill) => (
                 <div key={skill.id} className="bg-slate-900/50 p-2 rounded border border-slate-800">
                   <div className="flex justify-between items-center text-[9px] mb-1.5">
@@ -121,12 +117,12 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Languages */}
         {languages.length > 0 && (
-          <section>
+          <section className={layout.shouldDistribute ? "mt-auto" : ""}>
             <div className="flex items-center gap-2 mb-3">
               <Terminal className="h-3 w-3" style={{ color: accentColor }} />
               <h2 className="text-[10px] font-mono font-bold uppercase tracking-wider">languages</h2>
             </div>
-            <div className="space-y-1">
+            <div className={cn("space-y-1", layout.contentDensity === 'sparse' && "space-y-2")}>
               {languages.map((lang) => (
                 <div key={lang.id} className="text-[9px] font-mono text-slate-400">
                   <span style={{ color: accentColor }}>&gt;</span> {lang.name}
@@ -139,10 +135,10 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 overflow-auto">
+      <main className={cn("flex-1 p-6 overflow-auto flex flex-col", layout.shouldDistribute && "justify-between")}>
         {/* Summary */}
         {personalInfo.summary && (
-          <section className="mb-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+          <section className={cn("p-4 bg-slate-800/50 rounded-lg border border-slate-700", layout.shouldDistribute ? "" : "mb-6")}>
             <p className="text-slate-300 leading-relaxed font-mono text-[10px]">
               <span style={{ color: accentColor }}>/**</span><br />
               <span className="text-slate-400">* </span>{personalInfo.summary}<br />
@@ -153,12 +149,12 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Experience */}
         {experience.length > 0 && (
-          <section className="mb-6">
+          <section className={cn(layout.shouldDistribute ? "flex-grow py-4" : "mb-6")}>
             <div className="flex items-center gap-2 mb-4">
               <Database className="h-4 w-4" style={{ color: accentColor }} />
-              <h2 className="text-sm font-mono font-bold">experience.log</h2>
+              <h2 className={cn("font-mono font-bold", layout.subtitleSize)}>experience.log</h2>
             </div>
-            <div className="space-y-5">
+            <div className={cn("space-y-5", layout.contentDensity === 'dense' && "space-y-3")}>
               {experience.map((exp) => (
                 <div key={exp.id} className="relative pl-4 border-l-2" style={{ borderColor: accentColor }}>
                   <div className="flex justify-between items-start mb-1">
@@ -183,11 +179,11 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Education */}
         {education.length > 0 && (
-          <section>
-            <h2 className="text-sm font-mono font-bold mb-4 flex items-center gap-2">
+          <section className={layout.shouldDistribute ? "mt-auto" : ""}>
+            <h2 className={cn("font-mono font-bold mb-4 flex items-center gap-2", layout.subtitleSize)}>
               <span style={{ color: accentColor }}>#</span> education
             </h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className={cn("grid grid-cols-2", layout.itemGap)}>
               {education.map((edu) => (
                 <div key={edu.id} className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
                   <h3 className="font-medium text-slate-100 text-[10px]">{edu.degree}</h3>

@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin, GraduationCap, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
 interface TemplateProps {
   data: CVData;
@@ -23,37 +24,32 @@ const skillLevelDots: Record<string, number> = {
 const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
-
-  const spacingClass = {
-    compact: 'text-[9px] leading-tight',
-    normal: 'text-[10px] leading-normal',
-    spacious: 'text-[11px] leading-relaxed',
-  }[theme.spacing];
+  const layout = useAdaptiveLayout(data);
 
   return (
     <div 
       ref={ref}
       className={cn(
-        "w-full h-full bg-white",
+        "w-full h-full bg-white flex flex-col",
         theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-        spacingClass
+        layout.fontSize
       )}
     >
       {/* Elegant Header with accent banner */}
       <header 
-        className="px-8 py-6 text-white"
+        className={cn("px-8 text-white", layout.contentDensity === 'sparse' ? 'py-8' : 'py-6')}
         style={{ backgroundColor: accentColor }}
       >
-        <h1 className="text-2xl font-bold tracking-wide">
+        <h1 className={cn("font-bold tracking-wide", layout.headerSize)}>
           {personalInfo.fullName || 'Votre Nom'}
         </h1>
-        <p className="text-white/90 mt-1 text-sm font-light">
+        <p className={cn("text-white/90 mt-1 font-light", layout.titleSize)}>
           {personalInfo.jobTitle || 'Votre Titre Professionnel'}
         </p>
       </header>
 
       {/* Contact bar */}
-      <div className="px-8 py-3 bg-gray-50 flex flex-wrap gap-4 text-[9px] text-gray-600 border-b">
+      <div className={cn("px-8 py-3 bg-gray-50 flex flex-wrap gap-4 text-gray-600 border-b", layout.contentDensity === 'sparse' ? 'text-[10px]' : 'text-[9px]')}>
         {personalInfo.email && (
           <span className="flex items-center gap-1.5">
             <Mail className="h-3 w-3" style={{ color: accentColor }} />
@@ -80,10 +76,10 @@ const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
         )}
       </div>
 
-      <div className="p-8">
+      <div className={cn("p-8 flex-grow", layout.shouldDistribute && "flex flex-col justify-between")}>
         {/* Summary with decorative border */}
         {personalInfo.summary && (
-          <section className="mb-6 relative pl-4">
+          <section className={cn("relative pl-4", layout.shouldDistribute ? "" : "mb-6")}>
             <div 
               className="absolute left-0 top-0 bottom-0 w-1 rounded-full"
               style={{ backgroundColor: accentColor }}
@@ -94,19 +90,19 @@ const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
           </section>
         )}
 
-        <div className="grid grid-cols-3 gap-8">
+        <div className={cn("grid grid-cols-3", layout.sectionGap, layout.shouldDistribute ? "flex-grow items-start" : "")}>
           {/* Main Column */}
-          <div className="col-span-2 space-y-6">
+          <div className={cn("col-span-2 flex flex-col", layout.itemGap)}>
             {/* Experience */}
             {experience.length > 0 && (
-              <section>
+              <section className="flex-grow">
                 <div className="flex items-center gap-2 mb-4">
                   <Briefcase className="h-4 w-4" style={{ color: accentColor }} />
-                  <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: accentColor }}>
+                  <h2 className={cn("font-bold uppercase tracking-wider", layout.subtitleSize)} style={{ color: accentColor }}>
                     Expérience Professionnelle
                   </h2>
                 </div>
-                <div className="space-y-5">
+                <div className={cn("space-y-5", layout.contentDensity === 'dense' && "space-y-3")}>
                   {experience.map((exp, idx) => (
                     <div key={exp.id} className="relative pl-5">
                       {/* Timeline dot and line */}
@@ -140,14 +136,14 @@ const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
 
             {/* Education */}
             {education.length > 0 && (
-              <section>
+              <section className={cn(layout.shouldDistribute ? "" : "mt-4")}>
                 <div className="flex items-center gap-2 mb-4">
                   <GraduationCap className="h-4 w-4" style={{ color: accentColor }} />
-                  <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: accentColor }}>
+                  <h2 className={cn("font-bold uppercase tracking-wider", layout.subtitleSize)} style={{ color: accentColor }}>
                     Formation
                   </h2>
                 </div>
-                <div className="space-y-4">
+                <div className={cn("space-y-4", layout.contentDensity === 'dense' && "space-y-2")}>
                   {education.map((edu) => (
                     <div key={edu.id} className="pl-5 relative">
                       <div 
@@ -171,14 +167,14 @@ const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className={cn("flex flex-col", layout.itemGap)}>
             {/* Skills */}
             {skills.length > 0 && (
-              <section className="p-4 rounded-lg" style={{ backgroundColor: `${accentColor}08` }}>
-                <h2 className="text-[11px] font-bold uppercase tracking-wider mb-3" style={{ color: accentColor }}>
+              <section className={cn("p-4 rounded-lg flex-grow", layout.contentDensity === 'sparse' && "p-5")} style={{ backgroundColor: `${accentColor}08` }}>
+                <h2 className={cn("font-bold uppercase tracking-wider mb-3", layout.subtitleSize)} style={{ color: accentColor }}>
                   Compétences
                 </h2>
-                <div className="space-y-2">
+                <div className={cn("space-y-2", layout.contentDensity === 'sparse' && "space-y-3")}>
                   {skills.map((skill) => (
                     <div key={skill.id} className="flex items-center justify-between">
                       <span className="text-gray-700">{skill.name}</span>
@@ -186,7 +182,7 @@ const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
                         {[1, 2, 3, 4].map((dot) => (
                           <div 
                             key={dot}
-                            className="w-1.5 h-1.5 rounded-full"
+                            className={cn("rounded-full", layout.contentDensity === 'sparse' ? 'w-2 h-2' : 'w-1.5 h-1.5')}
                             style={{ 
                               backgroundColor: dot <= skillLevelDots[skill.level] 
                                 ? accentColor 
@@ -203,11 +199,11 @@ const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
 
             {/* Languages */}
             {languages.length > 0 && (
-              <section className="p-4 rounded-lg" style={{ backgroundColor: `${accentColor}08` }}>
-                <h2 className="text-[11px] font-bold uppercase tracking-wider mb-3" style={{ color: accentColor }}>
+              <section className={cn("p-4 rounded-lg", layout.contentDensity === 'sparse' && "p-5")} style={{ backgroundColor: `${accentColor}08` }}>
+                <h2 className={cn("font-bold uppercase tracking-wider mb-3", layout.subtitleSize)} style={{ color: accentColor }}>
                   Langues
                 </h2>
-                <div className="space-y-2">
+                <div className={cn("space-y-2", layout.contentDensity === 'sparse' && "space-y-3")}>
                   {languages.map((lang) => (
                     <div key={lang.id} className="flex justify-between">
                       <span className="text-gray-700">{lang.name}</span>
