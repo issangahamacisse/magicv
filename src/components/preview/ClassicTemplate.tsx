@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { cn } from '@/lib/utils';
+import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
 interface TemplateProps {
   data: CVData;
@@ -14,32 +15,36 @@ const formatDate = (dateStr: string) => {
 
 const ClassicTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
-
-  const spacingClass = {
-    compact: 'text-[9px] leading-tight',
-    normal: 'text-[10px] leading-normal',
-    spacious: 'text-[11px] leading-relaxed',
-  }[theme.spacing];
+  const layout = useAdaptiveLayout(data);
 
   return (
     <div 
       ref={ref}
       className={cn(
-        "w-full h-full p-8 bg-cv-paper text-cv-text",
-        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-        spacingClass
+        "w-full h-full bg-cv-paper text-cv-text flex flex-col",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans'
       )}
+      style={{ 
+        padding: layout.contentPadding,
+        fontSize: layout.bodyFontSize
+      }}
     >
       {/* Header */}
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold text-cv-text mb-1">
+      <header className="flex-shrink-0" style={{ marginBottom: layout.sectionMargin }}>
+        <h1 
+          className="font-bold text-cv-text"
+          style={{ fontSize: layout.headerFontSize, marginBottom: '4px' }}
+        >
           {personalInfo.fullName || 'Votre Nom'}
         </h1>
-        <p className="text-base text-cv-muted mb-2">
+        <p 
+          className="text-cv-muted"
+          style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+        >
           {personalInfo.jobTitle || 'Votre Titre Professionnel'}
         </p>
         
-        <div className="text-[9px] text-cv-muted space-y-0.5">
+        <div className="text-cv-muted space-y-0.5">
           {personalInfo.email && <p>{personalInfo.email}</p>}
           {personalInfo.phone && <p>{personalInfo.phone}</p>}
           {personalInfo.location && <p>{personalInfo.location}</p>}
@@ -49,74 +54,93 @@ const ClassicTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
 
       {/* Summary */}
       {personalInfo.summary && (
-        <section className="mb-5">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-cv-text mb-2 pb-1 border-b border-cv-border">
+        <section className="flex-shrink-0" style={{ marginBottom: layout.sectionMargin }}>
+          <h2 
+            className="font-bold uppercase tracking-wider text-cv-text pb-1 border-b border-cv-border"
+            style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+          >
             Profil
           </h2>
           <p className="text-cv-muted">{personalInfo.summary}</p>
         </section>
       )}
 
-      {/* Experience */}
-      {experience.length > 0 && (
-        <section className="mb-5">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-cv-text mb-2 pb-1 border-b border-cv-border">
-            Expérience Professionnelle
-          </h2>
-          <div className="space-y-4">
-            {experience.map((exp) => (
-              <div key={exp.id}>
-                <div className="mb-1">
-                  <h3 className="font-semibold text-cv-text">{exp.position}</h3>
-                  <p className="text-cv-muted">
-                    {exp.company}{exp.location && `, ${exp.location}`}
-                  </p>
-                  <p className="text-[8px] text-cv-muted italic">
-                    {formatDate(exp.startDate)} - {exp.current ? 'Présent' : formatDate(exp.endDate)}
-                  </p>
+      {/* Main Content - grows to fill */}
+      <main className="flex-grow flex flex-col" style={{ gap: layout.sectionMargin }}>
+        {/* Experience */}
+        {experience.length > 0 && (
+          <section className="flex-grow">
+            <h2 
+              className="font-bold uppercase tracking-wider text-cv-text pb-1 border-b border-cv-border"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
+              Expérience Professionnelle
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
+              {experience.map((exp) => (
+                <div key={exp.id}>
+                  <div className="mb-1">
+                    <h3 className="font-semibold text-cv-text">{exp.position}</h3>
+                    <p className="text-cv-muted">
+                      {exp.company}{exp.location && `, ${exp.location}`}
+                    </p>
+                    <p className="text-cv-muted italic" style={{ fontSize: '10px' }}>
+                      {formatDate(exp.startDate)} - {exp.current ? 'Présent' : formatDate(exp.endDate)}
+                    </p>
+                  </div>
+                  {exp.description && (
+                    <p className="text-cv-muted whitespace-pre-line mt-1">{exp.description}</p>
+                  )}
                 </div>
-                {exp.description && (
-                  <p className="text-cv-muted whitespace-pre-line mt-1">{exp.description}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+              ))}
+            </div>
+          </section>
+        )}
 
-      {/* Education */}
-      {education.length > 0 && (
-        <section className="mb-5">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-cv-text mb-2 pb-1 border-b border-cv-border">
-            Formation
-          </h2>
-          <div className="space-y-3">
-            {education.map((edu) => (
-              <div key={edu.id}>
-                <h3 className="font-semibold text-cv-text">
-                  {edu.degree} {edu.field && `- ${edu.field}`}
-                </h3>
-                <p className="text-cv-muted">{edu.institution}</p>
-                <p className="text-[8px] text-cv-muted italic">
-                  {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
-                </p>
-                {edu.description && (
-                  <p className="text-cv-muted mt-1">{edu.description}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+        {/* Education */}
+        {education.length > 0 && (
+          <section>
+            <h2 
+              className="font-bold uppercase tracking-wider text-cv-text pb-1 border-b border-cv-border"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
+              Formation
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
+              {education.map((edu) => (
+                <div key={edu.id}>
+                  <h3 className="font-semibold text-cv-text">
+                    {edu.degree} {edu.field && `- ${edu.field}`}
+                  </h3>
+                  <p className="text-cv-muted">{edu.institution}</p>
+                  <p className="text-cv-muted italic" style={{ fontSize: '10px' }}>
+                    {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
+                  </p>
+                  {edu.description && (
+                    <p className="text-cv-muted mt-1">{edu.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
 
-      <div className="grid grid-cols-2 gap-6">
+      {/* Footer - Skills & Languages */}
+      <footer 
+        className="flex-shrink-0 grid grid-cols-2 mt-auto"
+        style={{ gap: layout.sectionMargin, paddingTop: layout.sectionMargin }}
+      >
         {/* Skills */}
         {skills.length > 0 && (
           <section>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-cv-text mb-2 pb-1 border-b border-cv-border">
+            <h2 
+              className="font-bold uppercase tracking-wider text-cv-text pb-1 border-b border-cv-border"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
               Compétences
             </h2>
-            <ul className="space-y-1">
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {skills.map((skill) => (
                 <li key={skill.id} className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-cv-text" />
@@ -130,10 +154,13 @@ const ClassicTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
         {/* Languages */}
         {languages.length > 0 && (
           <section>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-cv-text mb-2 pb-1 border-b border-cv-border">
+            <h2 
+              className="font-bold uppercase tracking-wider text-cv-text pb-1 border-b border-cv-border"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
               Langues
             </h2>
-            <ul className="space-y-1">
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {languages.map((lang) => (
                 <li key={lang.id}>
                   {lang.name} -{' '}
@@ -148,7 +175,7 @@ const ClassicTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
             </ul>
           </section>
         )}
-      </div>
+      </footer>
     </div>
   );
 });

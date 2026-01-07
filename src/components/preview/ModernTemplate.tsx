@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Globe, Linkedin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
 interface TemplateProps {
   data: CVData;
@@ -23,32 +24,39 @@ const skillLevelWidth: Record<string, string> = {
 const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
-
-  const spacingClass = {
-    compact: 'text-[9px] leading-tight',
-    normal: 'text-[10px] leading-normal',
-    spacious: 'text-[11px] leading-relaxed',
-  }[theme.spacing];
+  const layout = useAdaptiveLayout(data);
 
   return (
     <div 
       ref={ref}
       className={cn(
-        "w-full h-full p-6 bg-cv-paper text-cv-text",
-        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-        spacingClass
+        "w-full h-full bg-cv-paper text-cv-text flex flex-col",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans'
       )}
+      style={{ 
+        padding: layout.contentPadding,
+        fontSize: layout.bodyFontSize
+      }}
     >
       {/* Header */}
-      <header className="text-center mb-6 pb-4 border-b-2" style={{ borderColor: accentColor }}>
-        <h1 className="text-2xl font-bold mb-1" style={{ color: accentColor }}>
+      <header 
+        className="flex-shrink-0 text-center border-b-2"
+        style={{ borderColor: accentColor, paddingBottom: layout.itemMargin, marginBottom: layout.sectionMargin }}
+      >
+        <h1 
+          className="font-bold"
+          style={{ color: accentColor, fontSize: layout.headerFontSize, marginBottom: '4px' }}
+        >
           {personalInfo.fullName || 'Votre Nom'}
         </h1>
-        <p className="text-base font-medium text-cv-muted mb-3">
+        <p 
+          className="font-medium text-cv-muted"
+          style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+        >
           {personalInfo.jobTitle || 'Votre Titre Professionnel'}
         </p>
         
-        <div className="flex flex-wrap items-center justify-center gap-3 text-[9px]">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           {personalInfo.email && (
             <span className="flex items-center gap-1">
               <Mail className="h-3 w-3" style={{ color: accentColor }} />
@@ -78,26 +86,33 @@ const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref)
 
       {/* Summary */}
       {personalInfo.summary && (
-        <section className="mb-5">
+        <section className="flex-shrink-0" style={{ marginBottom: layout.sectionMargin }}>
           <p className="text-cv-muted leading-relaxed text-center">
             {personalInfo.summary}
           </p>
         </section>
       )}
 
-      <div className="grid grid-cols-3 gap-5">
+      {/* Main Content */}
+      <div className="grid grid-cols-3 flex-grow" style={{ gap: layout.sectionMargin }}>
         {/* Main Column */}
-        <div className="col-span-2 space-y-5">
+        <div className="col-span-2 flex flex-col" style={{ gap: layout.sectionMargin }}>
           {/* Experience */}
           {experience.length > 0 && (
-            <section>
+            <section className="flex-grow">
               <h2 
-                className="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b"
-                style={{ color: accentColor, borderColor: accentColor }}
+                className="font-bold uppercase tracking-wider border-b"
+                style={{ 
+                  color: accentColor, 
+                  borderColor: accentColor,
+                  fontSize: layout.titleFontSize,
+                  marginBottom: layout.itemMargin,
+                  paddingBottom: '4px'
+                }}
               >
                 Expérience Professionnelle
               </h2>
-              <div className="space-y-4">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                 {experience.map((exp) => (
                   <div key={exp.id}>
                     <div className="flex justify-between items-start mb-1">
@@ -105,7 +120,7 @@ const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref)
                         <h3 className="font-semibold">{exp.position}</h3>
                         <p className="text-cv-muted">{exp.company}{exp.location && ` · ${exp.location}`}</p>
                       </div>
-                      <span className="text-[8px] text-cv-muted whitespace-nowrap">
+                      <span className="text-cv-muted whitespace-nowrap" style={{ fontSize: '10px' }}>
                         {formatDate(exp.startDate)} - {exp.current ? 'Présent' : formatDate(exp.endDate)}
                       </span>
                     </div>
@@ -122,12 +137,18 @@ const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref)
           {education.length > 0 && (
             <section>
               <h2 
-                className="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b"
-                style={{ color: accentColor, borderColor: accentColor }}
+                className="font-bold uppercase tracking-wider border-b"
+                style={{ 
+                  color: accentColor, 
+                  borderColor: accentColor,
+                  fontSize: layout.titleFontSize,
+                  marginBottom: layout.itemMargin,
+                  paddingBottom: '4px'
+                }}
               >
                 Formation
               </h2>
-              <div className="space-y-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                 {education.map((edu) => (
                   <div key={edu.id}>
                     <div className="flex justify-between items-start mb-1">
@@ -135,7 +156,7 @@ const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref)
                         <h3 className="font-semibold">{edu.degree} {edu.field && `en ${edu.field}`}</h3>
                         <p className="text-cv-muted">{edu.institution}</p>
                       </div>
-                      <span className="text-[8px] text-cv-muted whitespace-nowrap">
+                      <span className="text-cv-muted whitespace-nowrap" style={{ fontSize: '10px' }}>
                         {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
                       </span>
                     </div>
@@ -150,20 +171,26 @@ const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref)
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-5">
+        <div className="flex flex-col" style={{ gap: layout.sectionMargin }}>
           {/* Skills */}
           {skills.length > 0 && (
-            <section>
+            <section className="flex-grow">
               <h2 
-                className="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b"
-                style={{ color: accentColor, borderColor: accentColor }}
+                className="font-bold uppercase tracking-wider border-b"
+                style={{ 
+                  color: accentColor, 
+                  borderColor: accentColor,
+                  fontSize: layout.titleFontSize,
+                  marginBottom: layout.itemMargin,
+                  paddingBottom: '4px'
+                }}
               >
                 Compétences
               </h2>
-              <div className="space-y-2">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                 {skills.map((skill) => (
                   <div key={skill.id}>
-                    <div className="flex justify-between text-[9px] mb-1">
+                    <div className="flex justify-between mb-1">
                       <span>{skill.name}</span>
                     </div>
                     <div className="h-1.5 bg-cv-border rounded-full overflow-hidden">
@@ -185,12 +212,18 @@ const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref)
           {languages.length > 0 && (
             <section>
               <h2 
-                className="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b"
-                style={{ color: accentColor, borderColor: accentColor }}
+                className="font-bold uppercase tracking-wider border-b"
+                style={{ 
+                  color: accentColor, 
+                  borderColor: accentColor,
+                  fontSize: layout.titleFontSize,
+                  marginBottom: layout.itemMargin,
+                  paddingBottom: '4px'
+                }}
               >
                 Langues
               </h2>
-              <div className="space-y-1.5">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {languages.map((lang) => (
                   <div key={lang.id} className="flex justify-between">
                     <span>{lang.name}</span>

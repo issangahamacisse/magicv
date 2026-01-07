@@ -19,33 +19,39 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
   const accentColor = theme.accentColor;
   const layout = useAdaptiveLayout(data);
 
-  // Compact uses smaller base sizes
-  const fontSize = layout.contentDensity === 'sparse' ? 'text-[10px]' : layout.contentDensity === 'normal' ? 'text-[9px]' : 'text-[8px]';
-
   return (
     <div 
       ref={ref}
       className={cn(
-        "w-full h-full bg-white text-gray-800 p-5 flex flex-col",
-        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-        fontSize
+        "w-full h-full bg-white text-gray-800 flex flex-col",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans'
       )}
+      style={{ 
+        padding: layout.contentPadding,
+        fontSize: layout.bodyFontSize
+      }}
     >
       {/* Compact Header - One line style */}
       <header 
-        className={cn("flex items-center justify-between pb-3 border-b-2", layout.shouldDistribute ? "mb-auto" : "mb-4")}
-        style={{ borderColor: accentColor }}
+        className="flex-shrink-0 flex items-center justify-between border-b-2"
+        style={{ borderColor: accentColor, paddingBottom: layout.itemMargin, marginBottom: layout.sectionMargin }}
       >
         <div>
-          <h1 className={cn("font-bold", layout.contentDensity === 'sparse' ? 'text-2xl' : 'text-xl')} style={{ color: accentColor }}>
+          <h1 
+            className="font-bold"
+            style={{ color: accentColor, fontSize: layout.headerFontSize }}
+          >
             {personalInfo.fullName || 'Votre Nom'}
           </h1>
-          <p className={cn("text-gray-500", layout.contentDensity === 'sparse' ? 'text-[11px]' : 'text-[10px]')}>
+          <p 
+            className="text-gray-500"
+            style={{ fontSize: layout.titleFontSize }}
+          >
             {personalInfo.jobTitle || 'Titre'}
           </p>
         </div>
         
-        <div className={cn("flex flex-col items-end gap-1 text-gray-500", layout.contentDensity === 'sparse' ? 'text-[9px]' : 'text-[8px]')}>
+        <div className="flex flex-col items-end gap-1 text-gray-500">
           {personalInfo.email && (
             <span className="flex items-center gap-1">
               {personalInfo.email}
@@ -69,37 +75,37 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
 
       {/* Summary - Compact */}
       {personalInfo.summary && (
-        <section className={cn(layout.shouldDistribute ? "my-auto" : "mb-4")}>
-          <p className={cn("text-gray-600 leading-relaxed", layout.contentDensity === 'sparse' ? 'text-[10px]' : 'text-[9px]')}>
+        <section className="flex-shrink-0" style={{ marginBottom: layout.sectionMargin }}>
+          <p className="text-gray-600 leading-relaxed">
             {personalInfo.summary}
           </p>
         </section>
       )}
 
       {/* Three Column Layout for max density */}
-      <div className={cn("grid grid-cols-12 flex-grow", layout.sectionGap, layout.shouldDistribute && "items-start")}>
+      <div className="grid grid-cols-12 flex-grow" style={{ gap: layout.sectionMargin }}>
         {/* Experience Column */}
         <div className="col-span-5 flex flex-col">
           {experience.length > 0 && (
             <section className="flex-grow">
               <h2 
-                className={cn("font-bold uppercase tracking-wider mb-2 pb-1 border-b", layout.contentDensity === 'sparse' ? 'text-[11px]' : 'text-[10px]')}
-                style={{ color: accentColor, borderColor: `${accentColor}40` }}
+                className="font-bold uppercase tracking-wider pb-1 border-b"
+                style={{ color: accentColor, borderColor: `${accentColor}40`, fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
               >
                 Expérience
               </h2>
-              <div className={cn("space-y-3", layout.contentDensity === 'dense' && "space-y-2")}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                 {experience.map((exp) => (
                   <div key={exp.id}>
                     <div className="flex items-start justify-between">
-                      <h3 className={cn("font-semibold text-gray-900", layout.contentDensity === 'sparse' ? 'text-[10px]' : 'text-[9px]')}>{exp.position}</h3>
-                      <span className="text-[7px] text-gray-400 whitespace-nowrap ml-1">
+                      <h3 className="font-semibold text-gray-900">{exp.position}</h3>
+                      <span className="text-gray-400 whitespace-nowrap ml-1" style={{ fontSize: '9px' }}>
                         {formatDate(exp.startDate).slice(0, 3)} - {exp.current ? 'Prés.' : formatDate(exp.endDate).slice(0, 3)}
                       </span>
                     </div>
-                    <p className="text-[8px]" style={{ color: accentColor }}>{exp.company}</p>
+                    <p style={{ color: accentColor, fontSize: '10px' }}>{exp.company}</p>
                     {exp.description && (
-                      <p className={cn("text-gray-500 mt-1", layout.contentDensity === 'sparse' ? 'text-[9px]' : 'text-[8px]', layout.contentDensity !== 'sparse' && "line-clamp-3")}>{exp.description}</p>
+                      <p className="text-gray-500 mt-1">{exp.description}</p>
                     )}
                   </div>
                 ))}
@@ -113,17 +119,17 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
           {education.length > 0 && (
             <section className="flex-grow">
               <h2 
-                className={cn("font-bold uppercase tracking-wider mb-2 pb-1 border-b", layout.contentDensity === 'sparse' ? 'text-[11px]' : 'text-[10px]')}
-                style={{ color: accentColor, borderColor: `${accentColor}40` }}
+                className="font-bold uppercase tracking-wider pb-1 border-b"
+                style={{ color: accentColor, borderColor: `${accentColor}40`, fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
               >
                 Formation
               </h2>
-              <div className={cn("space-y-2", layout.contentDensity === 'sparse' && "space-y-3")}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                 {education.map((edu) => (
                   <div key={edu.id}>
-                    <h3 className={cn("font-semibold text-gray-900", layout.contentDensity === 'sparse' ? 'text-[10px]' : 'text-[9px]')}>{edu.degree}</h3>
-                    <p className="text-[8px]" style={{ color: accentColor }}>{edu.institution}</p>
-                    <p className="text-[7px] text-gray-400">{formatDate(edu.endDate)}</p>
+                    <h3 className="font-semibold text-gray-900">{edu.degree}</h3>
+                    <p style={{ color: accentColor, fontSize: '10px' }}>{edu.institution}</p>
+                    <p className="text-gray-400" style={{ fontSize: '9px' }}>{formatDate(edu.endDate)}</p>
                   </div>
                 ))}
               </div>
@@ -132,25 +138,25 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
         </div>
 
         {/* Skills & Languages Column */}
-        <div className={cn("col-span-3 flex flex-col", layout.itemGap)}>
+        <div className="col-span-3 flex flex-col" style={{ gap: layout.sectionMargin }}>
           {/* Skills */}
           {skills.length > 0 && (
             <section className="flex-grow">
               <h2 
-                className={cn("font-bold uppercase tracking-wider mb-2 pb-1 border-b", layout.contentDensity === 'sparse' ? 'text-[11px]' : 'text-[10px]')}
-                style={{ color: accentColor, borderColor: `${accentColor}40` }}
+                className="font-bold uppercase tracking-wider pb-1 border-b"
+                style={{ color: accentColor, borderColor: `${accentColor}40`, fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
               >
                 Skills
               </h2>
-              <div className={cn("space-y-1", layout.contentDensity === 'sparse' && "space-y-2")}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {skills.map((skill) => (
                   <div key={skill.id} className="flex items-center justify-between">
-                    <span className={cn("text-gray-700", layout.contentDensity === 'sparse' ? 'text-[9px]' : 'text-[8px]')}>{skill.name}</span>
+                    <span className="text-gray-700">{skill.name}</span>
                     <div className="flex gap-0.5">
                       {[1, 2, 3, 4].map((dot) => (
                         <div 
                           key={dot}
-                          className={cn("rounded-full", layout.contentDensity === 'sparse' ? 'w-1.5 h-1.5' : 'w-1 h-1')}
+                          className="w-1.5 h-1.5 rounded-full"
                           style={{ 
                             backgroundColor: dot <= (
                               skill.level === 'expert' ? 4 :
@@ -169,16 +175,16 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
 
           {/* Languages */}
           {languages.length > 0 && (
-            <section className={cn(layout.shouldDistribute ? "" : "mt-2")}>
+            <section className="flex-shrink-0">
               <h2 
-                className={cn("font-bold uppercase tracking-wider mb-2 pb-1 border-b", layout.contentDensity === 'sparse' ? 'text-[11px]' : 'text-[10px]')}
-                style={{ color: accentColor, borderColor: `${accentColor}40` }}
+                className="font-bold uppercase tracking-wider pb-1 border-b"
+                style={{ color: accentColor, borderColor: `${accentColor}40`, fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
               >
                 Langues
               </h2>
-              <div className={cn("space-y-1", layout.contentDensity === 'sparse' && "space-y-2")}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {languages.map((lang) => (
-                  <div key={lang.id} className={cn("flex justify-between", layout.contentDensity === 'sparse' ? 'text-[9px]' : 'text-[8px]')}>
+                  <div key={lang.id} className="flex justify-between">
                     <span className="text-gray-700">{lang.name}</span>
                     <span className="text-gray-400">
                       {lang.level === 'native' ? 'C2' : 

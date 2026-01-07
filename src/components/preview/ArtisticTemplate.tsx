@@ -24,12 +24,12 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
       ref={ref}
       className={cn(
         "w-full h-full bg-gradient-to-br from-amber-50 via-white to-rose-50 flex flex-col",
-        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-        layout.fontSize
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans'
       )}
+      style={{ fontSize: layout.bodyFontSize }}
     >
       {/* Artistic diagonal header */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden flex-shrink-0">
         <div 
           className="absolute -top-20 -left-20 w-80 h-80 rounded-full opacity-20"
           style={{ backgroundColor: accentColor }}
@@ -39,30 +39,35 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
           style={{ backgroundColor: accentColor }}
         />
         
-        <header className={cn("relative p-8", layout.contentDensity === 'sparse' ? 'pb-8' : 'pb-6')}>
+        <header className="relative" style={{ padding: layout.contentPadding, paddingBottom: layout.sectionMargin }}>
           <div className="flex items-start gap-6">
             {/* Creative avatar */}
             <div 
-              className={cn(
-                "rounded-2xl rotate-3 shadow-lg flex items-center justify-center text-white",
-                layout.contentDensity === 'sparse' ? 'w-24 h-24' : 'w-20 h-20'
-              )}
+              className="rounded-2xl rotate-3 shadow-lg flex items-center justify-center text-white"
               style={{ 
-                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)` 
+                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+                width: layout.contentDensity === 'sparse' ? '96px' : '80px',
+                height: layout.contentDensity === 'sparse' ? '96px' : '80px'
               }}
             >
-              <Palette className={layout.contentDensity === 'sparse' ? 'w-10 h-10' : 'w-8 h-8'} />
+              <Palette style={{ width: '32px', height: '32px' }} />
             </div>
             
             <div className="flex-1">
-              <h1 className={cn("font-black tracking-tight", layout.headerSize)} style={{ color: accentColor }}>
+              <h1 
+                className="font-black tracking-tight"
+                style={{ color: accentColor, fontSize: layout.headerFontSize }}
+              >
                 {personalInfo.fullName || 'Votre Nom'}
               </h1>
-              <p className={cn("text-gray-600 font-light mt-0.5", layout.titleSize)}>
+              <p 
+                className="text-gray-600 font-light mt-0.5"
+                style={{ fontSize: layout.titleFontSize }}
+              >
                 {personalInfo.jobTitle || 'Titre Créatif'}
               </p>
               
-              <div className={cn("flex flex-wrap gap-3 mt-3 text-gray-500", layout.contentDensity === 'sparse' ? 'text-[10px]' : 'text-[9px]')}>
+              <div className="flex flex-wrap gap-3 mt-3 text-gray-500">
                 {personalInfo.email && (
                   <span className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-full">
                     <Mail className="h-3 w-3" style={{ color: accentColor }} />
@@ -87,10 +92,13 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
         </header>
       </div>
 
-      <div className={cn("px-8 pb-6 flex-grow", layout.shouldDistribute && "flex flex-col justify-between")}>
+      <div 
+        className="flex-grow flex flex-col"
+        style={{ padding: `0 ${layout.contentPadding} ${layout.contentPadding}` }}
+      >
         {/* Summary with artistic styling */}
         {personalInfo.summary && (
-          <section className={cn("relative", layout.shouldDistribute ? "" : "mb-6")}>
+          <section className="flex-shrink-0 relative" style={{ marginBottom: layout.sectionMargin }}>
             <div 
               className="absolute -left-2 top-0 bottom-0 w-1 rounded-full"
               style={{ backgroundColor: accentColor }}
@@ -101,26 +109,28 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
           </section>
         )}
 
-        <div className={cn("grid grid-cols-5", layout.sectionGap, layout.shouldDistribute ? "flex-grow items-start" : "")}>
+        <div className="grid grid-cols-5 flex-grow" style={{ gap: layout.sectionMargin }}>
           {/* Main Column */}
-          <div className={cn("col-span-3 flex flex-col", layout.itemGap)}>
+          <div className="col-span-3 flex flex-col" style={{ gap: layout.sectionMargin }}>
             {/* Experience */}
             {experience.length > 0 && (
               <section className="flex-grow">
                 <h2 
-                  className={cn("font-black mb-4 inline-block pb-1", layout.subtitleSize)}
+                  className="font-black inline-block pb-1"
                   style={{ 
                     color: accentColor,
-                    borderBottom: `3px solid ${accentColor}` 
+                    borderBottom: `3px solid ${accentColor}`,
+                    fontSize: layout.titleFontSize,
+                    marginBottom: layout.itemMargin
                   }}
                 >
                   Parcours
                 </h2>
-                <div className={cn("space-y-5", layout.contentDensity === 'dense' && "space-y-3")}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                   {experience.map((exp) => (
                     <div 
                       key={exp.id} 
-                      className="bg-white/70 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                      className="bg-white/70 p-4 rounded-xl shadow-sm"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div>
@@ -128,8 +138,8 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
                           <p className="font-medium" style={{ color: accentColor }}>{exp.company}</p>
                         </div>
                         <span 
-                          className="text-[8px] px-2 py-1 rounded-full text-white"
-                          style={{ backgroundColor: accentColor }}
+                          className="px-2 py-1 rounded-full text-white whitespace-nowrap"
+                          style={{ backgroundColor: accentColor, fontSize: '10px' }}
                         >
                           {formatDate(exp.startDate)} - {exp.current ? 'Présent' : formatDate(exp.endDate)}
                         </span>
@@ -145,22 +155,24 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
 
             {/* Education */}
             {education.length > 0 && (
-              <section className={cn(layout.shouldDistribute ? "" : "mt-4")}>
+              <section className="flex-shrink-0">
                 <h2 
-                  className={cn("font-black mb-4 inline-block pb-1", layout.subtitleSize)}
+                  className="font-black inline-block pb-1"
                   style={{ 
                     color: accentColor,
-                    borderBottom: `3px solid ${accentColor}` 
+                    borderBottom: `3px solid ${accentColor}`,
+                    fontSize: layout.titleFontSize,
+                    marginBottom: layout.itemMargin
                   }}
                 >
                   Formation
                 </h2>
-                <div className={cn("space-y-3", layout.contentDensity === 'dense' && "space-y-2")}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                   {education.map((edu) => (
                     <div key={edu.id} className="bg-white/70 p-3 rounded-xl">
                       <h3 className="font-bold text-gray-900">{edu.degree}</h3>
                       <p style={{ color: accentColor }}>{edu.institution}</p>
-                      <p className="text-[8px] text-gray-400 mt-1">{formatDate(edu.endDate)}</p>
+                      <p className="text-gray-400 mt-1" style={{ fontSize: '10px' }}>{formatDate(edu.endDate)}</p>
                     </div>
                   ))}
                 </div>
@@ -169,21 +181,24 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
           </div>
 
           {/* Sidebar */}
-          <div className={cn("col-span-2 flex flex-col", layout.itemGap)}>
+          <div className="col-span-2 flex flex-col" style={{ gap: layout.sectionMargin }}>
             {/* Skills */}
             {skills.length > 0 && (
               <section 
-                className={cn("p-4 rounded-2xl flex-grow", layout.contentDensity === 'sparse' && "p-5")}
-                style={{ backgroundColor: `${accentColor}10` }}
+                className="flex-grow rounded-2xl"
+                style={{ backgroundColor: `${accentColor}10`, padding: layout.itemMargin }}
               >
-                <h2 className={cn("font-black mb-3", layout.subtitleSize)} style={{ color: accentColor }}>
+                <h2 
+                  className="font-black"
+                  style={{ color: accentColor, fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+                >
                   ✦ Compétences
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {skills.map((skill) => (
                     <span 
                       key={skill.id}
-                      className={cn("px-3 py-1.5 rounded-full text-white font-medium", layout.contentDensity === 'sparse' ? 'text-[10px]' : 'text-[9px]')}
+                      className="px-3 py-1.5 rounded-full text-white font-medium"
                       style={{ backgroundColor: accentColor }}
                     >
                       {skill.name}
@@ -196,13 +211,16 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
             {/* Languages */}
             {languages.length > 0 && (
               <section 
-                className={cn("p-4 rounded-2xl", layout.contentDensity === 'sparse' && "p-5")}
-                style={{ backgroundColor: `${accentColor}10` }}
+                className="flex-shrink-0 rounded-2xl"
+                style={{ backgroundColor: `${accentColor}10`, padding: layout.itemMargin }}
               >
-                <h2 className={cn("font-black mb-3", layout.subtitleSize)} style={{ color: accentColor }}>
+                <h2 
+                  className="font-black"
+                  style={{ color: accentColor, fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+                >
                   ✦ Langues
                 </h2>
-                <div className={cn("space-y-2", layout.contentDensity === 'sparse' && "space-y-3")}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                   {languages.map((lang) => (
                     <div key={lang.id} className="flex items-center gap-2">
                       <div className="flex gap-0.5">
