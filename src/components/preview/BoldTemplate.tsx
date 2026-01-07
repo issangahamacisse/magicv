@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
 interface TemplateProps {
   data: CVData;
@@ -23,79 +24,95 @@ const skillLevelWidth: Record<string, string> = {
 const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
-
-  const spacingClass = {
-    compact: 'text-[9px] leading-tight',
-    normal: 'text-[10px] leading-normal',
-    spacious: 'text-[11px] leading-relaxed',
-  }[theme.spacing];
+  const layout = useAdaptiveLayout(data);
 
   return (
     <div 
       ref={ref}
       className={cn(
         "w-full h-full flex bg-white",
-        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-        spacingClass
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans'
       )}
+      style={{ fontSize: layout.bodyFontSize }}
     >
       {/* Bold Sidebar */}
       <aside 
-        className="w-[35%] p-6 text-white"
-        style={{ backgroundColor: accentColor }}
+        className="w-[35%] text-white flex flex-col"
+        style={{ backgroundColor: accentColor, padding: layout.contentPadding }}
       >
         {/* Avatar placeholder */}
-        <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white/20 flex items-center justify-center">
-          <span className="text-3xl font-bold text-white/80">
+        <div 
+          className="mx-auto rounded-full bg-white/20 flex items-center justify-center flex-shrink-0"
+          style={{ 
+            width: layout.contentDensity === 'sparse' ? '100px' : '80px',
+            height: layout.contentDensity === 'sparse' ? '100px' : '80px',
+            marginBottom: layout.sectionMargin
+          }}
+        >
+          <span 
+            className="font-bold text-white/80"
+            style={{ fontSize: layout.headerFontSize }}
+          >
             {personalInfo.fullName?.charAt(0) || 'N'}
           </span>
         </div>
 
-        <h1 className="text-xl font-black text-center mb-1 tracking-tight">
+        <h1 
+          className="font-black text-center tracking-tight"
+          style={{ fontSize: layout.headerFontSize, marginBottom: '4px' }}
+        >
           {personalInfo.fullName || 'Votre Nom'}
         </h1>
-        <p className="text-white/80 text-center text-sm mb-6 font-light">
+        <p 
+          className="text-white/80 text-center font-light"
+          style={{ fontSize: layout.titleFontSize, marginBottom: layout.sectionMargin }}
+        >
           {personalInfo.jobTitle || 'Titre'}
         </p>
 
         {/* Contact */}
-        <div className="space-y-2 mb-8">
-          {personalInfo.email && (
-            <div className="flex items-center gap-2 text-white/90 text-[9px]">
-              <Mail className="h-3 w-3" />
-              <span className="truncate">{personalInfo.email}</span>
-            </div>
-          )}
-          {personalInfo.phone && (
-            <div className="flex items-center gap-2 text-white/90 text-[9px]">
-              <Phone className="h-3 w-3" />
-              <span>{personalInfo.phone}</span>
-            </div>
-          )}
-          {personalInfo.location && (
-            <div className="flex items-center gap-2 text-white/90 text-[9px]">
-              <MapPin className="h-3 w-3" />
-              <span>{personalInfo.location}</span>
-            </div>
-          )}
-          {personalInfo.linkedin && (
-            <div className="flex items-center gap-2 text-white/90 text-[9px]">
-              <Linkedin className="h-3 w-3" />
-              <span className="truncate">{personalInfo.linkedin}</span>
-            </div>
-          )}
+        <div className="flex-shrink-0" style={{ marginBottom: layout.sectionMargin }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {personalInfo.email && (
+              <div className="flex items-center gap-2 text-white/90">
+                <Mail className="h-3 w-3" />
+                <span className="truncate">{personalInfo.email}</span>
+              </div>
+            )}
+            {personalInfo.phone && (
+              <div className="flex items-center gap-2 text-white/90">
+                <Phone className="h-3 w-3" />
+                <span>{personalInfo.phone}</span>
+              </div>
+            )}
+            {personalInfo.location && (
+              <div className="flex items-center gap-2 text-white/90">
+                <MapPin className="h-3 w-3" />
+                <span>{personalInfo.location}</span>
+              </div>
+            )}
+            {personalInfo.linkedin && (
+              <div className="flex items-center gap-2 text-white/90">
+                <Linkedin className="h-3 w-3" />
+                <span className="truncate">{personalInfo.linkedin}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Skills */}
         {skills.length > 0 && (
-          <section className="mb-6">
-            <h2 className="text-[11px] font-black uppercase tracking-widest mb-3 pb-1 border-b border-white/30">
+          <section className="flex-grow" style={{ marginBottom: layout.sectionMargin }}>
+            <h2 
+              className="font-black uppercase tracking-widest pb-1 border-b border-white/30"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
               Compétences
             </h2>
-            <div className="space-y-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
               {skills.map((skill) => (
                 <div key={skill.id}>
-                  <div className="flex justify-between text-[9px] mb-1">
+                  <div className="flex justify-between mb-1">
                     <span>{skill.name}</span>
                   </div>
                   <div className="h-1 bg-white/20 rounded-full overflow-hidden">
@@ -112,13 +129,16 @@ const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Languages */}
         {languages.length > 0 && (
-          <section>
-            <h2 className="text-[11px] font-black uppercase tracking-widest mb-3 pb-1 border-b border-white/30">
+          <section className="mt-auto flex-shrink-0">
+            <h2 
+              className="font-black uppercase tracking-widest pb-1 border-b border-white/30"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
               Langues
             </h2>
-            <div className="space-y-1.5">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {languages.map((lang) => (
-                <div key={lang.id} className="flex justify-between text-[9px]">
+                <div key={lang.id} className="flex justify-between">
                   <span>{lang.name}</span>
                   <span className="text-white/70 capitalize">
                     {lang.level === 'native' ? 'Natif' : 
@@ -134,10 +154,16 @@ const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6">
+      <main 
+        className="flex-1 flex flex-col"
+        style={{ padding: layout.contentPadding }}
+      >
         {/* Summary */}
         {personalInfo.summary && (
-          <section className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <section 
+            className="flex-shrink-0 p-4 bg-gray-50 rounded-lg"
+            style={{ marginBottom: layout.sectionMargin }}
+          >
             <p className="text-gray-600 leading-relaxed">
               {personalInfo.summary}
             </p>
@@ -146,15 +172,15 @@ const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Experience */}
         {experience.length > 0 && (
-          <section className="mb-6">
+          <section className="flex-grow" style={{ marginBottom: layout.sectionMargin }}>
             <h2 
-              className="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2"
-              style={{ color: accentColor }}
+              className="font-black uppercase tracking-widest flex items-center gap-2"
+              style={{ color: accentColor, fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
             >
               <div className="w-8 h-1 rounded-full" style={{ backgroundColor: accentColor }} />
               Expérience
             </h2>
-            <div className="space-y-5">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
               {experience.map((exp) => (
                 <div key={exp.id}>
                   <div className="flex justify-between items-start mb-1">
@@ -162,10 +188,14 @@ const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
                       <h3 className="font-bold text-gray-900">{exp.position}</h3>
                       <p className="font-medium" style={{ color: accentColor }}>{exp.company}</p>
                     </div>
-                    <span className="text-[8px] font-medium px-2 py-1 rounded" style={{ 
-                      backgroundColor: `${accentColor}15`,
-                      color: accentColor 
-                    }}>
+                    <span 
+                      className="font-medium px-2 py-1 rounded whitespace-nowrap"
+                      style={{ 
+                        backgroundColor: `${accentColor}15`,
+                        color: accentColor,
+                        fontSize: '10px'
+                      }}
+                    >
                       {formatDate(exp.startDate)} - {exp.current ? 'Présent' : formatDate(exp.endDate)}
                     </span>
                   </div>
@@ -180,15 +210,15 @@ const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Education */}
         {education.length > 0 && (
-          <section>
+          <section className="mt-auto flex-shrink-0">
             <h2 
-              className="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2"
-              style={{ color: accentColor }}
+              className="font-black uppercase tracking-widest flex items-center gap-2"
+              style={{ color: accentColor, fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
             >
               <div className="w-8 h-1 rounded-full" style={{ backgroundColor: accentColor }} />
               Formation
             </h2>
-            <div className="space-y-4">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
               {education.map((edu) => (
                 <div key={edu.id}>
                   <div className="flex justify-between items-start">
@@ -196,7 +226,7 @@ const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
                       <h3 className="font-bold text-gray-900">{edu.degree}</h3>
                       <p className="text-gray-500">{edu.institution}</p>
                     </div>
-                    <span className="text-[8px] text-gray-400">
+                    <span className="text-gray-400" style={{ fontSize: '10px' }}>
                       {formatDate(edu.endDate)}
                     </span>
                   </div>

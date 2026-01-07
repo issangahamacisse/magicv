@@ -31,69 +31,83 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
       ref={ref}
       className={cn(
         "w-full h-full bg-slate-900 text-slate-100 flex",
-        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-        layout.fontSize
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans'
       )}
+      style={{ fontSize: layout.bodyFontSize }}
     >
       {/* Sidebar - Dark tech style */}
-      <aside className={cn("w-[32%] p-5 bg-slate-950 border-r border-slate-800 flex flex-col", layout.shouldDistribute && "justify-between")}>
+      <aside 
+        className="w-[32%] bg-slate-950 border-r border-slate-800 flex flex-col"
+        style={{ padding: layout.contentPadding }}
+      >
         {/* Terminal-style header */}
-        <div className={cn(layout.shouldDistribute ? "" : "mb-6", "pb-4 border-b border-slate-800")}>
+        <div 
+          className="flex-shrink-0 pb-4 border-b border-slate-800"
+          style={{ marginBottom: layout.sectionMargin }}
+        >
           <div className="flex items-center gap-1.5 mb-3">
             <div className="w-2 h-2 rounded-full bg-red-500" />
             <div className="w-2 h-2 rounded-full bg-yellow-500" />
             <div className="w-2 h-2 rounded-full bg-green-500" />
           </div>
-          <div className="font-mono text-[10px] text-slate-500">
+          <div className="font-mono text-slate-500" style={{ fontSize: '12px' }}>
             <span style={{ color: accentColor }}>$</span> whoami
           </div>
-          <h1 className={cn("font-bold mt-1 font-mono", layout.contentDensity === 'sparse' ? 'text-xl' : 'text-lg')}>
+          <h1 
+            className="font-bold mt-1 font-mono"
+            style={{ fontSize: layout.headerFontSize }}
+          >
             {personalInfo.fullName || 'username'}
           </h1>
-          <p className={cn("mt-1 font-mono", layout.subtitleSize)} style={{ color: accentColor }}>
+          <p 
+            className="mt-1 font-mono"
+            style={{ color: accentColor, fontSize: layout.titleFontSize }}
+          >
             {personalInfo.jobTitle || 'Developer'}
           </p>
         </div>
 
         {/* Contact */}
-        <div className={cn("space-y-2 text-[9px]", layout.shouldDistribute ? "my-auto" : "mb-6")}>
-          {personalInfo.email && (
-            <div className="flex items-center gap-2 text-slate-400">
-              <Mail className="h-3 w-3" style={{ color: accentColor }} />
-              <span className="font-mono truncate">{personalInfo.email}</span>
-            </div>
-          )}
-          {personalInfo.phone && (
-            <div className="flex items-center gap-2 text-slate-400">
-              <Phone className="h-3 w-3" style={{ color: accentColor }} />
-              <span className="font-mono">{personalInfo.phone}</span>
-            </div>
-          )}
-          {personalInfo.location && (
-            <div className="flex items-center gap-2 text-slate-400">
-              <MapPin className="h-3 w-3" style={{ color: accentColor }} />
-              <span className="font-mono">{personalInfo.location}</span>
-            </div>
-          )}
-          {personalInfo.linkedin && (
-            <div className="flex items-center gap-2 text-slate-400">
-              <Linkedin className="h-3 w-3" style={{ color: accentColor }} />
-              <span className="font-mono truncate">{personalInfo.linkedin}</span>
-            </div>
-          )}
+        <div className="flex-shrink-0" style={{ marginBottom: layout.sectionMargin }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {personalInfo.email && (
+              <div className="flex items-center gap-2 text-slate-400">
+                <Mail className="h-3 w-3" style={{ color: accentColor }} />
+                <span className="font-mono truncate">{personalInfo.email}</span>
+              </div>
+            )}
+            {personalInfo.phone && (
+              <div className="flex items-center gap-2 text-slate-400">
+                <Phone className="h-3 w-3" style={{ color: accentColor }} />
+                <span className="font-mono">{personalInfo.phone}</span>
+              </div>
+            )}
+            {personalInfo.location && (
+              <div className="flex items-center gap-2 text-slate-400">
+                <MapPin className="h-3 w-3" style={{ color: accentColor }} />
+                <span className="font-mono">{personalInfo.location}</span>
+              </div>
+            )}
+            {personalInfo.linkedin && (
+              <div className="flex items-center gap-2 text-slate-400">
+                <Linkedin className="h-3 w-3" style={{ color: accentColor }} />
+                <span className="font-mono truncate">{personalInfo.linkedin}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Skills as code blocks */}
         {skills.length > 0 && (
-          <section className={cn(layout.shouldDistribute ? "my-auto" : "mb-6")}>
-            <div className="flex items-center gap-2 mb-3">
+          <section className="flex-grow" style={{ marginBottom: layout.sectionMargin }}>
+            <div className="flex items-center gap-2" style={{ marginBottom: layout.itemMargin }}>
               <Code className="h-3 w-3" style={{ color: accentColor }} />
-              <h2 className="text-[10px] font-mono font-bold uppercase tracking-wider">skills.tech</h2>
+              <h2 className="font-mono font-bold uppercase tracking-wider" style={{ fontSize: layout.titleFontSize }}>skills.tech</h2>
             </div>
-            <div className={cn("space-y-2", layout.contentDensity === 'sparse' && "space-y-3")}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
               {skills.map((skill) => (
                 <div key={skill.id} className="bg-slate-900/50 p-2 rounded border border-slate-800">
-                  <div className="flex justify-between items-center text-[9px] mb-1.5">
+                  <div className="flex justify-between items-center mb-1.5">
                     <span className="font-mono">{skill.name}</span>
                   </div>
                   <div className="flex gap-0.5">
@@ -117,14 +131,14 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Languages */}
         {languages.length > 0 && (
-          <section className={layout.shouldDistribute ? "mt-auto" : ""}>
-            <div className="flex items-center gap-2 mb-3">
+          <section className="mt-auto flex-shrink-0">
+            <div className="flex items-center gap-2" style={{ marginBottom: layout.itemMargin }}>
               <Terminal className="h-3 w-3" style={{ color: accentColor }} />
-              <h2 className="text-[10px] font-mono font-bold uppercase tracking-wider">languages</h2>
+              <h2 className="font-mono font-bold uppercase tracking-wider" style={{ fontSize: layout.titleFontSize }}>languages</h2>
             </div>
-            <div className={cn("space-y-1", layout.contentDensity === 'sparse' && "space-y-2")}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {languages.map((lang) => (
-                <div key={lang.id} className="text-[9px] font-mono text-slate-400">
+                <div key={lang.id} className="font-mono text-slate-400">
                   <span style={{ color: accentColor }}>&gt;</span> {lang.name}
                   <span className="text-slate-600"> // {lang.level}</span>
                 </div>
@@ -135,11 +149,17 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
       </aside>
 
       {/* Main Content */}
-      <main className={cn("flex-1 p-6 overflow-auto flex flex-col", layout.shouldDistribute && "justify-between")}>
+      <main 
+        className="flex-1 overflow-auto flex flex-col"
+        style={{ padding: layout.contentPadding }}
+      >
         {/* Summary */}
         {personalInfo.summary && (
-          <section className={cn("p-4 bg-slate-800/50 rounded-lg border border-slate-700", layout.shouldDistribute ? "" : "mb-6")}>
-            <p className="text-slate-300 leading-relaxed font-mono text-[10px]">
+          <section 
+            className="flex-shrink-0 p-4 bg-slate-800/50 rounded-lg border border-slate-700"
+            style={{ marginBottom: layout.sectionMargin }}
+          >
+            <p className="text-slate-300 leading-relaxed font-mono">
               <span style={{ color: accentColor }}>/**</span><br />
               <span className="text-slate-400">* </span>{personalInfo.summary}<br />
               <span style={{ color: accentColor }}>*/</span>
@@ -149,22 +169,25 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Experience */}
         {experience.length > 0 && (
-          <section className={cn(layout.shouldDistribute ? "flex-grow py-4" : "mb-6")}>
-            <div className="flex items-center gap-2 mb-4">
+          <section className="flex-grow" style={{ marginBottom: layout.sectionMargin }}>
+            <div className="flex items-center gap-2" style={{ marginBottom: layout.itemMargin }}>
               <Database className="h-4 w-4" style={{ color: accentColor }} />
-              <h2 className={cn("font-mono font-bold", layout.subtitleSize)}>experience.log</h2>
+              <h2 className="font-mono font-bold" style={{ fontSize: layout.titleFontSize }}>experience.log</h2>
             </div>
-            <div className={cn("space-y-5", layout.contentDensity === 'dense' && "space-y-3")}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
               {experience.map((exp) => (
                 <div key={exp.id} className="relative pl-4 border-l-2" style={{ borderColor: accentColor }}>
                   <div className="flex justify-between items-start mb-1">
                     <div>
                       <h3 className="font-bold text-slate-100">{exp.position}</h3>
-                      <p className="font-mono text-[9px]" style={{ color: accentColor }}>
+                      <p className="font-mono" style={{ color: accentColor, fontSize: '11px' }}>
                         @ {exp.company}
                       </p>
                     </div>
-                    <span className="font-mono text-[8px] px-2 py-1 bg-slate-800 rounded text-slate-400">
+                    <span 
+                      className="font-mono px-2 py-1 bg-slate-800 rounded text-slate-400 whitespace-nowrap"
+                      style={{ fontSize: '10px' }}
+                    >
                       {formatDate(exp.startDate)} → {exp.current ? 'now' : formatDate(exp.endDate)}
                     </span>
                   </div>
@@ -179,18 +202,21 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Education */}
         {education.length > 0 && (
-          <section className={layout.shouldDistribute ? "mt-auto" : ""}>
-            <h2 className={cn("font-mono font-bold mb-4 flex items-center gap-2", layout.subtitleSize)}>
+          <section className="mt-auto flex-shrink-0">
+            <h2 
+              className="font-mono font-bold flex items-center gap-2"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
               <span style={{ color: accentColor }}>#</span> education
             </h2>
-            <div className={cn("grid grid-cols-2", layout.itemGap)}>
+            <div className="grid grid-cols-2" style={{ gap: layout.itemMargin }}>
               {education.map((edu) => (
                 <div key={edu.id} className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                  <h3 className="font-medium text-slate-100 text-[10px]">{edu.degree}</h3>
-                  <p className="font-mono text-[9px]" style={{ color: accentColor }}>
+                  <h3 className="font-medium text-slate-100">{edu.degree}</h3>
+                  <p className="font-mono" style={{ color: accentColor, fontSize: '11px' }}>
                     {edu.institution}
                   </p>
-                  <p className="font-mono text-[8px] text-slate-500 mt-1">
+                  <p className="font-mono text-slate-500 mt-1" style={{ fontSize: '10px' }}>
                     {formatDate(edu.endDate)}
                   </p>
                 </div>

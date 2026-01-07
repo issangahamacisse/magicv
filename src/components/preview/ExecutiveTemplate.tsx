@@ -22,22 +22,33 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
     <div 
       ref={ref}
       className={cn(
-        "w-full h-full bg-white text-gray-800 p-8",
-        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-        layout.fontSize,
-        layout.containerClass
+        "w-full h-full bg-white text-gray-800 flex flex-col",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans'
       )}
+      style={{ 
+        padding: layout.contentPadding,
+        fontSize: layout.bodyFontSize
+      }}
     >
       {/* Executive Header - Luxe style */}
-      <header className={cn("text-center border-b-2 border-gray-200", layout.shouldDistribute ? "pb-8 mb-auto" : "pb-6 mb-8")}>
-        <h1 className={cn("font-light tracking-[0.2em] uppercase mb-2", layout.headerSize)} style={{ color: accentColor }}>
+      <header 
+        className="flex-shrink-0 text-center border-b-2 border-gray-200"
+        style={{ paddingBottom: layout.sectionMargin, marginBottom: layout.sectionMargin }}
+      >
+        <h1 
+          className="font-light tracking-[0.2em] uppercase"
+          style={{ color: accentColor, fontSize: layout.headerFontSize, marginBottom: '8px' }}
+        >
           {personalInfo.fullName || 'Votre Nom'}
         </h1>
-        <p className={cn("font-light tracking-[0.15em] uppercase text-gray-500 mb-4", layout.titleSize)}>
+        <p 
+          className="font-light tracking-[0.15em] uppercase text-gray-500"
+          style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+        >
           {personalInfo.jobTitle || 'Titre Professionnel'}
         </p>
         
-        <div className={cn("flex items-center justify-center gap-6 text-gray-500", layout.contentDensity === 'sparse' ? 'text-[10px]' : 'text-[9px]')}>
+        <div className="flex items-center justify-center gap-6 text-gray-500">
           {personalInfo.email && <span>{personalInfo.email}</span>}
           {personalInfo.phone && (
             <>
@@ -56,7 +67,10 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
 
       {/* Summary with elegant styling */}
       {personalInfo.summary && (
-        <section className={cn("text-center max-w-2xl mx-auto", layout.shouldDistribute ? "my-auto" : "mb-8")}>
+        <section 
+          className="flex-shrink-0 text-center max-w-2xl mx-auto"
+          style={{ marginBottom: layout.sectionMargin }}
+        >
           <p className="text-gray-600 leading-relaxed font-light italic">
             {personalInfo.summary}
           </p>
@@ -64,29 +78,35 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
       )}
 
       {/* Two column layout */}
-      <div className={cn("grid grid-cols-3", layout.sectionGap, layout.shouldDistribute ? "flex-grow" : "")}>
+      <div className="grid grid-cols-3 flex-grow" style={{ gap: layout.sectionMargin }}>
         {/* Main Column */}
-        <div className={cn("col-span-2 flex flex-col", layout.itemGap)}>
+        <div className="col-span-2 flex flex-col" style={{ gap: layout.sectionMargin }}>
           {/* Experience */}
           {experience.length > 0 && (
             <section className="flex-grow">
               <h2 
-                className={cn("font-light uppercase tracking-[0.25em] mb-5 pb-2", layout.subtitleSize)}
-                style={{ color: accentColor, borderBottom: `1px solid ${accentColor}` }}
+                className="font-light uppercase tracking-[0.25em]"
+                style={{ 
+                  color: accentColor, 
+                  borderBottom: `1px solid ${accentColor}`,
+                  fontSize: layout.titleFontSize,
+                  paddingBottom: '8px',
+                  marginBottom: layout.itemMargin
+                }}
               >
                 Expérience Professionnelle
               </h2>
-              <div className={cn("space-y-6", layout.contentDensity === 'dense' && "space-y-4")}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                 {experience.map((exp) => (
                   <div key={exp.id}>
                     <div className="mb-2">
                       <div className="flex justify-between items-baseline">
                         <h3 className="font-medium text-gray-900">{exp.position}</h3>
-                        <span className="text-[8px] text-gray-400 italic">
+                        <span className="text-gray-400 italic" style={{ fontSize: '10px' }}>
                           {formatDate(exp.startDate)} — {exp.current ? 'Présent' : formatDate(exp.endDate)}
                         </span>
                       </div>
-                      <p className="text-[9px] uppercase tracking-wider" style={{ color: accentColor }}>
+                      <p className="uppercase tracking-wider" style={{ color: accentColor, fontSize: '11px' }}>
                         {exp.company}
                       </p>
                     </div>
@@ -101,23 +121,29 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
 
           {/* Education */}
           {education.length > 0 && (
-            <section className={cn(layout.shouldDistribute ? "" : "mt-4")}>
+            <section className="flex-shrink-0">
               <h2 
-                className={cn("font-light uppercase tracking-[0.25em] mb-5 pb-2", layout.subtitleSize)}
-                style={{ color: accentColor, borderBottom: `1px solid ${accentColor}` }}
+                className="font-light uppercase tracking-[0.25em]"
+                style={{ 
+                  color: accentColor, 
+                  borderBottom: `1px solid ${accentColor}`,
+                  fontSize: layout.titleFontSize,
+                  paddingBottom: '8px',
+                  marginBottom: layout.itemMargin
+                }}
               >
                 Formation
               </h2>
-              <div className={cn("space-y-4", layout.contentDensity === 'dense' && "space-y-3")}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                 {education.map((edu) => (
                   <div key={edu.id}>
                     <div className="flex justify-between items-baseline">
                       <h3 className="font-medium text-gray-900">{edu.degree}</h3>
-                      <span className="text-[8px] text-gray-400 italic">
+                      <span className="text-gray-400 italic" style={{ fontSize: '10px' }}>
                         {formatDate(edu.endDate)}
                       </span>
                     </div>
-                    <p className="text-[9px] uppercase tracking-wider" style={{ color: accentColor }}>
+                    <p className="uppercase tracking-wider" style={{ color: accentColor, fontSize: '11px' }}>
                       {edu.institution}
                     </p>
                   </div>
@@ -128,17 +154,23 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
         </div>
 
         {/* Sidebar */}
-        <div className={cn("border-l border-gray-200 pl-6 flex flex-col", layout.itemGap)}>
+        <div className="border-l border-gray-200 flex flex-col" style={{ paddingLeft: layout.itemMargin, gap: layout.sectionMargin }}>
           {/* Skills */}
           {skills.length > 0 && (
             <section className="flex-grow">
               <h2 
-                className={cn("font-light uppercase tracking-[0.25em] mb-4 pb-2", layout.subtitleSize)}
-                style={{ color: accentColor, borderBottom: `1px solid ${accentColor}` }}
+                className="font-light uppercase tracking-[0.25em]"
+                style={{ 
+                  color: accentColor, 
+                  borderBottom: `1px solid ${accentColor}`,
+                  fontSize: layout.titleFontSize,
+                  paddingBottom: '8px',
+                  marginBottom: layout.itemMargin
+                }}
               >
                 Expertise
               </h2>
-              <div className={cn("space-y-2", layout.contentDensity === 'sparse' && "space-y-3")}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                 {skills.map((skill) => (
                   <div key={skill.id} className="flex items-center gap-2">
                     <div 
@@ -154,18 +186,24 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
 
           {/* Languages */}
           {languages.length > 0 && (
-            <section className={cn(layout.shouldDistribute ? "" : "mt-4")}>
+            <section className="flex-shrink-0">
               <h2 
-                className={cn("font-light uppercase tracking-[0.25em] mb-4 pb-2", layout.subtitleSize)}
-                style={{ color: accentColor, borderBottom: `1px solid ${accentColor}` }}
+                className="font-light uppercase tracking-[0.25em]"
+                style={{ 
+                  color: accentColor, 
+                  borderBottom: `1px solid ${accentColor}`,
+                  fontSize: layout.titleFontSize,
+                  paddingBottom: '8px',
+                  marginBottom: layout.itemMargin
+                }}
               >
                 Langues
               </h2>
-              <div className={cn("space-y-2", layout.contentDensity === 'sparse' && "space-y-3")}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
                 {languages.map((lang) => (
                   <div key={lang.id}>
                     <span className="text-gray-700">{lang.name}</span>
-                    <span className="text-gray-400 text-[9px] ml-2 capitalize">
+                    <span className="text-gray-400 ml-2 capitalize" style={{ fontSize: '11px' }}>
                       ({lang.level === 'native' ? 'Natif' : 
                         lang.level === 'fluent' ? 'Bilingue' :
                         lang.level === 'professional' ? 'Professionnel' :

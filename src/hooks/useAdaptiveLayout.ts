@@ -4,14 +4,17 @@ import { CVData } from '@/types/cv';
 export interface AdaptiveLayoutResult {
   contentDensity: 'sparse' | 'normal' | 'dense';
   densityScore: number;
-  headerSize: string;
-  sectionGap: string;
-  itemGap: string;
-  fontSize: string;
-  titleSize: string;
-  subtitleSize: string;
-  shouldDistribute: boolean;
-  containerClass: string;
+  
+  // Dynamic pixel-based values for intelligent filling
+  headerFontSize: string;
+  titleFontSize: string;
+  bodyFontSize: string;
+  sectionMargin: string;
+  itemMargin: string;
+  contentPadding: string;
+  
+  // Expansion factor for spacing multiplier
+  expansionFactor: number;
 }
 
 function calculateDensity(data: CVData): number {
@@ -62,63 +65,80 @@ export function useAdaptiveLayout(data: CVData): AdaptiveLayoutResult {
   return useMemo(() => {
     const densityScore = calculateDensity(data);
     
-    // Sparse: < 25, Normal: 25-55, Dense: > 55
+    // Content density classification
     let contentDensity: 'sparse' | 'normal' | 'dense';
-    let headerSize: string;
-    let sectionGap: string;
-    let itemGap: string;
-    let fontSize: string;
-    let titleSize: string;
-    let subtitleSize: string;
-    let shouldDistribute: boolean;
-    
     if (densityScore < 25) {
-      // Très peu de contenu - agrandir tout et distribuer
       contentDensity = 'sparse';
-      headerSize = 'text-4xl';
-      titleSize = 'text-lg';
-      subtitleSize = 'text-base';
-      sectionGap = 'gap-8';
-      itemGap = 'gap-6';
-      fontSize = 'text-[12px]';
-      shouldDistribute = true;
     } else if (densityScore < 55) {
-      // Contenu normal
       contentDensity = 'normal';
-      headerSize = 'text-3xl';
-      titleSize = 'text-base';
-      subtitleSize = 'text-sm';
-      sectionGap = 'gap-6';
-      itemGap = 'gap-4';
-      fontSize = 'text-[11px]';
-      shouldDistribute = densityScore < 40;
     } else {
-      // Beaucoup de contenu - compacter
       contentDensity = 'dense';
-      headerSize = 'text-2xl';
-      titleSize = 'text-sm';
-      subtitleSize = 'text-xs';
-      sectionGap = 'gap-4';
-      itemGap = 'gap-3';
-      fontSize = 'text-[10px]';
-      shouldDistribute = false;
     }
     
-    const containerClass = shouldDistribute 
-      ? 'flex flex-col justify-between h-full' 
-      : 'flex flex-col h-full';
+    // Expansion factor: inversely proportional to content
+    // Less content = more expansion to fill the page
+    const expansionFactor = Math.max(1, 2.5 - (densityScore / 40));
+    
+    // Dynamic sizing based on density
+    let headerFontSize: string;
+    let titleFontSize: string;
+    let bodyFontSize: string;
+    let sectionMargin: string;
+    let itemMargin: string;
+    let contentPadding: string;
+    
+    if (densityScore < 20) {
+      // Very sparse - maximize everything
+      headerFontSize = '36px';
+      titleFontSize = '16px';
+      bodyFontSize = '13px';
+      sectionMargin = `${Math.round(48 * expansionFactor)}px`;
+      itemMargin = `${Math.round(24 * expansionFactor)}px`;
+      contentPadding = `${Math.round(40 * expansionFactor)}px`;
+    } else if (densityScore < 35) {
+      // Sparse - enlarge moderately
+      headerFontSize = '32px';
+      titleFontSize = '14px';
+      bodyFontSize = '12px';
+      sectionMargin = `${Math.round(36 * expansionFactor)}px`;
+      itemMargin = `${Math.round(20 * expansionFactor)}px`;
+      contentPadding = `${Math.round(36 * expansionFactor)}px`;
+    } else if (densityScore < 55) {
+      // Normal
+      headerFontSize = '28px';
+      titleFontSize = '13px';
+      bodyFontSize = '11px';
+      sectionMargin = '28px';
+      itemMargin = '18px';
+      contentPadding = '32px';
+    } else if (densityScore < 75) {
+      // Dense
+      headerFontSize = '24px';
+      titleFontSize = '12px';
+      bodyFontSize = '10px';
+      sectionMargin = '20px';
+      itemMargin = '14px';
+      contentPadding = '24px';
+    } else {
+      // Very dense - compact everything
+      headerFontSize = '22px';
+      titleFontSize = '11px';
+      bodyFontSize = '9px';
+      sectionMargin = '16px';
+      itemMargin = '10px';
+      contentPadding = '20px';
+    }
     
     return {
       contentDensity,
       densityScore,
-      headerSize,
-      sectionGap,
-      itemGap,
-      fontSize,
-      titleSize,
-      subtitleSize,
-      shouldDistribute,
-      containerClass,
+      headerFontSize,
+      titleFontSize,
+      bodyFontSize,
+      sectionMargin,
+      itemMargin,
+      contentPadding,
+      expansionFactor,
     };
   }, [data]);
 }
