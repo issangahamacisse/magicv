@@ -1,15 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCV } from '@/context/CVContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Plus, Trash2, GripVertical, GraduationCap } from 'lucide-react';
+import { Plus, Trash2, GripVertical, GraduationCap, Sparkles, Loader2 } from 'lucide-react';
+import { useAIRewrite } from '@/hooks/useAIRewrite';
+import AIRewriteModal from './AIRewriteModal';
 
 const EducationForm: React.FC = () => {
   const { cvData, addEducation, updateEducation, removeEducation } = useCV();
   const { education } = cvData;
+  const { rewrite, isLoading } = useAIRewrite();
+  
+  const [modalOpen, setModalOpen] = useState(false);
+  const [rewrittenText, setRewrittenText] = useState('');
+  const [activeEduId, setActiveEduId] = useState<string | null>(null);
+  const [originalText, setOriginalText] = useState('');
+
+  const handleAIImprove = async (eduId: string, description: string) => {
+    if (!description.trim()) return;
+    
+    setActiveEduId(eduId);
+    setOriginalText(description);
+    
+    const result = await rewrite(description, 'education');
+    if (result) {
+      setRewrittenText(result);
+      setModalOpen(true);
+    }
+  };
+
+  const handleAccept = () => {
+    if (activeEduId) {
+      updateEducation(activeEduId, 'description', rewrittenText);
+    }
+    setModalOpen(false);
+    setRewrittenText('');
+    setActiveEduId(null);
+    setOriginalText('');
+  };
+
+  const handleRegenerate = async () => {
+    if (!originalText) return;
+    const result = await rewrite(originalText, 'education');
+    if (result) {
+      setRewrittenText(result);
+    }
+  };
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -95,7 +134,23 @@ const EducationForm: React.FC = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm">Description (optionnel)</Label>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm">Description (optionnel)</Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs text-primary hover:text-primary/80 ai-shimmer"
+                        onClick={() => handleAIImprove(edu.id, edu.description)}
+                        disabled={isLoading || !edu.description.trim()}
+                      >
+                        {isLoading && activeEduId === edu.id ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-3 w-3 mr-1" />
+                        )}
+                        Améliorer avec l'IA
+                      </Button>
+                    </div>
                     <Textarea
                       placeholder="Mention Très Bien, Spécialisation en IA..."
                       value={edu.description}
@@ -116,6 +171,16 @@ const EducationForm: React.FC = () => {
           Ajouter une formation
         </Button>
       )}
+
+      <AIRewriteModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        originalText={originalText}
+        rewrittenText={rewrittenText}
+        onAccept={handleAccept}
+        onRegenerate={handleRegenerate}
+        isRegenerating={isLoading}
+      />
     </div>
   );
 };

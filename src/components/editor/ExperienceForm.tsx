@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCV } from '@/context/CVContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -6,11 +6,50 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
-import { Plus, Trash2, GripVertical, Building2, Sparkles } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Building2, Sparkles, Loader2 } from 'lucide-react';
+import { useAIRewrite } from '@/hooks/useAIRewrite';
+import AIRewriteModal from './AIRewriteModal';
 
 const ExperienceForm: React.FC = () => {
   const { cvData, addExperience, updateExperience, removeExperience } = useCV();
   const { experience } = cvData;
+  const { rewrite, isLoading } = useAIRewrite();
+  
+  const [modalOpen, setModalOpen] = useState(false);
+  const [rewrittenText, setRewrittenText] = useState('');
+  const [activeExpId, setActiveExpId] = useState<string | null>(null);
+  const [originalText, setOriginalText] = useState('');
+
+  const handleAIGenerate = async (expId: string, description: string) => {
+    if (!description.trim()) return;
+    
+    setActiveExpId(expId);
+    setOriginalText(description);
+    
+    const result = await rewrite(description, 'bullets');
+    if (result) {
+      setRewrittenText(result);
+      setModalOpen(true);
+    }
+  };
+
+  const handleAccept = () => {
+    if (activeExpId) {
+      updateExperience(activeExpId, 'description', rewrittenText);
+    }
+    setModalOpen(false);
+    setRewrittenText('');
+    setActiveExpId(null);
+    setOriginalText('');
+  };
+
+  const handleRegenerate = async () => {
+    if (!originalText) return;
+    const result = await rewrite(originalText, 'bullets');
+    if (result) {
+      setRewrittenText(result);
+    }
+  };
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -114,9 +153,14 @@ const ExperienceForm: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         className="h-7 text-xs text-primary hover:text-primary/80 ai-shimmer"
-                        disabled
+                        onClick={() => handleAIGenerate(exp.id, exp.description)}
+                        disabled={isLoading || !exp.description.trim()}
                       >
-                        <Sparkles className="h-3 w-3 mr-1" />
+                        {isLoading && activeExpId === exp.id ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-3 w-3 mr-1" />
+                        )}
                         Générer des puces
                       </Button>
                     </div>
@@ -140,6 +184,16 @@ const ExperienceForm: React.FC = () => {
           Ajouter une expérience
         </Button>
       )}
+
+      <AIRewriteModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        originalText={originalText}
+        rewrittenText={rewrittenText}
+        onAccept={handleAccept}
+        onRegenerate={handleRegenerate}
+        isRegenerating={isLoading}
+      />
     </div>
   );
 };
