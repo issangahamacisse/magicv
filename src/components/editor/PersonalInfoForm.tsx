@@ -1,14 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCV } from '@/context/CVContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { User, Mail, Phone, MapPin, Globe, Linkedin, Sparkles } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Globe, Linkedin, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAIRewrite } from '@/hooks/useAIRewrite';
+import AIRewriteModal from './AIRewriteModal';
 
 const PersonalInfoForm: React.FC = () => {
   const { cvData, updatePersonalInfo } = useCV();
   const { personalInfo } = cvData;
+  const { rewrite, isLoading } = useAIRewrite();
+  
+  const [modalOpen, setModalOpen] = useState(false);
+  const [rewrittenText, setRewrittenText] = useState('');
+
+  const handleAIImprove = async () => {
+    if (!personalInfo.summary.trim()) return;
+    
+    const result = await rewrite(personalInfo.summary, 'summary');
+    if (result) {
+      setRewrittenText(result);
+      setModalOpen(true);
+    }
+  };
+
+  const handleAccept = () => {
+    updatePersonalInfo('summary', rewrittenText);
+    setModalOpen(false);
+    setRewrittenText('');
+  };
+
+  const handleRegenerate = async () => {
+    const result = await rewrite(personalInfo.summary, 'summary');
+    if (result) {
+      setRewrittenText(result);
+    }
+  };
 
   const InputWithIcon = ({ 
     icon: Icon, 
@@ -105,9 +134,14 @@ const PersonalInfoForm: React.FC = () => {
             variant="ghost"
             size="sm"
             className="h-7 text-xs text-primary hover:text-primary/80 ai-shimmer"
-            disabled
+            onClick={handleAIImprove}
+            disabled={isLoading || !personalInfo.summary.trim()}
           >
-            <Sparkles className="h-3 w-3 mr-1" />
+            {isLoading ? (
+              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+            ) : (
+              <Sparkles className="h-3 w-3 mr-1" />
+            )}
             Améliorer avec l'IA
           </Button>
         </div>
@@ -122,6 +156,16 @@ const PersonalInfoForm: React.FC = () => {
           {personalInfo.summary.length}/500 caractères
         </p>
       </div>
+
+      <AIRewriteModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        originalText={personalInfo.summary}
+        rewrittenText={rewrittenText}
+        onAccept={handleAccept}
+        onRegenerate={handleRegenerate}
+        isRegenerating={isLoading}
+      />
     </div>
   );
 };
