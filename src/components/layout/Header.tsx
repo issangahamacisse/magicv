@@ -78,10 +78,6 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
             Connexion
           </Button>
         )}
-        
-        <Button size="sm" className="gap-2">
-          Passer Premium
-        </Button>
       </div>
 
       {/* Mobile Menu */}
@@ -110,10 +106,6 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
                   Connexion
                 </Button>
               )}
-              
-              <Button className="justify-start">
-                Passer Premium
-              </Button>
             </div>
           </SheetContent>
         </Sheet>

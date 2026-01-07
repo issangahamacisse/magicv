@@ -30,6 +30,7 @@ interface ResumeScorePanelProps {
   issues?: Issue[];
   quickWins?: QuickWin[];
   onFixIssue?: (issueId: string) => void;
+  onQuickWinAction?: (quickWinId: string) => void;
   onAutoFix?: () => void;
 }
 
@@ -45,6 +46,7 @@ const ResumeScorePanel: React.FC<ResumeScorePanelProps> = ({
     { id: '3', title: 'Ajouter photo de profil', completed: false, action: 'Ajouter' },
   ],
   onFixIssue,
+  onQuickWinAction,
   onAutoFix,
 }) => {
   const completedWins = quickWins.filter(w => w.completed).length;
@@ -164,7 +166,12 @@ const ResumeScorePanel: React.FC<ResumeScorePanelProps> = ({
                   {win.title}
                 </span>
                 {!win.completed && win.action && (
-                  <Button variant="ghost" size="sm" className="h-7 text-xs">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 text-xs"
+                    onClick={() => onQuickWinAction?.(win.id)}
+                  >
                     {win.action}
                   </Button>
                 )}

@@ -3,9 +3,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Edit3, LayoutGrid, ClipboardCheck, User } from 'lucide-react';
 import EditorPanel from './EditorPanel';
 import ResumeScorePanel from '@/components/review/ResumeScorePanel';
+import TemplateGallery from './TemplateGallery';
+import ProfilePanel from './ProfilePanel';
 import { useCV } from '@/context/CVContext';
 
-const EditorTabs: React.FC = () => {
+interface EditorTabsProps {
+  onNavigateToSection?: (section: string) => void;
+}
+
+const EditorTabs: React.FC<EditorTabsProps> = ({ onNavigateToSection }) => {
   const [activeTab, setActiveTab] = useState('editor');
   const { cvData, completionScore } = useCV();
 
@@ -14,7 +20,7 @@ const EditorTabs: React.FC = () => {
   
   if (!cvData.personalInfo.email || !cvData.personalInfo.phone) {
     issues.push({
-      id: '1',
+      id: 'contact',
       type: 'critical' as const,
       title: 'Coordonnées manquantes',
       description: 'Les recruteurs ont besoin d\'un moyen de vous contacter.',
@@ -23,7 +29,7 @@ const EditorTabs: React.FC = () => {
   
   if (!cvData.personalInfo.summary || cvData.personalInfo.summary.length < 100) {
     issues.push({
-      id: '2',
+      id: 'summary',
       type: 'warning' as const,
       title: 'Résumé trop court',
       description: 'Visez au moins 3 phrases pour un bon résumé.',
@@ -32,7 +38,7 @@ const EditorTabs: React.FC = () => {
 
   if (cvData.experience.length === 0) {
     issues.push({
-      id: '3',
+      id: 'experience',
       type: 'critical' as const,
       title: 'Aucune expérience',
       description: 'Ajoutez au moins une expérience professionnelle.',
@@ -42,23 +48,49 @@ const EditorTabs: React.FC = () => {
   // Calculate quick wins
   const quickWins = [
     {
-      id: '1',
+      id: 'font',
       title: 'Police cohérente',
       completed: true,
     },
     {
-      id: '2',
+      id: 'linkedin',
       title: 'Ajouter URL LinkedIn',
       completed: !!cvData.personalInfo.linkedin,
       action: 'Corriger',
     },
     {
-      id: '3',
+      id: 'photo',
       title: 'Ajouter photo de profil',
       completed: !!cvData.personalInfo.photoUrl,
       action: 'Ajouter',
     },
   ];
+
+  const handleFixIssue = (issueId: string) => {
+    setActiveTab('editor');
+    // Map issue IDs to section names
+    const sectionMap: Record<string, string> = {
+      contact: 'personal',
+      summary: 'personal',
+      experience: 'experience',
+    };
+    const section = sectionMap[issueId];
+    if (section && onNavigateToSection) {
+      onNavigateToSection(section);
+    }
+  };
+
+  const handleQuickWinAction = (quickWinId: string) => {
+    setActiveTab('editor');
+    const sectionMap: Record<string, string> = {
+      linkedin: 'personal',
+      photo: 'personal',
+    };
+    const section = sectionMap[quickWinId];
+    if (section && onNavigateToSection) {
+      onNavigateToSection(section);
+    }
+  };
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
@@ -100,10 +132,8 @@ const EditorTabs: React.FC = () => {
           <EditorPanel />
         </TabsContent>
 
-        <TabsContent value="templates" className="h-full m-0 p-4">
-          <div className="text-center text-muted-foreground py-8">
-            Les templates sont disponibles dans l'onglet Apparence de l'éditeur.
-          </div>
+        <TabsContent value="templates" className="h-full m-0">
+          <TemplateGallery />
         </TabsContent>
 
         <TabsContent value="review" className="h-full m-0">
@@ -111,13 +141,13 @@ const EditorTabs: React.FC = () => {
             score={completionScore}
             issues={issues}
             quickWins={quickWins}
+            onFixIssue={handleFixIssue}
+            onQuickWinAction={handleQuickWinAction}
           />
         </TabsContent>
 
-        <TabsContent value="profile" className="h-full m-0 p-4">
-          <div className="text-center text-muted-foreground py-8">
-            Connectez-vous pour accéder à votre profil.
-          </div>
+        <TabsContent value="profile" className="h-full m-0">
+          <ProfilePanel />
         </TabsContent>
       </div>
     </Tabs>

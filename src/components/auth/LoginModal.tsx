@@ -9,8 +9,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, X } from 'lucide-react';
+import { Eye, EyeOff, X, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  email: z.string().trim().email({ message: "Adresse email invalide" }),
+  password: z.string().min(6, { message: "Le mot de passe doit contenir au moins 6 caractères" }),
+});
 
 interface LoginModalProps {
   open: boolean;
@@ -22,11 +30,43 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToS
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  
+  const { signIn } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement login logic
-    console.log('Login:', { email, password });
+    setErrors({});
+    
+    const validation = loginSchema.safeParse({ email, password });
+    if (!validation.success) {
+      const fieldErrors: { email?: string; password?: string } = {};
+      validation.error.errors.forEach((err) => {
+        if (err.path[0] === 'email') fieldErrors.email = err.message;
+        if (err.path[0] === 'password') fieldErrors.password = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setIsLoading(true);
+    const { error } = await signIn(email, password);
+    setIsLoading(false);
+
+    if (error) {
+      if (error.message.includes('Invalid login credentials')) {
+        toast.error('Email ou mot de passe incorrect');
+      } else {
+        toast.error(error.message);
+      }
+      return;
+    }
+
+    toast.success('Connexion réussie !');
+    onOpenChange(false);
+    setEmail('');
+    setPassword('');
   };
 
   return (
@@ -44,13 +84,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToS
           <DialogHeader className="mb-6">
             <DialogTitle className="text-2xl font-semibold">Connexion</DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Sauvegardez votre progression
+              Connectez-vous pour accéder à votre compte
             </DialogDescription>
           </DialogHeader>
-
-          <p className="text-sm text-muted-foreground mb-6">
-            Créez un compte pour télécharger votre CV et débloquer les modèles premium.
-          </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -61,8 +97,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToS
                 placeholder="exemple@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                disabled={isLoading}
+                className={errors.email ? 'border-destructive' : ''}
               />
+              {errors.email && (
+                <p className="text-xs text-destructive">{errors.email}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -82,7 +122,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToS
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  disabled={isLoading}
+                  className={errors.password ? 'border-destructive' : ''}
                 />
                 <button
                   type="button"
@@ -96,10 +137,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToS
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-xs text-destructive">{errors.password}</p>
+              )}
             </div>
 
-            <Button type="submit" className="w-full">
-              Créer un compte
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Connexion...
+                </>
+              ) : (
+                'Se connecter'
+              )}
             </Button>
           </form>
 
@@ -113,7 +164,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToS
           <Button
             variant="outline"
             className="w-full gap-2"
-            onClick={() => console.log('Google login')}
+            onClick={() => toast.info('Connexion Google bientôt disponible')}
+            disabled={isLoading}
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -136,16 +188,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToS
             Continuer avec Google
           </Button>
 
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            En continuant, vous acceptez nos{' '}
-            <a href="#" className="underline hover:text-foreground">
-              Conditions d'utilisation
-            </a>{' '}
-            et{' '}
-            <a href="#" className="underline hover:text-foreground">
-              Politique de confidentialité
-            </a>
-            .
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Pas encore de compte ?{' '}
+            <button
+              onClick={onSwitchToSignUp}
+              className="text-primary hover:underline font-medium"
+            >
+              Créer un compte
+            </button>
           </p>
         </div>
       </DialogContent>

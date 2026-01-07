@@ -9,8 +9,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, FileText } from 'lucide-react';
+import { Eye, EyeOff, FileText, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+const signUpSchema = z.object({
+  fullName: z.string().trim().min(2, { message: "Le nom doit contenir au moins 2 caractères" }).max(100),
+  email: z.string().trim().email({ message: "Adresse email invalide" }).max(255),
+  password: z.string().min(6, { message: "Le mot de passe doit contenir au moins 6 caractères" }).max(100),
+});
 
 interface SignUpModalProps {
   open: boolean;
@@ -29,6 +38,10 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ fullName?: string; email?: string; password?: string }>({});
+  
+  const { signUp } = useAuth();
 
   const getPasswordStrength = (pwd: string): { level: string; color: string } => {
     if (pwd.length === 0) return { level: '', color: '' };
@@ -39,10 +52,40 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
 
   const passwordStrength = getPasswordStrength(password);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement signup logic
-    console.log('Sign up:', { fullName, email, password });
+    setErrors({});
+    
+    const validation = signUpSchema.safeParse({ fullName, email, password });
+    if (!validation.success) {
+      const fieldErrors: { fullName?: string; email?: string; password?: string } = {};
+      validation.error.errors.forEach((err) => {
+        if (err.path[0] === 'fullName') fieldErrors.fullName = err.message;
+        if (err.path[0] === 'email') fieldErrors.email = err.message;
+        if (err.path[0] === 'password') fieldErrors.password = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setIsLoading(true);
+    const { error } = await signUp(email, password, fullName);
+    setIsLoading(false);
+
+    if (error) {
+      if (error.message.includes('User already registered')) {
+        toast.error('Un compte existe déjà avec cet email');
+      } else {
+        toast.error(error.message);
+      }
+      return;
+    }
+
+    toast.success('Compte créé avec succès !');
+    onOpenChange(false);
+    setFullName('');
+    setEmail('');
+    setPassword('');
   };
 
   return (
@@ -57,10 +100,10 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
 
           <DialogHeader className="text-center mb-6">
             <DialogTitle className="text-2xl font-semibold">
-              Bienvenue sur ResumeBuilder
+              Bienvenue sur CV Builder
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Créez un compte pour sauvegarder votre CV et débloquer les modèles premium.
+              Créez un compte pour sauvegarder votre CV dans le cloud.
             </DialogDescription>
           </DialogHeader>
 
@@ -68,7 +111,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
             <Button 
               variant="default" 
               className="flex-1"
-              onClick={() => {}}
+              disabled
             >
               Inscription
             </Button>
@@ -90,8 +133,12 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
                 placeholder="Jean Dupont"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                required
+                disabled={isLoading}
+                className={errors.fullName ? 'border-destructive' : ''}
               />
+              {errors.fullName && (
+                <p className="text-xs text-destructive">{errors.fullName}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -102,8 +149,12 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
                 placeholder="exemple@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                disabled={isLoading}
+                className={errors.email ? 'border-destructive' : ''}
               />
+              {errors.email && (
+                <p className="text-xs text-destructive">{errors.email}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -115,7 +166,8 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  disabled={isLoading}
+                  className={errors.password ? 'border-destructive' : ''}
                 />
                 <button
                   type="button"
@@ -129,7 +181,10 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
                   )}
                 </button>
               </div>
-              {password && (
+              {errors.password && (
+                <p className="text-xs text-destructive">{errors.password}</p>
+              )}
+              {password && !errors.password && (
                 <div className="flex items-center gap-2 mt-1">
                   <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
                     <div 
@@ -146,8 +201,15 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
               )}
             </div>
 
-            <Button type="submit" className="w-full">
-              Créer un compte
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Création...
+                </>
+              ) : (
+                'Créer un compte'
+              )}
             </Button>
           </form>
 
@@ -162,7 +224,8 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
             <Button
               variant="outline"
               className="flex-1 gap-2"
-              onClick={() => console.log('Google signup')}
+              onClick={() => toast.info('Connexion Google bientôt disponible')}
+              disabled={isLoading}
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -187,7 +250,8 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
             <Button
               variant="outline"
               className="flex-1 gap-2"
-              onClick={() => console.log('Apple signup')}
+              onClick={() => toast.info('Connexion Apple bientôt disponible')}
+              disabled={isLoading}
             >
               <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
@@ -199,6 +263,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
           <button
             onClick={onContinueAsGuest}
             className="w-full mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            disabled={isLoading}
           >
             Pas maintenant ? <span className="underline">Continuer en invité</span>
           </button>
