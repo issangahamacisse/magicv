@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Globe, Linkedin } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ const skillLevelWidth: Record<string, string> = {
   expert: '100%',
 };
 
-const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
+const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
 
@@ -31,11 +31,14 @@ const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
   }[theme.spacing];
 
   return (
-    <div className={cn(
-      "w-full h-full p-6 bg-cv-paper text-cv-text",
-      theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-      spacingClass
-    )}>
+    <div 
+      ref={ref}
+      className={cn(
+        "w-full h-full p-6 bg-cv-paper text-cv-text",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
+        spacingClass
+      )}
+    >
       {/* Header */}
       <header className="text-center mb-6 pb-4 border-b-2" style={{ borderColor: accentColor }}>
         <h1 className="text-2xl font-bold mb-1" style={{ color: accentColor }}>
@@ -206,6 +209,8 @@ const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
+
+ModernTemplate.displayName = 'ModernTemplate';
 
 export default ModernTemplate;

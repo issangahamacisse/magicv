@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ const skillLevelDots: Record<string, number> = {
   expert: 4,
 };
 
-const CreativeTemplate: React.FC<TemplateProps> = ({ data }) => {
+const CreativeTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
 
@@ -31,11 +31,14 @@ const CreativeTemplate: React.FC<TemplateProps> = ({ data }) => {
   }[theme.spacing];
 
   return (
-    <div className={cn(
-      "w-full h-full flex bg-cv-paper text-cv-text",
-      theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-      spacingClass
-    )}>
+    <div 
+      ref={ref}
+      className={cn(
+        "w-full h-full flex bg-cv-paper text-cv-text",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
+        spacingClass
+      )}
+    >
       {/* Sidebar */}
       <div 
         className="w-[35%] p-5 text-primary-foreground"
@@ -219,6 +222,8 @@ const CreativeTemplate: React.FC<TemplateProps> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
+
+CreativeTemplate.displayName = 'CreativeTemplate';
 
 export default CreativeTemplate;

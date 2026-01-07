@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { CVData, defaultCVData, Experience, Education, Skill, Language, Project, Certification } from '@/types/cv';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import type { Json } from '@/integrations/supabase/types';
 
 interface CVContextType {
   cvData: CVData;
@@ -28,17 +31,161 @@ interface CVContextType {
   toggleSectionVisibility: (sectionId: string) => void;
   completionScore: number;
   isSaving: boolean;
+  isCloudSynced: boolean;
+  resetCV: () => void;
+  loadCV: (resumeId: string) => Promise<void>;
+  currentResumeId: string | null;
 }
 
 const CVContext = createContext<CVContextType | undefined>(undefined);
 
 export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [cvData, setCVData] = useState<CVData>(() => {
     const saved = localStorage.getItem('cvData');
     return saved ? JSON.parse(saved) : defaultCVData;
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isCloudSynced, setIsCloudSynced] = useState(false);
+  const [currentResumeId, setCurrentResumeId] = useState<string | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const cloudSyncTimeoutRef = useRef<NodeJS.Timeout>();
+  const lastSyncedRef = useRef<string>('');
+
+  // Load latest resume from cloud on login
+  useEffect(() => {
+    if (user) {
+      loadLatestResume();
+    } else {
+      setCurrentResumeId(null);
+      setIsCloudSynced(false);
+    }
+  }, [user]);
+
+  const loadLatestResume = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('resumes')
+      .select('id, content, theme_config')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error loading resume:', error);
+      return;
+    }
+
+    if (data) {
+      setCurrentResumeId(data.id);
+      const content = data.content as Record<string, unknown>;
+      const themeConfig = data.theme_config as Record<string, unknown>;
+      
+      const loadedData = {
+        ...content,
+        theme: themeConfig,
+      } as unknown as CVData;
+      
+      lastSyncedRef.current = JSON.stringify(loadedData);
+      setCVData(loadedData);
+      setIsCloudSynced(true);
+    }
+  };
+
+  const loadCV = async (resumeId: string) => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('resumes')
+      .select('id, content, theme_config')
+      .eq('id', resumeId)
+      .single();
+
+    if (error) {
+      toast.error('Erreur lors du chargement du CV');
+      return;
+    }
+
+    if (data) {
+      setCurrentResumeId(data.id);
+      const content = data.content as Record<string, unknown>;
+      const themeConfig = data.theme_config as Record<string, unknown>;
+      
+      const loadedData = {
+        ...content,
+        theme: themeConfig,
+      } as unknown as CVData;
+      
+      lastSyncedRef.current = JSON.stringify(loadedData);
+      setCVData(loadedData);
+      localStorage.setItem('cvData', JSON.stringify(loadedData));
+      toast.success('CV chargé');
+    }
+  };
+
+  const resetCV = useCallback(() => {
+    setCVData(defaultCVData);
+    setCurrentResumeId(null);
+    lastSyncedRef.current = '';
+    localStorage.setItem('cvData', JSON.stringify(defaultCVData));
+    toast.success('Nouveau CV créé');
+  }, []);
+
+  // Sync to cloud for logged-in users
+  const syncToCloud = useCallback(async (data: CVData) => {
+    if (!user) return;
+
+    setIsSaving(true);
+
+    const { theme, ...content } = data;
+    const title = data.personalInfo.fullName 
+      ? `CV - ${data.personalInfo.fullName}`
+      : 'Mon CV';
+
+    const contentJson = JSON.parse(JSON.stringify(content)) as Json;
+    const themeJson = JSON.parse(JSON.stringify(theme)) as Json;
+
+    try {
+      if (currentResumeId) {
+        const { error } = await supabase
+          .from('resumes')
+          .update({
+            title,
+            content: contentJson,
+            theme_config: themeJson,
+          })
+          .eq('id', currentResumeId);
+
+        if (error) throw error;
+      } else {
+        const { data: newResume, error } = await supabase
+          .from('resumes')
+          .insert([{
+            user_id: user.id,
+            title,
+            content: contentJson,
+            theme_config: themeJson,
+          }])
+          .select('id')
+          .single();
+
+        if (error) throw error;
+        if (newResume) {
+          setCurrentResumeId(newResume.id);
+        }
+      }
+
+      lastSyncedRef.current = JSON.stringify(data);
+      setIsCloudSynced(true);
+    } catch (error) {
+      console.error('Sync error:', error);
+      setIsCloudSynced(false);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [user, currentResumeId]);
 
   // Auto-save with requestIdleCallback for smooth typing
   useEffect(() => {
@@ -47,7 +194,6 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      // Use requestIdleCallback to avoid blocking typing
       const saveData = () => {
         setIsSaving(true);
         localStorage.setItem('cvData', JSON.stringify(cvData));
@@ -69,6 +215,28 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       }
     };
   }, [cvData]);
+
+  // Cloud sync (debounced)
+  useEffect(() => {
+    if (!user) return;
+
+    const dataString = JSON.stringify(cvData);
+    if (dataString === lastSyncedRef.current) return;
+
+    if (cloudSyncTimeoutRef.current) {
+      clearTimeout(cloudSyncTimeoutRef.current);
+    }
+
+    cloudSyncTimeoutRef.current = setTimeout(() => {
+      syncToCloud(cvData);
+    }, 2000);
+
+    return () => {
+      if (cloudSyncTimeoutRef.current) {
+        clearTimeout(cloudSyncTimeoutRef.current);
+      }
+    };
+  }, [cvData, user, syncToCloud]);
 
   // Calculate completion score
   const completionScore = useCallback(() => {
@@ -323,6 +491,10 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         toggleSectionVisibility,
         completionScore,
         isSaving,
+        isCloudSynced,
+        resetCV,
+        loadCV,
+        currentResumeId,
       }}
     >
       {children}

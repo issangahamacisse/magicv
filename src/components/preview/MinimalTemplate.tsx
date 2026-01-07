@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +12,7 @@ const formatDate = (dateStr: string) => {
   return date.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
 };
 
-const MinimalTemplate: React.FC<TemplateProps> = ({ data }) => {
+const MinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
 
@@ -23,11 +23,14 @@ const MinimalTemplate: React.FC<TemplateProps> = ({ data }) => {
   }[theme.spacing];
 
   return (
-    <div className={cn(
-      "w-full h-full p-8 bg-white text-gray-900",
-      theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-      spacingClass
-    )}>
+    <div 
+      ref={ref}
+      className={cn(
+        "w-full h-full p-8 bg-white text-gray-900",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
+        spacingClass
+      )}
+    >
       {/* Header - Ultra minimal */}
       <header className="mb-8">
         <h1 className="text-3xl font-light tracking-tight mb-1">
@@ -142,6 +145,8 @@ const MinimalTemplate: React.FC<TemplateProps> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
+
+MinimalTemplate.displayName = 'MinimalTemplate';
 
 export default MinimalTemplate;

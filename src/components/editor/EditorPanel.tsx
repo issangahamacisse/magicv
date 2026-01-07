@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCV } from '@/context/CVContext';
 import {
   Accordion,
@@ -17,6 +17,7 @@ import {
   Palette,
   Save,
   Loader2,
+  Cloud,
 } from 'lucide-react';
 import PersonalInfoForm from './PersonalInfoForm';
 import ExperienceForm from './ExperienceForm';
@@ -25,8 +26,14 @@ import SkillsForm from './SkillsForm';
 import LanguagesForm from './LanguagesForm';
 import ThemeSelector from './ThemeSelector';
 
-const EditorPanel: React.FC = () => {
-  const { completionScore, isSaving } = useCV();
+interface EditorPanelProps {
+  openSection?: string;
+  onSectionOpened?: () => void;
+}
+
+const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened }) => {
+  const { completionScore, isSaving, isCloudSynced } = useCV();
+  const [openSections, setOpenSections] = useState<string[]>(['personal']);
 
   const sections = [
     { id: 'personal', icon: User, label: 'Informations personnelles', component: PersonalInfoForm },
@@ -36,6 +43,20 @@ const EditorPanel: React.FC = () => {
     { id: 'languages', icon: Languages, label: 'Langues', component: LanguagesForm },
     { id: 'theme', icon: Palette, label: 'Apparence', component: ThemeSelector },
   ];
+
+  // Handle external section opening (from Quick Wins)
+  useEffect(() => {
+    if (openSection && !openSections.includes(openSection)) {
+      setOpenSections(prev => [...prev, openSection]);
+      onSectionOpened?.();
+      
+      // Scroll to the section after a short delay
+      setTimeout(() => {
+        const element = document.getElementById(`section-${openSection}`);
+        element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [openSection, onSectionOpened]);
 
   return (
     <div className="h-full flex flex-col bg-card">
@@ -48,6 +69,11 @@ const EditorPanel: React.FC = () => {
               <>
                 <Loader2 className="h-3 w-3 animate-spin" />
                 <span>Sauvegarde...</span>
+              </>
+            ) : isCloudSynced ? (
+              <>
+                <Cloud className="h-3 w-3 text-emerald-500" />
+                <span>Synchronisé</span>
               </>
             ) : (
               <>
@@ -77,9 +103,19 @@ const EditorPanel: React.FC = () => {
 
       {/* Sections */}
       <ScrollArea className="flex-1">
-        <Accordion type="multiple" defaultValue={['personal']} className="p-4">
+        <Accordion 
+          type="multiple" 
+          value={openSections} 
+          onValueChange={setOpenSections}
+          className="p-4"
+        >
           {sections.map((section) => (
-            <AccordionItem key={section.id} value={section.id} className="border-b-0 mb-2">
+            <AccordionItem 
+              key={section.id} 
+              value={section.id} 
+              id={`section-${section.id}`}
+              className="border-b-0 mb-2"
+            >
               <AccordionTrigger className="hover:no-underline p-3 rounded-lg bg-muted/30 hover:bg-muted/50 data-[state=open]:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-md bg-primary/10">

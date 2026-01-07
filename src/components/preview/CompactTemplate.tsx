@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,7 @@ const formatDate = (dateStr: string) => {
   return date.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
 };
 
-const CompactTemplate: React.FC<TemplateProps> = ({ data }) => {
+const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
   const { personalInfo, experience, education, skills, languages, theme } = data;
   const accentColor = theme.accentColor;
 
@@ -24,11 +24,14 @@ const CompactTemplate: React.FC<TemplateProps> = ({ data }) => {
   }[theme.spacing];
 
   return (
-    <div className={cn(
-      "w-full h-full bg-white text-gray-800 p-5",
-      theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
-      spacingClass
-    )}>
+    <div 
+      ref={ref}
+      className={cn(
+        "w-full h-full bg-white text-gray-800 p-5",
+        theme.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
+        spacingClass
+      )}
+    >
       {/* Compact Header - One line style */}
       <header 
         className="flex items-center justify-between mb-4 pb-3 border-b-2"
@@ -193,6 +196,8 @@ const CompactTemplate: React.FC<TemplateProps> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
+
+CompactTemplate.displayName = 'CompactTemplate';
 
 export default CompactTemplate;
