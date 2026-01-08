@@ -6,9 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
-import { Plus, Trash2, GripVertical, Building2, Sparkles, Loader2 } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Building2, Sparkles, Loader2, SpellCheck } from 'lucide-react';
 import { useAIRewrite } from '@/hooks/useAIRewrite';
 import AIRewriteModal from './AIRewriteModal';
+import { toast } from 'sonner';
 
 const ExperienceForm: React.FC = () => {
   const { cvData, addExperience, updateExperience, removeExperience } = useCV();
@@ -19,6 +20,7 @@ const ExperienceForm: React.FC = () => {
   const [rewrittenText, setRewrittenText] = useState('');
   const [activeExpId, setActiveExpId] = useState<string | null>(null);
   const [originalText, setOriginalText] = useState('');
+  const [spellcheckingId, setSpellcheckingId] = useState<string | null>(null);
 
   const handleAIGenerate = async (expId: string, description: string) => {
     if (!description.trim()) return;
@@ -49,6 +51,17 @@ const ExperienceForm: React.FC = () => {
     if (result) {
       setRewrittenText(result);
     }
+  };
+
+  const handleSpellcheck = async (expId: string, description: string) => {
+    if (!description.trim()) return;
+    setSpellcheckingId(expId);
+    const result = await rewrite(description, 'spellcheck');
+    if (result) {
+      updateExperience(expId, 'description', result);
+      toast.success('Orthographe corrigée');
+    }
+    setSpellcheckingId(null);
   };
 
   return (
@@ -149,20 +162,36 @@ const ExperienceForm: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label className="text-sm">Description</Label>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs text-primary hover:text-primary/80 ai-shimmer"
-                        onClick={() => handleAIGenerate(exp.id, exp.description)}
-                        disabled={isLoading || !exp.description.trim()}
-                      >
-                        {isLoading && activeExpId === exp.id ? (
-                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                        ) : (
-                          <Sparkles className="h-3 w-3 mr-1" />
-                        )}
-                        Générer des puces
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs text-muted-foreground hover:text-foreground"
+                          onClick={() => handleSpellcheck(exp.id, exp.description)}
+                          disabled={spellcheckingId === exp.id || !exp.description.trim()}
+                        >
+                          {spellcheckingId === exp.id ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <SpellCheck className="h-3 w-3 mr-1" />
+                          )}
+                          Orthographe
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs text-primary hover:text-primary/80 ai-shimmer"
+                          onClick={() => handleAIGenerate(exp.id, exp.description)}
+                          disabled={isLoading || !exp.description.trim()}
+                        >
+                          {isLoading && activeExpId === exp.id ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-3 w-3 mr-1" />
+                          )}
+                          Puces IA
+                        </Button>
+                      </div>
                     </div>
                     <Textarea
                       placeholder="• Développement de fonctionnalités clés&#10;• Gestion d'une équipe de 5 personnes&#10;• Amélioration des performances de 40%"

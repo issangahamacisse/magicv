@@ -52,14 +52,20 @@ serve(async (req) => {
         - Corrige les fautes d'orthographe
         - Réponds UNIQUEMENT avec le texte reformulé, sans explication.`;
         break;
+      case 'spellcheck':
+        systemPrompt = `Tu es un correcteur orthographique et grammatical expert. Corrige UNIQUEMENT les fautes d'orthographe et de grammaire dans le texte suivant.
+        - NE MODIFIE PAS le sens, le style ou la structure du texte
+        - NE REFORMULE PAS les phrases
+        - Garde exactement le même ton et le même niveau de formalité
+        - Si le texte est déjà correct, renvoie-le tel quel
+        - Réponds UNIQUEMENT avec le texte corrigé, sans explication ni commentaire.`;
+        break;
       default:
         return new Response(JSON.stringify({ error: 'Invalid action type' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
     }
-
-    console.log(`Processing AI rewrite request: action=${action}, text length=${text.length}`);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
