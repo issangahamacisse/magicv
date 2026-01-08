@@ -5,11 +5,13 @@ import { FileText, Star, Check, Download, Zap, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import LoginModal from '@/components/auth/LoginModal';
 import SignUpModal from '@/components/auth/SignUpModal';
+import { ResetPasswordModal } from '@/components/auth/ResetPasswordModal';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
 
   const handleCreateResume = () => {
     navigate('/editor');
@@ -165,6 +167,10 @@ const Landing: React.FC = () => {
           setShowLogin(false);
           setShowSignUp(true);
         }}
+        onForgotPassword={() => {
+          setShowLogin(false);
+          setShowResetPassword(true);
+        }}
       />
       <SignUpModal 
         open={showSignUp} 
@@ -174,6 +180,14 @@ const Landing: React.FC = () => {
           setShowLogin(true);
         }}
         onContinueAsGuest={handleCreateResume}
+      />
+      <ResetPasswordModal
+        open={showResetPassword}
+        onOpenChange={setShowResetPassword}
+        onBackToLogin={() => {
+          setShowResetPassword(false);
+          setShowLogin(true);
+        }}
       />
     </>
   );

@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FileText, Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
+import { FileText, Eye, EyeOff, Loader2, ArrowLeft, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
@@ -22,6 +22,8 @@ const signInSchema = z.object({
 
 const Auth: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -29,7 +31,7 @@ const Auth: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,20 +65,14 @@ const Auth: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-    
     setIsLoading(true);
 
     try {
       if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) {
-          if (error.message.includes('Invalid login credentials')) {
-            toast.error("Email ou mot de passe incorrect");
-          } else {
-            toast.error(error.message);
-          }
+          toast.error(error.message.includes('Invalid login credentials') ? "Email ou mot de passe incorrect" : error.message);
           return;
         }
         toast.success("Connexion réussie !");
@@ -84,15 +80,32 @@ const Auth: React.FC = () => {
       } else {
         const { error } = await signUp(email, password, fullName);
         if (error) {
-          if (error.message.includes('User already registered')) {
-            toast.error("Un compte existe déjà avec cet email");
-          } else {
-            toast.error(error.message);
-          }
+          toast.error(error.message.includes('User already registered') ? "Un compte existe déjà avec cet email" : error.message);
           return;
         }
         toast.success("Compte créé avec succès !");
         navigate('/editor');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = z.string().email("Email invalide").safeParse(email);
+    if (!result.success) {
+      setErrors({ email: result.error.errors[0].message });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await resetPassword(email);
+      if (error) {
+        toast.error(error.message);
+      } else {
+        setResetEmailSent(true);
+        toast.success('Email de réinitialisation envoyé !');
       }
     } finally {
       setIsLoading(false);
@@ -108,19 +121,12 @@ const Auth: React.FC = () => {
 
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          {/* Back Button */}
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/')}
-            className="mb-6 gap-2"
-          >
+          <Button variant="ghost" onClick={() => navigate('/')} className="mb-6 gap-2">
             <ArrowLeft className="h-4 w-4" />
             Retour
           </Button>
 
-          {/* Card */}
           <div className="bg-card border border-border rounded-2xl p-8 shadow-lg">
-            {/* Logo */}
             <div className="flex items-center justify-center gap-3 mb-6">
               <div className="p-3 rounded-xl bg-primary/10">
                 <FileText className="h-6 w-6 text-primary" />
@@ -128,145 +134,96 @@ const Auth: React.FC = () => {
               <span className="text-xl font-bold">CV Builder</span>
             </div>
 
-            {/* Title */}
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold mb-2">
-                {isLogin ? 'Bienvenue !' : 'Créer un compte'}
-              </h1>
-              <p className="text-muted-foreground">
-                {isLogin
-                  ? 'Connectez-vous pour accéder à vos CV.'
-                  : 'Inscrivez-vous pour sauvegarder vos CV.'}
-              </p>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex gap-2 p-1 bg-muted rounded-lg mb-6">
-              <button
-                onClick={() => setIsLogin(false)}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  !isLogin ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
-                }`}
-              >
-                Inscription
-              </button>
-              <button
-                onClick={() => setIsLogin(true)}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  isLogin ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
-                }`}
-              >
-                Connexion
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Nom complet</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Jean Dupont"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className={errors.fullName ? 'border-destructive' : ''}
-                  />
-                  {errors.fullName && (
-                    <p className="text-xs text-destructive">{errors.fullName}</p>
-                  )}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="vous@exemple.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={errors.email ? 'border-destructive' : ''}
-                />
-                {errors.email && (
-                  <p className="text-xs text-destructive">{errors.email}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  {isLogin && (
-                    <button
-                      type="button"
-                      className="text-xs text-primary hover:underline"
-                    >
-                      Mot de passe oublié ?
-                    </button>
-                  )}
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={errors.password ? 'border-destructive pr-10' : 'pr-10'}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-xs text-destructive">{errors.password}</p>
-                )}
-                {!isLogin && (
-                  <p className="text-xs text-muted-foreground">
-                    Minimum 8 caractères
+            {showForgotPassword ? (
+              resetEmailSent ? (
+                <div className="text-center space-y-4">
+                  <div className="flex justify-center">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-8 h-8 text-green-600" />
+                    </div>
+                  </div>
+                  <h1 className="text-2xl font-bold">Email envoyé !</h1>
+                  <p className="text-muted-foreground">
+                    Nous avons envoyé un lien de réinitialisation à <strong>{email}</strong>.
                   </p>
-                )}
-              </div>
+                  <Button onClick={() => { setShowForgotPassword(false); setResetEmailSent(false); }} variant="outline" className="w-full">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Retour à la connexion
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="text-center mb-6">
+                    <h1 className="text-2xl font-bold mb-2">Mot de passe oublié</h1>
+                    <p className="text-muted-foreground">Entrez votre email pour recevoir un lien de réinitialisation.</p>
+                  </div>
+                  <form onSubmit={handleResetPassword} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-email">Email</Label>
+                      <Input id="reset-email" type="email" placeholder="vous@exemple.com" value={email} onChange={(e) => setEmail(e.target.value)} className={errors.email ? 'border-destructive' : ''} />
+                      {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                    </div>
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                      {isLoading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Envoi...</> : 'Envoyer le lien'}
+                    </Button>
+                    <Button type="button" onClick={() => setShowForgotPassword(false)} variant="ghost" className="w-full">
+                      <ArrowLeft className="w-4 h-4 mr-2" />Retour
+                    </Button>
+                  </form>
+                </div>
+              )
+            ) : (
+              <>
+                <div className="text-center mb-8">
+                  <h1 className="text-2xl font-bold mb-2">{isLogin ? 'Bienvenue !' : 'Créer un compte'}</h1>
+                  <p className="text-muted-foreground">{isLogin ? 'Connectez-vous pour accéder à vos CV.' : 'Inscrivez-vous pour sauvegarder vos CV.'}</p>
+                </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    {isLogin ? 'Connexion...' : 'Création...'}
-                  </>
-                ) : (
-                  isLogin ? 'Se connecter' : 'Créer mon compte'
-                )}
-              </Button>
-            </form>
+                <div className="flex gap-2 p-1 bg-muted rounded-lg mb-6">
+                  <button onClick={() => setIsLogin(false)} className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${!isLogin ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'}`}>Inscription</button>
+                  <button onClick={() => setIsLogin(true)} className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${isLogin ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'}`}>Connexion</button>
+                </div>
 
-            {/* Guest */}
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => navigate('/editor')}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Continuer sans compte →
-              </button>
-            </div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {!isLogin && (
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName">Nom complet</Label>
+                      <Input id="fullName" type="text" placeholder="Jean Dupont" value={fullName} onChange={(e) => setFullName(e.target.value)} className={errors.fullName ? 'border-destructive' : ''} />
+                      {errors.fullName && <p className="text-xs text-destructive">{errors.fullName}</p>}
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="vous@exemple.com" value={email} onChange={(e) => setEmail(e.target.value)} className={errors.email ? 'border-destructive' : ''} />
+                    {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Mot de passe</Label>
+                      {isLogin && <button type="button" onClick={() => setShowForgotPassword(true)} className="text-xs text-primary hover:underline">Mot de passe oublié ?</button>}
+                    </div>
+                    <div className="relative">
+                      <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className={errors.password ? 'border-destructive pr-10' : 'pr-10'} />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+                    {!isLogin && <p className="text-xs text-muted-foreground">Minimum 8 caractères</p>}
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />{isLogin ? 'Connexion...' : 'Création...'}</> : isLogin ? 'Se connecter' : 'Créer mon compte'}
+                  </Button>
+                </form>
+                <div className="mt-6 text-center">
+                  <button onClick={() => navigate('/editor')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Continuer sans compte →</button>
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Terms */}
           <p className="text-xs text-muted-foreground text-center mt-6">
-            En continuant, vous acceptez nos{' '}
-            <a href="#" className="underline hover:text-foreground">
-              Conditions d'utilisation
-            </a>{' '}
-            et notre{' '}
-            <a href="#" className="underline hover:text-foreground">
-              Politique de confidentialité
-            </a>
-            .
+            En continuant, vous acceptez nos <a href="#" className="underline hover:text-foreground">Conditions d'utilisation</a> et notre <a href="#" className="underline hover:text-foreground">Politique de confidentialité</a>.
           </p>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
-import { Mail, Phone, MapPin, Linkedin, Code, Terminal, Database } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Code, Terminal, Database, Folder, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
@@ -202,7 +202,7 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
 
         {/* Education */}
         {education.length > 0 && (
-          <section className="mt-auto flex-shrink-0">
+          <section style={{ marginBottom: layout.sectionMargin }}>
             <h2 
               className="font-mono font-bold flex items-center gap-2"
               style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
@@ -218,6 +218,59 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
                   </p>
                   <p className="font-mono text-slate-500 mt-1" style={{ fontSize: '10px' }}>
                     {formatDate(edu.endDate)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Projects */}
+        {projects.length > 0 && (
+          <section style={{ marginBottom: layout.sectionMargin }}>
+            <div className="flex items-center gap-2" style={{ marginBottom: layout.itemMargin }}>
+              <Folder className="h-4 w-4" style={{ color: accentColor }} />
+              <h2 className="font-mono font-bold" style={{ fontSize: layout.titleFontSize }}>projects.git</h2>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
+              {projects.map((project) => (
+                <div key={project.id} className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                  <h3 className="font-medium text-slate-100">{project.name}</h3>
+                  {project.description && (
+                    <p className="text-slate-400 font-mono" style={{ fontSize: '11px' }}>{project.description}</p>
+                  )}
+                  {project.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {project.technologies.map((tech) => (
+                        <span 
+                          key={tech} 
+                          className="px-2 py-0.5 rounded font-mono text-white"
+                          style={{ backgroundColor: accentColor, fontSize: '9px' }}
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Certifications */}
+        {certifications.length > 0 && (
+          <section className="flex-shrink-0">
+            <div className="flex items-center gap-2" style={{ marginBottom: layout.itemMargin }}>
+              <Award className="h-4 w-4" style={{ color: accentColor }} />
+              <h2 className="font-mono font-bold" style={{ fontSize: layout.titleFontSize }}>certifications</h2>
+            </div>
+            <div className="grid grid-cols-2" style={{ gap: layout.itemMargin }}>
+              {certifications.map((cert) => (
+                <div key={cert.id} className="p-2 bg-slate-800/50 rounded border border-slate-700">
+                  <span className="font-medium text-slate-100">{cert.name}</span>
+                  <p className="font-mono text-slate-500" style={{ fontSize: '10px' }}>
+                    {cert.issuer} {cert.date && `· ${formatDate(cert.date)}`}
                   </p>
                 </div>
               ))}
