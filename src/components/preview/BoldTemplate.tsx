@@ -22,7 +22,7 @@ const skillLevelWidth: Record<string, string> = {
 };
 
 const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
-  const { personalInfo, experience, education, skills, languages, theme } = data;
+  const { personalInfo, experience, education, skills, languages, projects, certifications, theme } = data;
   const accentColor = theme.accentColor;
   const layout = useAdaptiveLayout(data);
 

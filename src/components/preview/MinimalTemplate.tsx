@@ -14,7 +14,7 @@ const formatDate = (dateStr: string) => {
 };
 
 const MinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
-  const { personalInfo, experience, education, skills, languages, theme } = data;
+  const { personalInfo, experience, education, skills, languages, projects, certifications, theme } = data;
   const accentColor = theme.accentColor;
   const layout = useAdaptiveLayout(data);
 
@@ -111,6 +111,63 @@ const MinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
                     </span>
                   </div>
                   <p className="text-gray-500" style={{ fontSize: '11px' }}>{edu.institution}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Projects */}
+        {projects.length > 0 && (
+          <section>
+            <h2 
+              className="font-semibold uppercase tracking-[0.2em] text-gray-400"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
+              Projets
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
+              {projects.map((project) => (
+                <div key={project.id} className="border-l-2 pl-4" style={{ borderColor: accentColor }}>
+                  <h3 className="font-medium">{project.name}</h3>
+                  {project.description && (
+                    <p className="text-gray-500" style={{ fontSize: '11px' }}>{project.description}</p>
+                  )}
+                  {project.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {project.technologies.map((tech) => (
+                        <span 
+                          key={tech} 
+                          className="px-1 py-0.5 rounded text-white"
+                          style={{ backgroundColor: accentColor, fontSize: '8px' }}
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Certifications */}
+        {certifications.length > 0 && (
+          <section>
+            <h2 
+              className="font-semibold uppercase tracking-[0.2em] text-gray-400"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
+              Certifications
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {certifications.map((cert) => (
+                <div key={cert.id} className="border-l-2 pl-4" style={{ borderColor: accentColor }}>
+                  <span className="font-medium">{cert.name}</span>
+                  <p className="text-gray-500" style={{ fontSize: '10px' }}>
+                    {cert.issuer} {cert.date && `· ${formatDate(cert.date)}`}
+                  </p>
                 </div>
               ))}
             </div>
