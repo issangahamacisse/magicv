@@ -14,7 +14,7 @@ const formatDate = (dateStr: string) => {
 };
 
 const ClassicTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) => {
-  const { personalInfo, experience, education, skills, languages, theme } = data;
+  const { personalInfo, experience, education, skills, languages, projects, certifications, theme } = data;
   const layout = useAdaptiveLayout(data);
 
   return (
@@ -119,6 +119,55 @@ const ClassicTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
                   {edu.description && (
                     <p className="text-cv-muted mt-1">{edu.description}</p>
                   )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Projects */}
+        {projects.length > 0 && (
+          <section>
+            <h2 
+              className="font-bold uppercase tracking-wider text-cv-text pb-1 border-b border-cv-border"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
+              Projets
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
+              {projects.map((project) => (
+                <div key={project.id}>
+                  <h3 className="font-semibold text-cv-text">{project.name}</h3>
+                  {project.description && (
+                    <p className="text-cv-muted">{project.description}</p>
+                  )}
+                  {project.technologies.length > 0 && (
+                    <p className="text-cv-muted italic" style={{ fontSize: '10px' }}>
+                      {project.technologies.join(' · ')}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Certifications */}
+        {certifications.length > 0 && (
+          <section>
+            <h2 
+              className="font-bold uppercase tracking-wider text-cv-text pb-1 border-b border-cv-border"
+              style={{ fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
+            >
+              Certifications
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {certifications.map((cert) => (
+                <div key={cert.id}>
+                  <span className="font-semibold text-cv-text">{cert.name}</span>
+                  <p className="text-cv-muted" style={{ fontSize: '10px' }}>
+                    {cert.issuer} {cert.date && `· ${formatDate(cert.date)}`}
+                  </p>
                 </div>
               ))}
             </div>
