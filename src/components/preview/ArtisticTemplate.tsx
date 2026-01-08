@@ -3,6 +3,7 @@ import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin, Palette, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
+import { ProjectsSection, CertificationsSection } from './TemplateSections';
 
 interface TemplateProps {
   data: CVData;
@@ -155,7 +156,7 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
 
             {/* Education */}
             {education.length > 0 && (
-              <section className="flex-shrink-0">
+              <section style={{ marginBottom: layout.sectionMargin }}>
                 <h2 
                   className="font-black inline-block pb-1"
                   style={{ 
@@ -178,6 +179,22 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
                 </div>
               </section>
             )}
+
+            {/* Projects */}
+            <ProjectsSection
+              projects={projects}
+              accentColor={accentColor}
+              titleFontSize={layout.titleFontSize}
+              itemMargin={layout.itemMargin}
+            />
+
+            {/* Certifications */}
+            <CertificationsSection
+              certifications={certifications}
+              accentColor={accentColor}
+              titleFontSize={layout.titleFontSize}
+              itemMargin={layout.itemMargin}
+            />
           </div>
 
           {/* Sidebar */}

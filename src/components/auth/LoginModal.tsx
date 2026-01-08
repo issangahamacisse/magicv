@@ -24,9 +24,10 @@ interface LoginModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSwitchToSignUp: () => void;
+  onForgotPassword: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToSignUp }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToSignUp, onForgotPassword }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -110,6 +111,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToS
                 <Label htmlFor="password">Mot de passe</Label>
                 <button
                   type="button"
+                  onClick={onForgotPassword}
                   className="text-xs text-primary hover:underline"
                 >
                   Mot de passe oublié ?

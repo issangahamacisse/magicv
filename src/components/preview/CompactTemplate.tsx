@@ -3,6 +3,7 @@ import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
+import { ProjectsSection, CertificationsSection } from './TemplateSections';
 
 interface TemplateProps {
   data: CVData;
@@ -199,6 +200,24 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
           )}
         </div>
       </div>
+
+      {/* Projects & Certifications Row */}
+      {(projects.length > 0 || certifications.length > 0) && (
+        <div className="grid grid-cols-2 flex-shrink-0" style={{ gap: layout.sectionMargin, marginTop: layout.sectionMargin }}>
+          <ProjectsSection
+            projects={projects}
+            accentColor={accentColor}
+            titleFontSize={layout.titleFontSize}
+            itemMargin={layout.itemMargin}
+          />
+          <CertificationsSection
+            certifications={certifications}
+            accentColor={accentColor}
+            titleFontSize={layout.titleFontSize}
+            itemMargin={layout.itemMargin}
+          />
+        </div>
+      )}
     </div>
   );
 });

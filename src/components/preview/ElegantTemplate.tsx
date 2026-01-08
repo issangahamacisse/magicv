@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
-import { Mail, Phone, MapPin, Linkedin, GraduationCap, Briefcase } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, GraduationCap, Briefcase, FolderOpen, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
@@ -157,7 +157,7 @@ const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
 
             {/* Education */}
             {education.length > 0 && (
-              <section className="flex-shrink-0">
+              <section>
                 <div className="flex items-center gap-2" style={{ marginBottom: layout.itemMargin }}>
                   <GraduationCap className="h-4 w-4" style={{ color: accentColor }} />
                   <h2 
@@ -183,6 +183,77 @@ const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
                           {formatDate(edu.endDate)}
                         </span>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Projects */}
+            {projects.length > 0 && (
+              <section>
+                <div className="flex items-center gap-2" style={{ marginBottom: layout.itemMargin }}>
+                  <FolderOpen className="h-4 w-4" style={{ color: accentColor }} />
+                  <h2 
+                    className="font-bold uppercase tracking-wider"
+                    style={{ color: accentColor, fontSize: layout.titleFontSize }}
+                  >
+                    Projets
+                  </h2>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
+                  {projects.map((project) => (
+                    <div key={project.id} className="pl-5 relative">
+                      <div 
+                        className="absolute left-0 top-1.5 w-2 h-2 rounded-full"
+                        style={{ backgroundColor: accentColor }}
+                      />
+                      <h3 className="font-semibold text-gray-900">{project.name}</h3>
+                      {project.description && (
+                        <p className="text-gray-500" style={{ fontSize: '11px' }}>{project.description}</p>
+                      )}
+                      {project.technologies.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {project.technologies.map((tech) => (
+                            <span 
+                              key={tech} 
+                              className="px-1.5 py-0.5 rounded text-white"
+                              style={{ backgroundColor: accentColor, fontSize: '9px' }}
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Certifications */}
+            {certifications.length > 0 && (
+              <section className="flex-shrink-0">
+                <div className="flex items-center gap-2" style={{ marginBottom: layout.itemMargin }}>
+                  <Award className="h-4 w-4" style={{ color: accentColor }} />
+                  <h2 
+                    className="font-bold uppercase tracking-wider"
+                    style={{ color: accentColor, fontSize: layout.titleFontSize }}
+                  >
+                    Certifications
+                  </h2>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: layout.itemMargin }}>
+                  {certifications.map((cert) => (
+                    <div key={cert.id} className="pl-5 relative">
+                      <div 
+                        className="absolute left-0 top-1.5 w-2 h-2 rounded-full"
+                        style={{ backgroundColor: accentColor }}
+                      />
+                      <span className="font-semibold text-gray-900">{cert.name}</span>
+                      <p className="text-gray-500" style={{ fontSize: '11px' }}>
+                        {cert.issuer} {cert.date && `· ${formatDate(cert.date)}`}
+                      </p>
                     </div>
                   ))}
                 </div>

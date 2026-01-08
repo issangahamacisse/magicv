@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { cn } from '@/lib/utils';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
+import { ProjectsSection, CertificationsSection } from './TemplateSections';
 
 interface TemplateProps {
   data: CVData;
@@ -121,7 +122,7 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
 
           {/* Education */}
           {education.length > 0 && (
-            <section className="flex-shrink-0">
+            <section style={{ marginBottom: layout.sectionMargin }}>
               <h2 
                 className="font-light uppercase tracking-[0.25em]"
                 style={{ 
@@ -151,6 +152,22 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
               </div>
             </section>
           )}
+
+          {/* Projects */}
+          <ProjectsSection
+            projects={projects}
+            accentColor={accentColor}
+            titleFontSize={layout.titleFontSize}
+            itemMargin={layout.itemMargin}
+          />
+
+          {/* Certifications */}
+          <CertificationsSection
+            certifications={certifications}
+            accentColor={accentColor}
+            titleFontSize={layout.titleFontSize}
+            itemMargin={layout.itemMargin}
+          />
         </div>
 
         {/* Sidebar */}

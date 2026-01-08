@@ -3,6 +3,7 @@ import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
+import { ProjectsSection, CertificationsSection } from './TemplateSections';
 
 interface TemplateProps {
   data: CVData;
@@ -217,7 +218,7 @@ const CreativeTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
 
         {/* Education */}
         {education.length > 0 && (
-          <section className="mt-auto flex-shrink-0">
+          <section style={{ marginBottom: layout.sectionMargin }}>
             <h2 
               className="font-bold uppercase tracking-wider pb-1 border-b-2"
               style={{ borderColor: accentColor, color: accentColor, fontSize: layout.titleFontSize, marginBottom: layout.itemMargin }}
@@ -241,6 +242,22 @@ const CreativeTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
             </div>
           </section>
         )}
+
+        {/* Projects */}
+        <ProjectsSection
+          projects={projects}
+          accentColor={accentColor}
+          titleFontSize={layout.titleFontSize}
+          itemMargin={layout.itemMargin}
+        />
+
+        {/* Certifications */}
+        <CertificationsSection
+          certifications={certifications}
+          accentColor={accentColor}
+          titleFontSize={layout.titleFontSize}
+          itemMargin={layout.itemMargin}
+        />
       </div>
     </div>
   );
