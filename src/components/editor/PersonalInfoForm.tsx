@@ -3,10 +3,12 @@ import { useCV } from '@/context/CVContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { User, Mail, Phone, MapPin, Globe, Linkedin, Sparkles, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Globe, Linkedin, Sparkles, Loader2, SpellCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAIRewrite } from '@/hooks/useAIRewrite';
 import AIRewriteModal from './AIRewriteModal';
+import PhotoUpload from './PhotoUpload';
+import { toast } from 'sonner';
 
 // Défini en dehors pour éviter la perte de focus
 const InputWithIcon = ({ 
@@ -48,6 +50,7 @@ const PersonalInfoForm: React.FC = () => {
   const { cvData, updatePersonalInfo } = useCV();
   const { personalInfo } = cvData;
   const { rewrite, isLoading } = useAIRewrite();
+  const [isSpellchecking, setIsSpellchecking] = useState(false);
   
   const [modalOpen, setModalOpen] = useState(false);
   const [rewrittenText, setRewrittenText] = useState('');
@@ -75,8 +78,26 @@ const PersonalInfoForm: React.FC = () => {
     }
   };
 
+  const handleSpellcheck = async () => {
+    if (!personalInfo.summary.trim()) return;
+    setIsSpellchecking(true);
+    const result = await rewrite(personalInfo.summary, 'spellcheck');
+    if (result) {
+      updatePersonalInfo('summary', result);
+      toast.success('Orthographe corrigée');
+    }
+    setIsSpellchecking(false);
+  };
+
   return (
     <div className="space-y-4 animate-fade-in">
+      {/* Photo Upload */}
+      <div className="pb-4 border-b border-border">
+        <Label className="text-sm font-medium text-foreground/80 mb-2 block">
+          Photo de profil
+        </Label>
+        <PhotoUpload />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <InputWithIcon
           icon={User}
@@ -149,20 +170,36 @@ const PersonalInfoForm: React.FC = () => {
           <Label htmlFor="summary" className="text-sm font-medium text-foreground/80">
             Résumé professionnel
           </Label>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 text-xs text-primary hover:text-primary/80 ai-shimmer"
-            onClick={handleAIImprove}
-            disabled={isLoading || !personalInfo.summary.trim()}
-          >
-            {isLoading ? (
-              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-            ) : (
-              <Sparkles className="h-3 w-3 mr-1" />
-            )}
-            Améliorer avec l'IA
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs text-muted-foreground hover:text-foreground"
+              onClick={handleSpellcheck}
+              disabled={isSpellchecking || !personalInfo.summary.trim()}
+            >
+              {isSpellchecking ? (
+                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+              ) : (
+                <SpellCheck className="h-3 w-3 mr-1" />
+              )}
+              Orthographe
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs text-primary hover:text-primary/80 ai-shimmer"
+              onClick={handleAIImprove}
+              disabled={isLoading || !personalInfo.summary.trim()}
+            >
+              {isLoading ? (
+                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+              ) : (
+                <Sparkles className="h-3 w-3 mr-1" />
+              )}
+              Améliorer
+            </Button>
+          </div>
         </div>
         <Textarea
           id="summary"

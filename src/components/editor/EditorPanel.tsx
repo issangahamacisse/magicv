@@ -18,6 +18,8 @@ import {
   Save,
   Loader2,
   Cloud,
+  FolderKanban,
+  Award,
 } from 'lucide-react';
 import PersonalInfoForm from './PersonalInfoForm';
 import ExperienceForm from './ExperienceForm';
@@ -25,6 +27,8 @@ import EducationForm from './EducationForm';
 import SkillsForm from './SkillsForm';
 import LanguagesForm from './LanguagesForm';
 import ThemeSelector from './ThemeSelector';
+import ProjectsForm from './ProjectsForm';
+import CertificationsForm from './CertificationsForm';
 
 interface EditorPanelProps {
   openSection?: string;
@@ -41,6 +45,8 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
     { id: 'education', icon: GraduationCap, label: 'Formation', component: EducationForm },
     { id: 'skills', icon: Lightbulb, label: 'Compétences', component: SkillsForm },
     { id: 'languages', icon: Languages, label: 'Langues', component: LanguagesForm },
+    { id: 'projects', icon: FolderKanban, label: 'Projets', component: ProjectsForm },
+    { id: 'certifications', icon: Award, label: 'Certifications', component: CertificationsForm },
     { id: 'theme', icon: Palette, label: 'Apparence', component: ThemeSelector },
   ];
 

@@ -40,17 +40,12 @@ const TemplateGallery: React.FC = () => {
                   isSelected ? 'ring-2 ring-primary' : ''
                 }`}
               >
-                <div className="aspect-[3/4] bg-muted flex items-center justify-center">
-                  <div className="w-[80%] h-[90%] bg-background rounded shadow-sm flex flex-col p-2">
-                    {/* Mini template preview */}
-                    <div className="h-3 w-1/2 bg-primary/20 rounded mb-1" />
-                    <div className="h-2 w-3/4 bg-muted-foreground/20 rounded mb-2" />
-                    <div className="flex-1 space-y-1">
-                      <div className="h-1.5 w-full bg-muted-foreground/10 rounded" />
-                      <div className="h-1.5 w-4/5 bg-muted-foreground/10 rounded" />
-                      <div className="h-1.5 w-full bg-muted-foreground/10 rounded" />
-                    </div>
-                  </div>
+                <div className="aspect-[3/4] bg-muted flex items-center justify-center overflow-hidden">
+                  <img 
+                    src={`/templates/${template.id}.svg`}
+                    alt={`Template ${template.name}`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 
                 <div className="p-3">

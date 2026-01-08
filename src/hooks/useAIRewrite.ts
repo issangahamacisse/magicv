@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-type ActionType = 'summary' | 'bullets' | 'education';
+type ActionType = 'summary' | 'bullets' | 'education' | 'spellcheck';
 
 export function useAIRewrite() {
   const [isLoading, setIsLoading] = useState(false);

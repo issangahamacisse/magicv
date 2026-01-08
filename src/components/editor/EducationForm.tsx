@@ -5,9 +5,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Plus, Trash2, GripVertical, GraduationCap, Sparkles, Loader2 } from 'lucide-react';
+import { Plus, Trash2, GripVertical, GraduationCap, Sparkles, Loader2, SpellCheck } from 'lucide-react';
 import { useAIRewrite } from '@/hooks/useAIRewrite';
 import AIRewriteModal from './AIRewriteModal';
+import { toast } from 'sonner';
 
 const EducationForm: React.FC = () => {
   const { cvData, addEducation, updateEducation, removeEducation } = useCV();
@@ -18,6 +19,7 @@ const EducationForm: React.FC = () => {
   const [rewrittenText, setRewrittenText] = useState('');
   const [activeEduId, setActiveEduId] = useState<string | null>(null);
   const [originalText, setOriginalText] = useState('');
+  const [spellcheckingId, setSpellcheckingId] = useState<string | null>(null);
 
   const handleAIImprove = async (eduId: string, description: string) => {
     if (!description.trim()) return;
@@ -48,6 +50,17 @@ const EducationForm: React.FC = () => {
     if (result) {
       setRewrittenText(result);
     }
+  };
+
+  const handleSpellcheck = async (eduId: string, description: string) => {
+    if (!description.trim()) return;
+    setSpellcheckingId(eduId);
+    const result = await rewrite(description, 'spellcheck');
+    if (result) {
+      updateEducation(eduId, 'description', result);
+      toast.success('Orthographe corrigée');
+    }
+    setSpellcheckingId(null);
   };
 
   return (
@@ -136,20 +149,36 @@ const EducationForm: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label className="text-sm">Description (optionnel)</Label>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs text-primary hover:text-primary/80 ai-shimmer"
-                        onClick={() => handleAIImprove(edu.id, edu.description)}
-                        disabled={isLoading || !edu.description.trim()}
-                      >
-                        {isLoading && activeEduId === edu.id ? (
-                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                        ) : (
-                          <Sparkles className="h-3 w-3 mr-1" />
-                        )}
-                        Améliorer avec l'IA
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs text-muted-foreground hover:text-foreground"
+                          onClick={() => handleSpellcheck(edu.id, edu.description)}
+                          disabled={spellcheckingId === edu.id || !edu.description.trim()}
+                        >
+                          {spellcheckingId === edu.id ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <SpellCheck className="h-3 w-3 mr-1" />
+                          )}
+                          Orthographe
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs text-primary hover:text-primary/80 ai-shimmer"
+                          onClick={() => handleAIImprove(edu.id, edu.description)}
+                          disabled={isLoading || !edu.description.trim()}
+                        >
+                          {isLoading && activeEduId === edu.id ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-3 w-3 mr-1" />
+                          )}
+                          Améliorer
+                        </Button>
+                      </div>
                     </div>
                     <Textarea
                       placeholder="Mention Très Bien, Spécialisation en IA..."
