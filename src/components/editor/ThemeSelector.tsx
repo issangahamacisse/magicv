@@ -3,11 +3,13 @@ import { useCV } from '@/context/CVContext';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
+import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { TemplateId } from '@/types/cv';
+import SectionOrderPanel from './SectionOrderPanel';
 import { 
   Palette, 
-  Type, 
+  Type,
   Maximize2, 
   Layout, 
   Briefcase, 
@@ -462,6 +464,11 @@ const ThemeSelector: React.FC = () => {
           ))}
         </div>
       </div>
+
+      <Separator className="my-6" />
+
+      {/* Section Order */}
+      <SectionOrderPanel />
     </div>
   );
 };
