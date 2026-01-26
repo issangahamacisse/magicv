@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 import {
   User,
   Briefcase,
@@ -20,6 +21,7 @@ import {
   Cloud,
   FolderKanban,
   Award,
+  Upload,
 } from 'lucide-react';
 import PersonalInfoForm from './PersonalInfoForm';
 import ExperienceForm from './ExperienceForm';
@@ -29,6 +31,7 @@ import LanguagesForm from './LanguagesForm';
 import ThemeSelector from './ThemeSelector';
 import ProjectsForm from './ProjectsForm';
 import CertificationsForm from './CertificationsForm';
+import CVImportModal from './CVImportModal';
 
 interface EditorPanelProps {
   openSection?: string;
@@ -38,6 +41,7 @@ interface EditorPanelProps {
 const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened }) => {
   const { completionScore, isSaving, isCloudSynced } = useCV();
   const [openSections, setOpenSections] = useState<string[]>(['personal']);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const sections = [
     { id: 'personal', icon: User, label: 'Informations personnelles', component: PersonalInfoForm },
@@ -90,6 +94,17 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
           </div>
         </div>
 
+        {/* Import Button */}
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full mb-3"
+          onClick={() => setIsImportModalOpen(true)}
+        >
+          <Upload className="h-4 w-4 mr-2" />
+          Importer un CV (PDF/DOCX)
+        </Button>
+
         {/* Completion Score */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
@@ -106,6 +121,9 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
           </p>
         </div>
       </div>
+
+      {/* Import Modal */}
+      <CVImportModal open={isImportModalOpen} onOpenChange={setIsImportModalOpen} />
 
       {/* Sections */}
       <ScrollArea className="flex-1">
