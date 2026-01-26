@@ -5,6 +5,16 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import type { Json } from '@/integrations/supabase/types';
 
+interface ImportedCVData {
+  personalInfo?: Partial<CVData['personalInfo']>;
+  experience?: CVData['experience'];
+  education?: CVData['education'];
+  skills?: CVData['skills'];
+  languages?: CVData['languages'];
+  projects?: CVData['projects'];
+  certifications?: CVData['certifications'];
+}
+
 interface CVContextType {
   cvData: CVData;
   updatePersonalInfo: (field: string, value: string) => void;
@@ -35,6 +45,7 @@ interface CVContextType {
   resetCV: () => void;
   loadCV: (resumeId: string) => Promise<void>;
   currentResumeId: string | null;
+  importCVData: (data: ImportedCVData) => void;
 }
 
 const CVContext = createContext<CVContextType | undefined>(undefined);
@@ -463,6 +474,24 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }));
   }, []);
 
+  // Import CV data from parsed file
+  const importCVData = useCallback((data: ImportedCVData) => {
+    setCVData(prev => ({
+      ...prev,
+      personalInfo: {
+        ...prev.personalInfo,
+        ...data.personalInfo,
+      },
+      experience: data.experience?.length ? data.experience : prev.experience,
+      education: data.education?.length ? data.education : prev.education,
+      skills: data.skills?.length ? data.skills : prev.skills,
+      languages: data.languages?.length ? data.languages : prev.languages,
+      projects: data.projects?.length ? data.projects : prev.projects,
+      certifications: data.certifications?.length ? data.certifications : prev.certifications,
+    }));
+    toast.success('Données importées avec succès !');
+  }, []);
+
   return (
     <CVContext.Provider
       value={{
@@ -495,6 +524,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         resetCV,
         loadCV,
         currentResumeId,
+        importCVData,
       }}
     >
       {children}

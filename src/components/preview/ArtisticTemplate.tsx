@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
-import { Mail, Phone, MapPin, Linkedin, Palette, Star } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Palette, Star, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 import { ProjectsSection, CertificationsSection } from './TemplateSections';
@@ -44,14 +44,22 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
           <div className="flex items-start gap-6">
             {/* Creative avatar */}
             <div 
-              className="rounded-2xl rotate-3 shadow-lg flex items-center justify-center text-white"
+              className="rounded-2xl rotate-3 shadow-lg flex items-center justify-center text-white overflow-hidden"
               style={{ 
-                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+                background: personalInfo.photoUrl ? 'transparent' : `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
                 width: layout.contentDensity === 'sparse' ? '96px' : '80px',
                 height: layout.contentDensity === 'sparse' ? '96px' : '80px'
               }}
             >
-              <Palette style={{ width: '32px', height: '32px' }} />
+              {personalInfo.photoUrl ? (
+                <img 
+                  src={personalInfo.photoUrl} 
+                  alt="Photo de profil"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User style={{ width: '32px', height: '32px' }} />
+              )}
             </div>
             
             <div className="flex-1">

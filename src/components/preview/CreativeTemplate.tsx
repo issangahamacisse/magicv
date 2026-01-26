@@ -41,21 +41,29 @@ const CreativeTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
         className="w-[35%] text-primary-foreground flex flex-col"
         style={{ backgroundColor: accentColor, padding: layout.contentPadding }}
       >
-        {/* Profile Photo Placeholder */}
+        {/* Profile Photo */}
         <div 
-          className="mx-auto rounded-full bg-primary-foreground/20 flex items-center justify-center flex-shrink-0"
+          className="mx-auto rounded-full bg-primary-foreground/20 flex items-center justify-center flex-shrink-0 overflow-hidden"
           style={{ 
             width: layout.contentDensity === 'sparse' ? '112px' : '96px',
             height: layout.contentDensity === 'sparse' ? '112px' : '96px',
             marginBottom: layout.itemMargin
           }}
         >
-          <span 
-            className="font-bold text-primary-foreground/60"
-            style={{ fontSize: layout.headerFontSize }}
-          >
-            {personalInfo.fullName ? personalInfo.fullName.charAt(0).toUpperCase() : '?'}
-          </span>
+          {personalInfo.photoUrl ? (
+            <img 
+              src={personalInfo.photoUrl} 
+              alt="Photo de profil"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span 
+              className="font-bold text-primary-foreground/60"
+              style={{ fontSize: layout.headerFontSize }}
+            >
+              {personalInfo.fullName ? personalInfo.fullName.charAt(0).toUpperCase() : '?'}
+            </span>
+          )}
         </div>
 
         {/* Name */}

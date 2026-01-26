@@ -43,19 +43,27 @@ const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
       >
         {/* Avatar placeholder */}
         <div 
-          className="mx-auto rounded-full bg-white/20 flex items-center justify-center flex-shrink-0"
+          className="mx-auto rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 overflow-hidden"
           style={{ 
             width: layout.contentDensity === 'sparse' ? '100px' : '80px',
             height: layout.contentDensity === 'sparse' ? '100px' : '80px',
             marginBottom: layout.sectionMargin
           }}
         >
-          <span 
-            className="font-bold text-white/80"
-            style={{ fontSize: layout.headerFontSize }}
-          >
-            {personalInfo.fullName?.charAt(0) || 'N'}
-          </span>
+          {personalInfo.photoUrl ? (
+            <img 
+              src={personalInfo.photoUrl} 
+              alt="Photo de profil"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span 
+              className="font-bold text-white/80"
+              style={{ fontSize: layout.headerFontSize }}
+            >
+              {personalInfo.fullName?.charAt(0) || 'N'}
+            </span>
+          )}
         </div>
 
         <h1 
