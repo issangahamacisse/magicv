@@ -14,14 +14,170 @@ export type Database = {
   }
   public: {
     Tables: {
+      coupon_uses: {
+        Row: {
+          coupon_id: string
+          id: string
+          used_at: string
+          user_id: string
+        }
+        Insert: {
+          coupon_id: string
+          id?: string
+          used_at?: string
+          user_id: string
+        }
+        Update: {
+          coupon_id?: string
+          id?: string
+          used_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_uses_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          credit_amount: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number
+          used_count: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          credit_amount?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number
+          used_count?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          credit_amount?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number
+          used_count?: number
+        }
+        Relationships: []
+      }
+      download_permissions: {
+        Row: {
+          granted_at: string
+          granted_by: string
+          id: string
+          resume_id: string
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          granted_by: string
+          id?: string
+          resume_id: string
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          granted_by?: string
+          id?: string
+          resume_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "download_permissions_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          payment_method: string | null
+          payment_type: string
+          phone_number: string | null
+          proof_url: string | null
+          resume_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          payment_method?: string | null
+          payment_type: string
+          phone_number?: string | null
+          proof_url?: string | null
+          resume_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_method?: string | null
+          payment_type?: string
+          phone_number?: string | null
+          proof_url?: string | null
+          resume_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           created_at: string
           credits_ai: number
           email: string | null
+          free_usage_count: number
           full_name: string | null
           id: string
+          is_subscribed: boolean
+          subscription_expires_at: string | null
           subscription_status: string
           updated_at: string
           user_id: string
@@ -31,8 +187,11 @@ export type Database = {
           created_at?: string
           credits_ai?: number
           email?: string | null
+          free_usage_count?: number
           full_name?: string | null
           id?: string
+          is_subscribed?: boolean
+          subscription_expires_at?: string | null
           subscription_status?: string
           updated_at?: string
           user_id: string
@@ -42,8 +201,11 @@ export type Database = {
           created_at?: string
           credits_ai?: number
           email?: string | null
+          free_usage_count?: number
           full_name?: string | null
           id?: string
+          is_subscribed?: boolean
+          subscription_expires_at?: string | null
           subscription_status?: string
           updated_at?: string
           user_id?: string
@@ -80,15 +242,53 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_download_resume: {
+        Args: { p_resume_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      can_use_ai: { Args: { p_user_id: string }; Returns: Json }
+      consume_ai_usage: { Args: { p_user_id: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      use_coupon: {
+        Args: { coupon_code: string; p_resume_id?: string }
+        Returns: Json
+      }
+      validate_payment: { Args: { payment_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -215,6 +415,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

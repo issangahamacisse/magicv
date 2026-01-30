@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
 
@@ -7,6 +6,12 @@ interface UsePdfExportOptions {
   filename?: string;
   addWatermark?: boolean;
 }
+
+// Dynamically load html2canvas
+const loadHtml2Canvas = async () => {
+  const module = await import('html2canvas');
+  return module.default;
+};
 
 export const usePdfExport = (options: UsePdfExportOptions = {}) => {
   const [isExporting, setIsExporting] = useState(false);
@@ -21,6 +26,8 @@ export const usePdfExport = (options: UsePdfExportOptions = {}) => {
     setIsExporting(true);
     
     try {
+      const html2canvas = await loadHtml2Canvas();
+
       // Create a clone of the element for export
       const clone = element.cloneNode(true) as HTMLElement;
       clone.style.transform = 'none';
@@ -55,7 +62,7 @@ export const usePdfExport = (options: UsePdfExportOptions = {}) => {
       if (addWatermark) {
         pdf.setFontSize(10);
         pdf.setTextColor(150, 150, 150);
-        pdf.text('Créé avec CV Builder', pdfWidth / 2, pdfHeight - 5, { align: 'center' });
+        pdf.text('Créé avec MagiCV', pdfWidth / 2, pdfHeight - 5, { align: 'center' });
       }
 
       pdf.save(`${filename}.pdf`);
