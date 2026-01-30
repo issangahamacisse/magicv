@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -146,7 +147,39 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Parsing CV (${fileType}), text length: ${cvText.length}`);
+    // Get authorization header to check user quota
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | null = null;
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+      
+      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } }
+      });
+
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        userId = user.id;
+        
+        // Check if user can use AI
+        const { data: canUseResult } = await supabase.rpc('can_use_ai', { p_user_id: userId });
+        
+        if (canUseResult && !canUseResult.allowed) {
+          return new Response(
+            JSON.stringify({ 
+              error: canUseResult.reason || "Quota IA épuisé. Achetez des crédits pour continuer.",
+              requiresPayment: true 
+            }),
+            { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+    }
+
+    console.log(`Parsing CV (${fileType}), text length: ${cvText.length}, user: ${userId || 'anonymous'}`);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -172,7 +205,7 @@ Instructions:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.0-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Voici le texte extrait d'un CV. Analyse-le et extrais toutes les informations structurées:\n\n${cvText}` }
@@ -202,6 +235,16 @@ Instructions:
 
     const result = await response.json();
     console.log("AI response received");
+
+    // Consume AI usage after successful call
+    if (userId) {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+      
+      await adminClient.rpc('consume_ai_usage', { p_user_id: userId });
+      console.log(`AI usage consumed for user ${userId}`);
+    }
 
     // Extract the tool call result
     const toolCall = result.choices?.[0]?.message?.tool_calls?.[0];

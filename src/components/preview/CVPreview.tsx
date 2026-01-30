@@ -2,6 +2,7 @@ import React, { useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import { useCV } from '@/context/CVContext';
 import { useAuth } from '@/context/AuthContext';
 import { usePdfExport } from '@/hooks/usePdfExport';
+import { useDownloadPermission } from '@/hooks/useDownloadPermission';
 import ModernTemplate from './ModernTemplate';
 import ClassicTemplate from './ClassicTemplate';
 import CreativeTemplate from './CreativeTemplate';
@@ -25,7 +26,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
-  const { cvData } = useCV();
+  const { cvData, currentResumeId } = useCV();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [zoom, setZoom] = useState(100);
@@ -36,7 +37,11 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
     filename: cvData.personalInfo.fullName 
       ? `CV-${cvData.personalInfo.fullName.replace(/\s+/g, '-')}`
       : 'mon-cv',
-    addWatermark: false, // 100% free for now
+    addWatermark: false,
+  });
+
+  const { checkPermission, isChecking } = useDownloadPermission({
+    resumeId: currentResumeId,
   });
 
   useImperativeHandle(ref, () => cvRef.current as HTMLDivElement);
@@ -58,9 +63,17 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
 
   const handleDownload = async () => {
     if (!user) {
+      toast.info('Connectez-vous pour télécharger votre CV');
       navigate('/auth');
       return;
     }
+
+    // Check download permission
+    const hasPermission = await checkPermission();
+    if (!hasPermission) {
+      return; // checkPermission handles the redirect
+    }
+
     await exportToPdf(cvRef.current);
   };
 
@@ -156,8 +169,8 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
           </DropdownMenu>
 
           {/* Download Button */}
-          <Button onClick={handleDownload} size="sm" className="gap-2" disabled={isExporting}>
-            {isExporting ? (
+          <Button onClick={handleDownload} size="sm" className="gap-2" disabled={isExporting || isChecking}>
+            {isExporting || isChecking ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Download className="h-4 w-4" />

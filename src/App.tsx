@@ -9,6 +9,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import Landing from "./pages/Landing";
 import Editor from "./pages/Editor";
 import Auth from "./pages/Auth";
+import Payment from "./pages/Payment";
+import AdminPortal from "./pages/AdminPortal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
                 <Route path="/" element={<Landing />} />
                 <Route path="/editor" element={<Editor />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/payment" element={<Payment />} />
+                <Route path="/admin-portal" element={<AdminPortal />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
