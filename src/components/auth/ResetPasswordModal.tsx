@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,11 +16,11 @@ interface ResetPasswordModalProps {
   onBackToLogin: () => void;
 }
 
-export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
+const ResetPasswordModal = forwardRef<HTMLDivElement, ResetPasswordModalProps>(({
   open,
   onOpenChange,
   onBackToLogin,
-}) => {
+}, _ref) => {
   const { resetPassword } = useAuth();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -141,4 +141,8 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
+});
+
+ResetPasswordModal.displayName = 'ResetPasswordModal';
+
+export { ResetPasswordModal };
