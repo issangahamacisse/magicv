@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,11 +16,11 @@ interface ResetPasswordModalProps {
   onBackToLogin: () => void;
 }
 
-const ResetPasswordModal = forwardRef<HTMLDivElement, ResetPasswordModalProps>(({
+const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
   open,
   onOpenChange,
   onBackToLogin,
-}, _ref) => {
+}) => {
   const { resetPassword } = useAuth();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -76,8 +76,8 @@ const ResetPasswordModal = forwardRef<HTMLDivElement, ResetPasswordModalProps>((
         {emailSent ? (
           <div className="space-y-4 py-4">
             <div className="flex justify-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
             <p className="text-center text-muted-foreground">
@@ -109,11 +109,11 @@ const ResetPasswordModal = forwardRef<HTMLDivElement, ResetPasswordModalProps>((
                   placeholder="vous@exemple.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`pl-10 ${error ? 'border-red-500' : ''}`}
+                  className={`pl-10 ${error ? 'border-destructive' : ''}`}
                   required
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
@@ -141,8 +141,6 @@ const ResetPasswordModal = forwardRef<HTMLDivElement, ResetPasswordModalProps>((
       </DialogContent>
     </Dialog>
   );
-});
-
-ResetPasswordModal.displayName = 'ResetPasswordModal';
+};
 
 export { ResetPasswordModal };
