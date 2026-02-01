@@ -181,9 +181,10 @@ serve(async (req) => {
 
     console.log(`Parsing CV (${fileType}), text length: ${cvText.length}, user: ${userId || 'anonymous'}`);
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    // Use OpenAI API with user's API key
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not configured");
     }
 
     const systemPrompt = `Tu es un expert en analyse de CV. Tu dois extraire toutes les informations d'un CV et les structurer de manière précise.
@@ -198,14 +199,14 @@ Instructions:
 - Traduis les niveaux en anglais (beginner, intermediate, advanced, expert pour les skills)
 - Traduis les niveaux de langue en anglais (basic, conversational, professional, fluent, native)`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash",
+        model: "gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Voici le texte extrait d'un CV. Analyse-le et extrais toutes les informations structurées:\n\n${cvText}` }
@@ -218,23 +219,23 @@ Instructions:
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Limite de requêtes atteinte, réessayez plus tard" }),
+          JSON.stringify({ error: "Limite de requêtes OpenAI atteinte, réessayez plus tard" }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      if (response.status === 402) {
+      if (response.status === 402 || response.status === 401) {
         return new Response(
-          JSON.stringify({ error: "Crédits épuisés, veuillez recharger votre compte" }),
+          JSON.stringify({ error: "Erreur d'authentification OpenAI, vérifiez votre clé API" }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("OpenAI API error:", response.status, errorText);
       throw new Error("Erreur lors de l'analyse du CV");
     }
 
     const result = await response.json();
-    console.log("AI response received");
+    console.log("OpenAI response received");
 
     // Consume AI usage after successful call
     if (userId) {

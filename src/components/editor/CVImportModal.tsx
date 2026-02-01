@@ -144,9 +144,25 @@ const CVImportModal: React.FC<CVImportModalProps> = ({ open, onOpenChange }) => 
               )}
             </div>
 
+            {/* Premium Warning */}
+            <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                    Mode Premium requis
+                  </p>
+                  <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                    L'importation d'un CV désactive le téléchargement gratuit avec filigrane. 
+                    Vous devrez payer <strong>1000F</strong> pour télécharger le fichier final sans filigrane.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="mt-4 p-4 bg-muted/50 rounded-lg">
               <div className="flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-muted-foreground">
                   <strong>Note :</strong> Les CV très graphiques (colonnes complexes, images) peuvent être moins bien interprétés. 
                   Vous pourrez vérifier et corriger les données extraites avant de les appliquer.
