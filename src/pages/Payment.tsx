@@ -127,8 +127,8 @@ const Payment: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="bg-muted p-4 rounded-lg space-y-2 text-sm">
               <p><strong>Montant:</strong> {prices[paymentType]} FCFA</p>
-              <p><strong>Orange Money:</strong> 07 07 07 07 07</p>
-              <p><strong>Moov Money:</strong> 05 05 05 05 05</p>
+              <p><strong>Orange Money:</strong> +226 66 78 38 31</p>
+              <p><strong>Moov Money:</strong> +226 66 78 38 31</p>
             </div>
             <p className="text-xs text-muted-foreground">
               Une fois le paiement confirmé, votre CV sera débloqué et vous recevrez vos crédits IA.
@@ -244,12 +244,12 @@ const Payment: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
                 <p className="font-semibold text-orange-700 dark:text-orange-400 mb-1">Orange Money</p>
-                <p className="text-2xl font-mono">07 07 07 07 07</p>
+                <p className="text-2xl font-mono">+226 66 78 38 31</p>
                 <p className="text-sm text-muted-foreground mt-1">Nom: MagiCV</p>
               </div>
               <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <p className="font-semibold text-blue-700 dark:text-blue-400 mb-1">Moov Money</p>
-                <p className="text-2xl font-mono">05 05 05 05 05</p>
+                <p className="text-2xl font-mono">+226 66 78 38 31</p>
                 <p className="text-sm text-muted-foreground mt-1">Nom: MagiCV</p>
               </div>
             </div>
