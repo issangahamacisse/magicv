@@ -60,9 +60,9 @@ export const usePdfExport = (options: UsePdfExportOptions = {}) => {
 
       // Add watermark for free users
       if (addWatermark) {
-        pdf.setFontSize(10);
-        pdf.setTextColor(150, 150, 150);
-        pdf.text('Créé avec MagiCV', pdfWidth / 2, pdfHeight - 5, { align: 'center' });
+        pdf.setFontSize(12);
+        pdf.setTextColor(180, 180, 180);
+        pdf.text('Créé sur MagicCV.com', pdfWidth / 2, pdfHeight - 8, { align: 'center' });
       }
 
       pdf.save(`${filename}.pdf`);
