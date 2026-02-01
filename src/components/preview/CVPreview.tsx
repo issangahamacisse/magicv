@@ -33,11 +33,13 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
   const [copied, setCopied] = useState(false);
   const cvRef = useRef<HTMLDivElement>(null);
   
+  const [addWatermark, setAddWatermark] = useState(true);
+  
   const { exportToPdf, isExporting } = usePdfExport({
     filename: cvData.personalInfo.fullName 
       ? `CV-${cvData.personalInfo.fullName.replace(/\s+/g, '-')}`
       : 'mon-cv',
-    addWatermark: false,
+    addWatermark,
   });
 
   const { checkPermission, isChecking } = useDownloadPermission({
@@ -61,21 +63,34 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
 
   const TemplateComponent = templateComponents[cvData.theme.template] || ModernTemplate;
 
-  const handleDownload = async () => {
-    if (!user) {
-      toast.info('Connectez-vous pour télécharger votre CV');
+  const handleDownload = async (premium: boolean = false) => {
+    if (premium && !user) {
+      toast.info('Connectez-vous pour télécharger sans filigrane');
       navigate('/auth');
       return;
     }
 
-    // Check download permission
-    const hasPermission = await checkPermission();
-    if (!hasPermission) {
-      return; // checkPermission handles the redirect
+    if (premium) {
+      // Check if user has premium access
+      const permission = await checkPermission();
+      if (!permission.isPremium) {
+        toast.info('Débloquez le téléchargement premium pour retirer le filigrane');
+        navigate(`/payment?resumeId=${currentResumeId}`);
+        return;
+      }
+      setAddWatermark(false);
+    } else {
+      setAddWatermark(true);
     }
 
-    await exportToPdf(cvRef.current);
+    // Small delay to ensure state is updated
+    setTimeout(() => {
+      exportToPdf(cvRef.current);
+    }, 50);
   };
+
+  const handleFreeDownload = () => handleDownload(false);
+  const handlePremiumDownload = () => handleDownload(true);
 
   const handleCopyLink = async () => {
     try {
@@ -168,15 +183,29 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Download Button */}
-          <Button onClick={handleDownload} size="sm" className="gap-2" disabled={isExporting || isChecking}>
-            {isExporting || isChecking ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4" />
-            )}
-            Télécharger
-          </Button>
+          {/* Download Buttons */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" className="gap-2" disabled={isExporting || isChecking}>
+                {isExporting || isChecking ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}
+                Télécharger
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleFreeDownload}>
+                <Download className="h-4 w-4 mr-2" />
+                Gratuit (avec filigrane)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handlePremiumDownload}>
+                <FileText className="h-4 w-4 mr-2" />
+                Premium (sans filigrane)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
