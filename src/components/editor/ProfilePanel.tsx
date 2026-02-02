@@ -20,8 +20,13 @@ import {
   CloudOff,
   ExternalLink,
   Download,
-  CheckCircle
+  CheckCircle,
+  Crown,
+  Clock,
+  AlertCircle,
+  XCircle
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -41,20 +46,40 @@ interface DownloadPermission {
   resume_title?: string;
 }
 
+interface Payment {
+  id: string;
+  payment_type: string;
+  status: string;
+  amount: number;
+  created_at: string;
+  resume_id: string | null;
+  resume_title?: string;
+}
+
+interface ProfileData {
+  full_name: string | null;
+  credits_ai: number;
+  is_subscribed: boolean;
+  subscription_status: string;
+  subscription_expires_at: string | null;
+}
+
 const ProfilePanel: React.FC = () => {
   const { user, signOut } = useAuth();
   const { resetCV, loadCV, currentResumeId } = useCV();
   const navigate = useNavigate();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [downloadPermissions, setDownloadPermissions] = useState<DownloadPermission[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [profile, setProfile] = useState<{ full_name: string | null; credits_ai: number } | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
 
   useEffect(() => {
     if (user) {
       fetchProfile();
       fetchResumes();
       fetchDownloadPermissions();
+      fetchPayments();
     } else {
       setIsLoading(false);
     }
@@ -65,7 +90,7 @@ const ProfilePanel: React.FC = () => {
     
     const { data, error } = await supabase
       .from('profiles')
-      .select('full_name, credits_ai')
+      .select('full_name, credits_ai, is_subscribed, subscription_status, subscription_expires_at')
       .eq('user_id', user.id)
       .maybeSingle();
 
@@ -121,6 +146,70 @@ const ProfilePanel: React.FC = () => {
       setDownloadPermissions(permissionsWithTitles);
     } else {
       setDownloadPermissions([]);
+    }
+  };
+
+  const fetchPayments = async () => {
+    if (!user) return;
+    
+    const { data: paymentsData, error } = await supabase
+      .from('payments')
+      .select('id, payment_type, status, amount, created_at, resume_id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching payments:', error);
+      return;
+    }
+
+    if (paymentsData && paymentsData.length > 0) {
+      // Fetch resume titles for payments with resume_id
+      const resumeIds = paymentsData.filter(p => p.resume_id).map(p => p.resume_id as string);
+      let resumesData: { id: string; title: string }[] = [];
+      
+      if (resumeIds.length > 0) {
+        const { data } = await supabase
+          .from('resumes')
+          .select('id, title')
+          .in('id', resumeIds);
+        resumesData = data || [];
+      }
+
+      const paymentsWithTitles = paymentsData.map(payment => ({
+        ...payment,
+        resume_title: payment.resume_id 
+          ? resumesData.find(r => r.id === payment.resume_id)?.title || 'CV sans titre'
+          : undefined
+      }));
+
+      setPayments(paymentsWithTitles);
+    } else {
+      setPayments([]);
+    }
+  };
+
+  const getPaymentStatusBadge = (status: string) => {
+    switch (status) {
+      case 'validated':
+        return <Badge className="bg-emerald-500 hover:bg-emerald-600"><CheckCircle className="h-3 w-3 mr-1" />Validé</Badge>;
+      case 'pending':
+        return <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-200"><Clock className="h-3 w-3 mr-1" />En attente</Badge>;
+      case 'rejected':
+        return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />Rejeté</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  const getPaymentTypeLabel = (type: string) => {
+    switch (type) {
+      case 'download':
+        return 'Téléchargement CV';
+      case 'subscription':
+        return 'Abonnement mensuel';
+      default:
+        return type;
     }
   };
 
@@ -232,6 +321,38 @@ const ProfilePanel: React.FC = () => {
                 Synchronisé avec le cloud
               </p>
             </div>
+          </div>
+        </Card>
+
+        {/* Subscription Status */}
+        <Card className={`p-4 ${profile?.is_subscribed ? 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800' : ''}`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-full ${profile?.is_subscribed ? 'bg-amber-100 dark:bg-amber-900/50' : 'bg-muted'}`}>
+                <Crown className={`h-5 w-5 ${profile?.is_subscribed ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`} />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Abonnement</p>
+                {profile?.is_subscribed ? (
+                  <div>
+                    <p className="text-sm text-emerald-600 dark:text-emerald-400 font-semibold">Actif</p>
+                    {profile.subscription_expires_at && (
+                      <p className="text-xs text-muted-foreground">
+                        Expire le {format(new Date(profile.subscription_expires_at), 'dd MMM yyyy', { locale: fr })}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Gratuit</p>
+                )}
+              </div>
+            </div>
+            {!profile?.is_subscribed && (
+              <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate('/payment')}>
+                <Crown className="h-3 w-3" />
+                S'abonner
+              </Button>
+            )}
           </div>
         </Card>
 
@@ -347,6 +468,35 @@ const ProfilePanel: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Payment History */}
+        {payments.length > 0 && (
+          <div>
+            <h4 className="font-medium flex items-center gap-2 mb-3">
+              <Clock className="h-4 w-4" />
+              Historique des demandes ({payments.length})
+            </h4>
+            <div className="space-y-2">
+              {payments.map((payment) => (
+                <Card key={payment.id} className="p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-medium text-sm">{getPaymentTypeLabel(payment.payment_type)}</p>
+                        {getPaymentStatusBadge(payment.status)}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {payment.resume_title && `${payment.resume_title} • `}
+                        {format(new Date(payment.created_at), 'dd MMM yyyy à HH:mm', { locale: fr })}
+                      </p>
+                    </div>
+                    <p className="text-sm font-semibold whitespace-nowrap">{payment.amount}F</p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Logout */}
         <Button 
