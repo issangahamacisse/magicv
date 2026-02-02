@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { FileText, User, Sparkles, Menu, LogOut } from 'lucide-react';
+import { FileText, User, Sparkles, Menu, LogOut, Shield } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -12,6 +13,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -23,6 +25,30 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePreview }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check if user has admin role
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      const { data, error } = await supabase.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'admin'
+      });
+
+      if (!error && data) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdminRole();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -66,6 +92,15 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {isAdmin && (
+                <>
+                  <DropdownMenuItem onClick={() => navigate('/admin-portal')} className="gap-2">
+                    <Shield className="h-4 w-4" />
+                    Portail Admin
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem onClick={handleSignOut} className="gap-2">
                 <LogOut className="h-4 w-4" />
                 Déconnexion
@@ -94,6 +129,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
                 <Sparkles className="h-4 w-4" />
                 Scanner ATS
               </Button>
+              
+              {isAdmin && (
+                <Button variant="ghost" className="justify-start gap-2" onClick={() => navigate('/admin-portal')}>
+                  <Shield className="h-4 w-4" />
+                  Portail Admin
+                </Button>
+              )}
               
               {user ? (
                 <Button variant="outline" className="justify-start gap-2" onClick={handleSignOut}>
