@@ -1,185 +1,86 @@
 
-## Plan : Afficher la vraie photo de profil + Import CV par IA
 
-### Partie 1 : Afficher la vraie photo dans les templates Bold, Creative et Artistic
+# Plan d'implémentation : Système de filigrane et accès admin
 
-**Probleme actuel :**
-- **BoldTemplate** (lignes 45-59) : Affiche l'initiale du nom dans un cercle
-- **CreativeTemplate** (lignes 45-59) : Affiche l'initiale dans un cercle
-- **ArtisticTemplate** (lignes 46-55) : Affiche une icone Palette au lieu d'une photo
+## Contexte
 
-**Solution :**
-Modifier chaque template pour verifier si `personalInfo.photoUrl` existe et afficher l'image, sinon garder le fallback actuel (initiale ou icone).
+Le système doit fonctionner ainsi :
+- **CV créés manuellement** : Téléchargement gratuit avec filigrane "Créé sur MagicCV"
+- **CV importés via IA** : Paiement obligatoire de 1000F (aucune option gratuite)
+- **Premium** : Téléchargement sans filigrane pour les abonnés ou ceux ayant payé
 
-**Fichiers a modifier :**
-| Fichier | Modification |
-|---------|-------------|
-| `src/components/preview/BoldTemplate.tsx` | Ajouter condition photoUrl avec `<img>` arrondie |
-| `src/components/preview/CreativeTemplate.tsx` | Ajouter condition photoUrl avec `<img>` arrondie |
-| `src/components/preview/ArtisticTemplate.tsx` | Ajouter condition photoUrl avec `<img>` stylisee |
+## Clarification importante sur le mot de passe admin
 
-**Code type :**
-```tsx
-{personalInfo.photoUrl ? (
-  <img 
-    src={personalInfo.photoUrl} 
-    alt="Photo de profil"
-    className="w-full h-full object-cover rounded-full"
-  />
-) : (
-  <span className="font-bold">{personalInfo.fullName?.charAt(0) || 'N'}</span>
-)}
-```
+Le portail admin utilise l'authentification standard (email + mot de passe). Le système ne stocke pas de mot de passe en clair - il faudra réinitialiser le mot de passe du compte `admin@cissedesign.com` via le flux "Mot de passe oublié" pour définir **66783831** comme nouveau mot de passe.
 
 ---
 
-### Partie 2 : Import de CV (PDF/DOCX) avec analyse IA
+## Phase 1 : Modification de la base de données
 
-Cette fonctionnalite permet a l'utilisateur d'importer un CV existant et de le convertir automatiquement en donnees structurees.
+### 1.1 Ajouter une colonne pour tracker l'import IA
 
-**Architecture :**
-```
-Utilisateur upload PDF/DOCX
-        |
-        v
-Frontend (CVImportModal)
-        |
-        v
-Edge Function (parse-cv)
-        |
-        v
-1. Extraction texte (pdf-parse / mammoth)
-2. Analyse IA (Lovable AI - gemini-2.5-flash)
-3. Extraction structuree (tool calling)
-        |
-        v
-Retour JSON -> CVData
-        |
-        v
-Modal de verification + Appliquer au CV
+Ajouter une colonne `used_ai_import` à la table `resumes` :
+
+```text
++-------------------+
+|     resumes       |
++-------------------+
+| ...               |
+| used_ai_import    | boolean DEFAULT false
++-------------------+
 ```
 
-**Fichiers a creer :**
+### 1.2 Mettre à jour la fonction `can_download_resume`
 
-| Fichier | Description |
-|---------|-------------|
-| `supabase/functions/parse-cv/index.ts` | Edge function pour parser PDF/DOCX et analyser avec l'IA |
-| `src/components/editor/CVImportModal.tsx` | Modal d'upload et preview des donnees extraites |
-| `src/hooks/useCVImport.ts` | Hook pour gerer l'import et l'appel a l'edge function |
-
-**Fichiers a modifier :**
-
-| Fichier | Modification |
-|---------|-------------|
-| `src/components/editor/EditorPanel.tsx` | Ajouter bouton "Importer un CV" |
-| `src/context/CVContext.tsx` | Ajouter fonction `importCVData(data: Partial<CVData>)` |
-| `supabase/config.toml` | Ajouter la nouvelle edge function |
+Modifier la logique pour prendre en compte le flag `used_ai_import` :
+- Si `used_ai_import = true` → Paiement obligatoire
+- Si `used_ai_import = false` → Téléchargement gratuit avec filigrane possible
 
 ---
 
-### Details techniques
+## Phase 2 : Mise à jour du backend (Edge Function)
 
-**1. Edge Function `parse-cv`**
+### 2.1 Fonction `parse-cv`
 
-```typescript
-// Prompts IA avec tool calling pour extraction structuree
-const tools = [{
-  type: "function",
-  function: {
-    name: "extract_cv_data",
-    description: "Extraire les informations structurees d'un CV",
-    parameters: {
-      type: "object",
-      properties: {
-        personalInfo: {
-          type: "object",
-          properties: {
-            fullName: { type: "string" },
-            jobTitle: { type: "string" },
-            email: { type: "string" },
-            phone: { type: "string" },
-            location: { type: "string" },
-            summary: { type: "string" }
-          }
-        },
-        experience: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              company: { type: "string" },
-              position: { type: "string" },
-              startDate: { type: "string" },
-              endDate: { type: "string" },
-              description: { type: "string" }
-            }
-          }
-        },
-        education: {
-          type: "array",
-          items: {...}
-        },
-        skills: {
-          type: "array",
-          items: { type: "object", properties: { name: { type: "string" }, level: { type: "string" } } }
-        },
-        languages: {
-          type: "array",
-          items: {...}
-        }
-      }
-    }
-  }
-}];
-```
-
-**2. CVImportModal**
-
-- Zone de drop/upload pour fichiers PDF et DOCX
-- Indicateur de progression pendant l'analyse
-- Affichage des donnees extraites en preview
-- Boutons "Modifier" pour ajuster avant import
-- Bouton "Appliquer" pour fusionner avec le CV actuel
-
-**3. Flux utilisateur**
-
-1. Clic sur "Importer un CV" dans l'editeur
-2. Drag & drop ou selection d'un fichier PDF/DOCX
-3. Upload vers l'edge function
-4. Affichage d'un loader "Analyse en cours..."
-5. Preview des donnees extraites avec possibilite de corriger
-6. Validation -> les donnees sont injectees dans le formulaire CV
+Après un import IA réussi, marquer le CV avec `used_ai_import = true` dans la base de données.
 
 ---
 
-### Gestion des formats
+## Phase 3 : Mise à jour du frontend
 
-**PDF :**
-- Utilisation de `pdf-parse` pour extraire le texte brut
-- L'IA analyse ensuite le texte pour identifier les sections
+### 3.1 Hook `useDownloadPermission`
 
-**DOCX :**
-- Utilisation de `mammoth` pour convertir en texte
-- Meme traitement IA ensuite
+Modifier la logique pour :
+1. Vérifier si le CV a utilisé l'import IA
+2. Si oui → Forcer le paiement (pas d'option gratuite)
+3. Si non → Permettre le téléchargement gratuit avec filigrane
 
-**Limitations :**
-- Les CV tres graphiques (images, colonnes complexes) peuvent etre moins bien interpretes
-- Message d'avertissement a l'utilisateur si l'extraction semble incomplete
+### 3.2 Composant `CVPreview`
+
+Adapter le menu de téléchargement :
+- Masquer l'option "Gratuit (avec filigrane)" si le CV a utilisé l'import IA
+- Afficher un message explicatif
+
+### 3.3 Modal d'import
+
+Clarifier le message d'avertissement pour indiquer que le téléchargement gratuit sera désactivé après l'import.
 
 ---
 
-### Resume des modifications
+## Phase 4 : Réinitialisation du mot de passe admin
 
-| Action | Fichier |
-|--------|---------|
-| Modifier | `src/components/preview/BoldTemplate.tsx` |
-| Modifier | `src/components/preview/CreativeTemplate.tsx` |
-| Modifier | `src/components/preview/ArtisticTemplate.tsx` |
-| Creer | `supabase/functions/parse-cv/index.ts` |
-| Creer | `src/components/editor/CVImportModal.tsx` |
-| Creer | `src/hooks/useCVImport.ts` |
-| Modifier | `src/components/editor/EditorPanel.tsx` |
-| Modifier | `src/context/CVContext.tsx` |
-| Modifier | `supabase/config.toml` |
+Envoyer un email de réinitialisation au compte admin pour définir le nouveau mot de passe **66783831**.
 
-**Estimation :** 3 fichiers modifies pour les photos + 3 nouveaux fichiers + 3 modifications pour l'import CV
+---
+
+## Résumé technique
+
+| Composant | Modification |
+|-----------|--------------|
+| **Base de données** | + colonne `used_ai_import` sur `resumes` |
+| **Fonction SQL** | Mise à jour de `can_download_resume` |
+| **Edge Function** | `parse-cv` marque le CV après import |
+| **useDownloadPermission** | Vérifie le flag AI import |
+| **CVPreview** | Adapte le menu selon le statut du CV |
+| **CVImportModal** | Avertissement clair avant import |
+
