@@ -18,7 +18,9 @@ import {
   Loader2,
   Cloud,
   CloudOff,
-  ExternalLink
+  ExternalLink,
+  Download,
+  CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -31,11 +33,20 @@ interface Resume {
   updated_at: string;
 }
 
+interface DownloadPermission {
+  id: string;
+  resume_id: string;
+  granted_at: string;
+  granted_by: string;
+  resume_title?: string;
+}
+
 const ProfilePanel: React.FC = () => {
   const { user, signOut } = useAuth();
   const { resetCV, loadCV, currentResumeId } = useCV();
   const navigate = useNavigate();
   const [resumes, setResumes] = useState<Resume[]>([]);
+  const [downloadPermissions, setDownloadPermissions] = useState<DownloadPermission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState<{ full_name: string | null; credits_ai: number } | null>(null);
 
@@ -43,6 +54,7 @@ const ProfilePanel: React.FC = () => {
     if (user) {
       fetchProfile();
       fetchResumes();
+      fetchDownloadPermissions();
     } else {
       setIsLoading(false);
     }
@@ -77,6 +89,39 @@ const ProfilePanel: React.FC = () => {
       setResumes(data || []);
     }
     setIsLoading(false);
+  };
+
+  const fetchDownloadPermissions = async () => {
+    if (!user) return;
+    
+    const { data: permissions, error } = await supabase
+      .from('download_permissions')
+      .select('id, resume_id, granted_at, granted_by')
+      .eq('user_id', user.id)
+      .order('granted_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching download permissions:', error);
+      return;
+    }
+
+    // Fetch resume titles for each permission
+    if (permissions && permissions.length > 0) {
+      const resumeIds = permissions.map(p => p.resume_id);
+      const { data: resumesData } = await supabase
+        .from('resumes')
+        .select('id, title')
+        .in('id', resumeIds);
+
+      const permissionsWithTitles = permissions.map(perm => ({
+        ...perm,
+        resume_title: resumesData?.find(r => r.id === perm.resume_id)?.title || 'CV sans titre'
+      }));
+
+      setDownloadPermissions(permissionsWithTitles);
+    } else {
+      setDownloadPermissions([]);
+    }
   };
 
   const handleNewCV = () => {
@@ -203,6 +248,31 @@ const ProfilePanel: React.FC = () => {
             </div>
           </div>
         </Card>
+
+        {/* Download Permissions */}
+        {downloadPermissions.length > 0 && (
+          <div>
+            <h4 className="font-medium flex items-center gap-2 mb-3">
+              <Download className="h-4 w-4" />
+              CVs débloqués ({downloadPermissions.length})
+            </h4>
+            <div className="space-y-2">
+              {downloadPermissions.map((perm) => (
+                <Card key={perm.id} className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{perm.resume_title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Débloqué le {format(new Date(perm.granted_at), 'dd MMM yyyy', { locale: fr })} via {perm.granted_by}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Saved CVs */}
         <div>
