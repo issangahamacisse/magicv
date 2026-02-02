@@ -474,8 +474,8 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }));
   }, []);
 
-  // Import CV data from parsed file
-  const importCVData = useCallback((data: ImportedCVData) => {
+  // Import CV data from parsed file and mark as AI-imported
+  const importCVData = useCallback(async (data: ImportedCVData) => {
     setCVData(prev => ({
       ...prev,
       personalInfo: {
@@ -489,8 +489,17 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       projects: data.projects?.length ? data.projects : prev.projects,
       certifications: data.certifications?.length ? data.certifications : prev.certifications,
     }));
+
+    // Mark the resume as having used AI import (requires payment for download)
+    if (user && currentResumeId) {
+      await supabase
+        .from('resumes')
+        .update({ used_ai_import: true } as Record<string, unknown>)
+        .eq('id', currentResumeId);
+    }
+
     toast.success('Données importées avec succès !');
-  }, []);
+  }, [user, currentResumeId]);
 
   return (
     <CVContext.Provider

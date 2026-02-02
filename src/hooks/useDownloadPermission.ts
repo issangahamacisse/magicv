@@ -9,6 +9,8 @@ interface UseDownloadPermissionOptions {
 interface DownloadPermissionResult {
   canDownload: boolean;
   isPremium: boolean;
+  usedAiImport: boolean;
+  reason: string;
 }
 
 export const useDownloadPermission = (options: UseDownloadPermissionOptions = {}) => {
@@ -17,25 +19,37 @@ export const useDownloadPermission = (options: UseDownloadPermissionOptions = {}
   const [isChecking, setIsChecking] = useState(false);
 
   /**
-   * Check if user has premium download permission (no watermark)
-   * Returns: { canDownload: always true, isPremium: true if paid/subscribed }
+   * Check download permission for the CV
+   * Returns:
+   * - canDownload: true if user can download (free with watermark OR premium)
+   * - isPremium: true if user can download without watermark (paid/subscribed)
+   * - usedAiImport: true if CV was created using AI import (requires payment, no free option)
+   * - reason: explanation of the permission status
    */
   const checkPermission = useCallback(async (): Promise<DownloadPermissionResult> => {
-    // Everyone can download, but we need to check if they get watermark-free version
-    
-    // Not logged in = free download with watermark
+    // Not logged in = free download with watermark (manual CVs only)
     if (!user) {
-      return { canDownload: true, isPremium: false };
+      return { 
+        canDownload: true, 
+        isPremium: false, 
+        usedAiImport: false,
+        reason: 'anonymous'
+      };
     }
 
     // No resumeId = new CV, free download with watermark
     if (!resumeId) {
-      return { canDownload: true, isPremium: false };
+      return { 
+        canDownload: true, 
+        isPremium: false, 
+        usedAiImport: false,
+        reason: 'new_cv'
+      };
     }
 
     setIsChecking(true);
     try {
-      // Check if user has premium access (subscription or paid for this CV)
+      // Check download permission using the updated RPC function
       const { data, error } = await supabase.rpc('can_download_resume', {
         p_user_id: user.id,
         p_resume_id: resumeId
@@ -43,11 +57,29 @@ export const useDownloadPermission = (options: UseDownloadPermissionOptions = {}
 
       if (error) throw error;
 
-      return { canDownload: true, isPremium: !!data };
+      // The function now returns a JSONB object
+      const result = data as {
+        can_download: boolean;
+        is_premium: boolean;
+        used_ai_import: boolean;
+        reason: string;
+      };
+
+      return { 
+        canDownload: result.can_download, 
+        isPremium: result.is_premium,
+        usedAiImport: result.used_ai_import,
+        reason: result.reason
+      };
     } catch (error) {
       console.error('Error checking download permission:', error);
-      // On error, allow download with watermark
-      return { canDownload: true, isPremium: false };
+      // On error, allow download with watermark (for manual CVs)
+      return { 
+        canDownload: true, 
+        isPremium: false, 
+        usedAiImport: false,
+        reason: 'error_fallback'
+      };
     } finally {
       setIsChecking(false);
     }
