@@ -270,7 +270,7 @@ export type Database = {
     Functions: {
       can_download_resume: {
         Args: { p_resume_id: string; p_user_id: string }
-        Returns: boolean
+        Returns: Json
       }
       can_use_ai: { Args: { p_user_id: string }; Returns: Json }
       consume_ai_usage: { Args: { p_user_id: string }; Returns: boolean }

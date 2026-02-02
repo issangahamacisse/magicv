@@ -1,4 +1,4 @@
-import React, { useState, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { useCV } from '@/context/CVContext';
 import { useAuth } from '@/context/AuthContext';
 import { usePdfExport } from '@/hooks/usePdfExport';
@@ -14,7 +14,7 @@ import TechTemplate from './TechTemplate';
 import ArtisticTemplate from './ArtisticTemplate';
 import CompactTemplate from './CompactTemplate';
 import { Button } from '@/components/ui/button';
-import { ZoomIn, ZoomOut, Download, FileText, Loader2, Share2, Check, Copy } from 'lucide-react';
+import { ZoomIn, ZoomOut, Download, FileText, Loader2, Share2, Check, Copy, Lock } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -23,6 +23,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 
 const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
@@ -34,6 +35,8 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
   const cvRef = useRef<HTMLDivElement>(null);
   
   const [addWatermark, setAddWatermark] = useState(true);
+  const [usedAiImport, setUsedAiImport] = useState(false);
+  const [permissionLoaded, setPermissionLoaded] = useState(false);
   
   const { exportToPdf, isExporting } = usePdfExport({
     filename: cvData.personalInfo.fullName 
@@ -45,6 +48,21 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
   const { checkPermission, isChecking } = useDownloadPermission({
     resumeId: currentResumeId,
   });
+
+  // Check permission on mount and when resumeId changes
+  useEffect(() => {
+    const loadPermission = async () => {
+      if (currentResumeId && user) {
+        const permission = await checkPermission();
+        setUsedAiImport(permission.usedAiImport);
+        setPermissionLoaded(true);
+      } else {
+        setUsedAiImport(false);
+        setPermissionLoaded(true);
+      }
+    };
+    loadPermission();
+  }, [currentResumeId, user, checkPermission]);
 
   useImperativeHandle(ref, () => cvRef.current as HTMLDivElement);
 
@@ -80,6 +98,12 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
       }
       setAddWatermark(false);
     } else {
+      // Check if this is an AI-imported CV - free download not allowed
+      if (usedAiImport) {
+        toast.error('Ce CV a été importé via IA. Paiement requis pour télécharger.');
+        navigate(`/payment?resumeId=${currentResumeId}`);
+        return;
+      }
       setAddWatermark(true);
     }
 
@@ -186,7 +210,7 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
           {/* Download Buttons */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" className="gap-2" disabled={isExporting || isChecking}>
+              <Button size="sm" className="gap-2" disabled={isExporting || isChecking || !permissionLoaded}>
                 {isExporting || isChecking ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -195,14 +219,27 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
                 Télécharger
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleFreeDownload}>
-                <Download className="h-4 w-4 mr-2" />
-                Gratuit (avec filigrane)
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-64">
+              {/* Show free option only if NOT an AI-imported CV */}
+              {!usedAiImport ? (
+                <DropdownMenuItem onClick={handleFreeDownload}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Gratuit (avec filigrane)
+                </DropdownMenuItem>
+              ) : (
+                <>
+                  <div className="px-2 py-2 text-xs text-muted-foreground flex items-start gap-2">
+                    <Lock className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                    <span>
+                      Ce CV a été importé via IA. Le téléchargement gratuit n'est pas disponible.
+                    </span>
+                  </div>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem onClick={handlePremiumDownload}>
                 <FileText className="h-4 w-4 mr-2" />
-                Premium (sans filigrane)
+                {usedAiImport ? 'Télécharger (1000F)' : 'Premium (sans filigrane)'}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
