@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { FileText, User, Sparkles, Menu, LogOut, Shield } from 'lucide-react';
+import { FileText, User, Sparkles, Menu, LogOut, Shield, LayoutDashboard } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -92,15 +92,20 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => navigate('/dashboard')} className="gap-2">
+                <LayoutDashboard className="h-4 w-4" />
+                Mon espace
+              </DropdownMenuItem>
               {isAdmin && (
                 <>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate('/admin-portal')} className="gap-2">
                     <Shield className="h-4 w-4" />
                     Portail Admin
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                 </>
               )}
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="gap-2">
                 <LogOut className="h-4 w-4" />
                 Déconnexion
@@ -125,6 +130,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
           </SheetTrigger>
           <SheetContent side="right" className="w-72">
             <div className="flex flex-col gap-4 mt-8">
+              {user && (
+                <Button variant="ghost" className="justify-start gap-2" onClick={() => navigate('/dashboard')}>
+                  <LayoutDashboard className="h-4 w-4" />
+                  Mon espace
+                </Button>
+              )}
+              
               <Button variant="ghost" className="justify-start gap-2">
                 <Sparkles className="h-4 w-4" />
                 Scanner ATS
