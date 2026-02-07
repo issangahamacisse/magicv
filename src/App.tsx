@@ -6,8 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { CVProvider } from "@/context/CVContext";
 import { AuthProvider } from "@/context/AuthContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Landing from "./pages/Landing";
 import Editor from "./pages/Editor";
+import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Payment from "./pages/Payment";
 import AdminPortal from "./pages/AdminPortal";
@@ -26,7 +28,8 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Landing />} />
-                <Route path="/editor" element={<Editor />} />
+                <Route path="/editor" element={<ProtectedRoute><Editor /></ProtectedRoute>} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="/admin-portal" element={<AdminPortal />} />
