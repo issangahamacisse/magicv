@@ -7,6 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { CVProvider } from "@/context/CVContext";
 import { AuthProvider } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import AdminRoute from "@/components/auth/AdminRoute";
 import Landing from "./pages/Landing";
 import Editor from "./pages/Editor";
 import Dashboard from "./pages/Dashboard";
@@ -32,7 +33,7 @@ const App = () => (
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/payment" element={<Payment />} />
-                <Route path="/admin-portal" element={<AdminPortal />} />
+                <Route path="/admin-portal" element={<AdminRoute><AdminPortal /></AdminRoute>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
