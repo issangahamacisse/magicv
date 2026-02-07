@@ -36,7 +36,7 @@ const Auth: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/editor');
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
@@ -76,7 +76,7 @@ const Auth: React.FC = () => {
           return;
         }
         toast.success("Connexion réussie !");
-        navigate('/editor');
+        navigate('/dashboard');
       } else {
         const { error } = await signUp(email, password, fullName);
         if (error) {
@@ -84,7 +84,7 @@ const Auth: React.FC = () => {
           return;
         }
         toast.success("Compte créé avec succès !");
-        navigate('/editor');
+        navigate('/dashboard');
       }
     } finally {
       setIsLoading(false);
