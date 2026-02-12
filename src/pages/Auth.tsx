@@ -215,9 +215,6 @@ const Auth: React.FC = () => {
                     {isLoading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />{isLogin ? 'Connexion...' : 'Création...'}</> : isLogin ? 'Se connecter' : 'Créer mon compte'}
                   </Button>
                 </form>
-                <div className="mt-6 text-center">
-                  <button onClick={() => navigate('/editor')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Continuer sans compte →</button>
-                </div>
               </>
             )}
           </div>
