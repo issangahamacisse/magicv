@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToS
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   
   const { signIn } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,10 +66,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, onSwitchToS
       return;
     }
 
-    toast.success('Connexion réussie !');
+    toast.success('Connexion réussie ! Redirection vers votre espace…');
     onOpenChange(false);
     setEmail('');
     setPassword('');
+    navigate('/dashboard');
   };
 
   return (
