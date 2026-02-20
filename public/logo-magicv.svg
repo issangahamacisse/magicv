@@ -59,21 +59,21 @@
     <circle cx="44" cy="42" r="1.2" fill="#9B87F5" opacity="0.5"/>
   </g>
 
-  <!-- Text: Magic -->
+  <!-- Text: Magi -->
   <text x="76" y="46" 
         font-family="'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif" 
         font-size="30" 
         font-weight="300" 
         letter-spacing="1" 
-        fill="#1A1F2C">Magic</text>
+        fill="#1A1F2C">Magi</text>
 
-  <!-- Text: V (bold, colored) -->
-  <text x="176" y="46" 
+  <!-- Text: CV (bold, colored) -->
+  <text x="157" y="46" 
         font-family="'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif" 
         font-size="32" 
         font-weight="800" 
         letter-spacing="0" 
-        fill="url(#gradV)">V</text>
+        fill="url(#gradV)">CV</text>
 
   <!-- Tagline -->
   <text x="77" y="60" 
