@@ -219,7 +219,7 @@ const Dashboard: React.FC = () => {
         <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <button onClick={() => navigate('/')} className="flex items-center gap-2">
-              <img src={logoMagiCV} alt="MagiCV" className="h-8 w-auto" />
+              <img src={logoMagiCV} alt="MagiCV" className="h-12 w-auto" />
             </button>
             <div className="flex items-center gap-3">
               <Button size="sm" onClick={() => navigate('/editor')} className="gap-2">
