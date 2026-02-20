@@ -13,7 +13,7 @@ const Editor: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Éditeur de CV - CV Builder</title>
+        <title>Éditeur de CV - MagiCV</title>
         <meta 
           name="description" 
           content="Créez votre CV professionnel avec notre éditeur intuitif. Modèles modernes et export PDF." 
