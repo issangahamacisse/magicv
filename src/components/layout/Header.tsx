@@ -111,10 +111,16 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate('/auth')}>
-            <User className="h-4 w-4" />
-            Connexion
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground" onClick={() => navigate('/auth')}>
+              <User className="h-4 w-4" />
+              Connexion
+            </Button>
+            <Button size="sm" className="gap-2 shadow-sm shadow-primary/20" onClick={() => navigate('/auth?signup=true')}>
+              <Sparkles className="h-4 w-4" />
+              S'inscrire gratuitement
+            </Button>
+          </div>
         )}
       </div>
 
