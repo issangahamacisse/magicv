@@ -209,7 +209,7 @@ const Dashboard: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Mon espace - CV Builder</title>
+        <title>Mon espace - MagiCV</title>
         <meta name="description" content="Gérez vos CV, votre abonnement et suivez vos téléchargements." />
       </Helmet>
 
@@ -221,7 +221,7 @@ const Dashboard: React.FC = () => {
               <div className="p-1.5 rounded-lg bg-primary/10">
                 <FileText className="h-5 w-5 text-primary" />
               </div>
-              CV Builder
+              MagiCV
             </button>
             <div className="flex items-center gap-3">
               <Button size="sm" onClick={() => navigate('/editor')} className="gap-2">

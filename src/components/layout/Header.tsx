@@ -62,7 +62,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
         <div className="p-2 rounded-lg bg-primary/10">
           <FileText className="h-5 w-5 text-primary" />
         </div>
-        <span className="font-semibold text-lg hidden sm:inline">CV Builder</span>
+        <span className="font-semibold text-lg hidden sm:inline">MagiCV</span>
       </div>
 
       {/* Mobile Preview Toggle */}

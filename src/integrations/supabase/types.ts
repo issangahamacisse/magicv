@@ -111,6 +111,30 @@ export type Database = {
           },
         ]
       }
+      page_views: {
+        Row: {
+          id: string
+          page: string
+          referrer: string | null
+          user_agent: string | null
+          visited_at: string
+        }
+        Insert: {
+          id?: string
+          page?: string
+          referrer?: string | null
+          user_agent?: string | null
+          visited_at?: string
+        }
+        Update: {
+          id?: string
+          page?: string
+          referrer?: string | null
+          user_agent?: string | null
+          visited_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number

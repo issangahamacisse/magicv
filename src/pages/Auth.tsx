@@ -115,7 +115,7 @@ const Auth: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>{isLogin ? 'Connexion' : 'Inscription'} - CV Builder</title>
+        <title>{isLogin ? 'Connexion' : 'Inscription'} - MagiCV</title>
         <meta name="description" content="Connectez-vous ou créez un compte pour sauvegarder vos CV." />
       </Helmet>
 
@@ -131,7 +131,7 @@ const Auth: React.FC = () => {
               <div className="p-3 rounded-xl bg-primary/10">
                 <FileText className="h-6 w-6 text-primary" />
               </div>
-              <span className="text-xl font-bold">CV Builder</span>
+              <span className="text-xl font-bold">MagiCV</span>
             </div>
 
             {showForgotPassword ? (

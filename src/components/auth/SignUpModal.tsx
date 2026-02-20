@@ -100,7 +100,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({
 
           <DialogHeader className="text-center mb-6">
             <DialogTitle className="text-2xl font-semibold">
-              Bienvenue sur CV Builder
+              Bienvenue sur MagiCV
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
               Créez un compte pour sauvegarder votre CV dans le cloud.

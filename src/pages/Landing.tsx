@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet-async';
 import { FileText, Star, Check, Download, Zap, Edit } from 'lucide-react';
@@ -6,12 +6,22 @@ import { useNavigate } from 'react-router-dom';
 import LoginModal from '@/components/auth/LoginModal';
 import SignUpModal from '@/components/auth/SignUpModal';
 import { ResetPasswordModal } from '@/components/auth/ResetPasswordModal';
+import { supabase } from '@/integrations/supabase/client';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
+
+  useEffect(() => {
+    // Track page view anonymously
+    supabase.from('page_views').insert({
+      page: '/',
+      user_agent: navigator.userAgent,
+      referrer: document.referrer || null,
+    }).then(() => {/* silent */});
+  }, []);
 
   const handleCreateResume = () => {
     navigate('/editor');
@@ -35,7 +45,7 @@ const Landing: React.FC = () => {
               <div className="p-2 rounded-lg bg-primary/10">
                 <FileText className="h-5 w-5 text-primary" />
               </div>
-              <span className="font-semibold text-lg">ResumeBuilder</span>
+              <span className="font-semibold text-lg">MagiCV</span>
             </div>
             <Button 
               variant="ghost" 
@@ -154,7 +164,7 @@ const Landing: React.FC = () => {
         {/* Footer */}
         <footer className="py-8 border-t border-border">
           <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-            © 2024 ResumeBuilder. Tous droits réservés.
+            © 2026 MagiCV — Issa N'gahama Cissé. Tous droits réservés.
           </div>
         </footer>
       </div>
