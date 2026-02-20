@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 72" fill="none">
+  <defs>
+    <linearGradient id="gradV" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9B87F5"/>
+      <stop offset="100%" stop-color="#6E59A5"/>
+    </linearGradient>
+    <linearGradient id="gradStar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C4B5FD"/>
+      <stop offset="100%" stop-color="#9B87F5"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background pill (optionnel, transparent par défaut) -->
+  
+  <!-- Icon: Stylized V with magic spark -->
+  <g transform="translate(8, 8)">
+    <!-- Main V shape -->
+    <path d="M4 4 L22 48 L40 4" 
+          stroke="url(#gradV)" 
+          stroke-width="7" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none"
+          filter="url(#glow)"/>
+    
+    <!-- Inner V highlight -->
+    <path d="M4 4 L22 48 L40 4" 
+          stroke="url(#gradStar)" 
+          stroke-width="3" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none"
+          opacity="0.5"/>
+
+    <!-- Sparkle top-right: big star -->
+    <g transform="translate(38, 2)" filter="url(#glow)">
+      <line x1="6" y1="0" x2="6" y2="12" stroke="#C4B5FD" stroke-width="2" stroke-linecap="round"/>
+      <line x1="0" y1="6" x2="12" y2="6" stroke="#C4B5FD" stroke-width="2" stroke-linecap="round"/>
+      <line x1="1.8" y1="1.8" x2="10.2" y2="10.2" stroke="#C4B5FD" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="10.2" y1="1.8" x2="1.8" y2="10.2" stroke="#C4B5FD" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="6" cy="6" r="2" fill="#E9D5FF"/>
+    </g>
+
+    <!-- Small sparkle top-left -->
+    <g transform="translate(0, 0)">
+      <line x1="3" y1="0" x2="3" y2="6" stroke="#9B87F5" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="0" y1="3" x2="6" y2="3" stroke="#9B87F5" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- Tiny dot accent -->
+    <circle cx="48" cy="30" r="2" fill="#C4B5FD" opacity="0.7"/>
+    <circle cx="44" cy="42" r="1.2" fill="#9B87F5" opacity="0.5"/>
+  </g>
+
+  <!-- Text: Magic -->
+  <text x="76" y="46" 
+        font-family="'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif" 
+        font-size="30" 
+        font-weight="300" 
+        letter-spacing="1" 
+        fill="#1A1F2C">Magic</text>
+
+  <!-- Text: V (bold, colored) -->
+  <text x="176" y="46" 
+        font-family="'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif" 
+        font-size="32" 
+        font-weight="800" 
+        letter-spacing="0" 
+        fill="url(#gradV)">V</text>
+
+  <!-- Tagline -->
+  <text x="77" y="60" 
+        font-family="'Segoe UI', 'Inter', Arial, sans-serif" 
+        font-size="9" 
+        font-weight="400" 
+        letter-spacing="3" 
+        fill="#9B87F5"
+        opacity="0.8">AI RESUME BUILDER</text>
+</svg>
