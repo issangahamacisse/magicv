@@ -370,7 +370,7 @@ const AdminPortal: React.FC = () => {
               </div>
             ) : stats ? (
               <div className="space-y-6">
-                {/* KPI Grid */}
+                {/* KPI Grid — Row 1: core metrics */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   <Card>
                     <CardContent className="p-5">
@@ -426,6 +426,62 @@ const AdminPortal: React.FC = () => {
                       </div>
                       <p className="text-2xl font-bold">{stats.pendingPayments}</p>
                       <p className="text-xs text-muted-foreground mt-1">paiement(s) à traiter</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* KPI Grid — Row 2: signups & revenue by plan */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* New signups — last 7 days */}
+                  <Card className="border-primary/20 bg-primary/5">
+                    <CardContent className="p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="p-2 rounded-lg bg-primary/15">
+                          <Users className="h-5 w-5 text-primary" />
+                        </div>
+                        <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">7 derniers jours</span>
+                      </div>
+                      <p className="text-3xl font-bold">
+                        {stats.signupsByDay.slice(-7).reduce((s, d) => s + d.count, 0)}
+                      </p>
+                      <p className="text-sm font-medium mt-1">Nouvelles inscriptions</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {stats.signupsByDay.slice(-30).reduce((s, d) => s + d.count, 0)} ce mois
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Revenue — Subscription plan */}
+                  <Card className="border-amber-400/30 bg-amber-500/5">
+                    <CardContent className="p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="p-2 rounded-lg bg-amber-500/15">
+                          <Crown className="h-5 w-5 text-amber-500" />
+                        </div>
+                        <span className="text-xs font-medium text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-full">Abonnements</span>
+                      </div>
+                      <p className="text-3xl font-bold">{stats.revenueSubscriptions.toLocaleString('fr-FR')} F</p>
+                      <p className="text-sm font-medium mt-1">Plan mensuel 3 000 F</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {stats.subscribedUsers} abonné(s) actif(s)
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Revenue — Download plan */}
+                  <Card className="border-blue-400/30 bg-blue-500/5">
+                    <CardContent className="p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="p-2 rounded-lg bg-blue-500/15">
+                          <FileText className="h-5 w-5 text-blue-500" />
+                        </div>
+                        <span className="text-xs font-medium text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded-full">Téléchargements</span>
+                      </div>
+                      <p className="text-3xl font-bold">{stats.revenueDownloads.toLocaleString('fr-FR')} F</p>
+                      <p className="text-sm font-medium mt-1">Par CV — 1 000 F/unité</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {Math.round(stats.revenueDownloads / 1000)} téléchargement(s) payant(s)
+                      </p>
                     </CardContent>
                   </Card>
                 </div>
