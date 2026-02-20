@@ -4,7 +4,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FileText, Eye, EyeOff, Loader2, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Loader2, ArrowLeft, CheckCircle } from 'lucide-react';
+import logoMagiCV from '@/assets/logo-magicv.svg';
 import { toast } from 'sonner';
 import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
@@ -128,10 +129,7 @@ const Auth: React.FC = () => {
 
           <div className="bg-card border border-border rounded-2xl p-8 shadow-lg">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="p-3 rounded-xl bg-primary/10">
-                <FileText className="h-6 w-6 text-primary" />
-              </div>
-              <span className="text-xl font-bold">MagiCV</span>
+              <img src={logoMagiCV} alt="MagiCV" className="h-10 w-auto" />
             </div>
 
             {showForgotPassword ? (
