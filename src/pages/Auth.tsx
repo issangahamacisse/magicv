@@ -129,7 +129,7 @@ const Auth: React.FC = () => {
 
           <div className="bg-card border border-border rounded-2xl p-8 shadow-lg">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <img src={logoMagiCV} alt="MagiCV" className="h-10 w-auto" />
+              <img src={logoMagiCV} alt="MagiCV" className="h-16 w-auto" />
             </div>
 
             {showForgotPassword ? (

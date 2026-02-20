@@ -60,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
     <header className="h-14 border-b border-border bg-card flex items-center justify-between px-4 lg:px-6">
       {/* Logo */}
       <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-        <img src={logoMagiCV} alt="MagiCV" className="h-8 w-auto" />
+        <img src={logoMagiCV} alt="MagiCV" className="h-12 w-auto" />
       </div>
 
       {/* Mobile Preview Toggle */}

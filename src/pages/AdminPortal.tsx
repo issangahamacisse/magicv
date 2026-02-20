@@ -325,7 +325,7 @@ const AdminPortal: React.FC = () => {
               <ArrowLeft className="h-4 w-4" />
               Retour
             </Button>
-            <img src={logoMagiCV} alt="MagiCV" className="h-8 w-auto" />
+            <img src={logoMagiCV} alt="MagiCV" className="h-12 w-auto" />
           </div>
           <Badge variant="outline" className="gap-1">
             <CheckCircle className="h-3 w-3 text-emerald-500" />

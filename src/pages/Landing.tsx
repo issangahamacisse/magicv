@@ -43,7 +43,7 @@ const Landing: React.FC = () => {
         <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <img src={logoMagiCV} alt="MagiCV" className="h-9 w-auto" />
+              <img src={logoMagiCV} alt="MagiCV" className="h-14 w-auto" />
             </div>
             <Button 
               variant="ghost" 
