@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { FileText, User, Sparkles, Menu, LogOut, Shield, LayoutDashboard } from 'lucide-react';
+import { User, Sparkles, Menu, LogOut, Shield, LayoutDashboard } from 'lucide-react';
+import logoMagiCV from '@/assets/logo-magicv.svg';
 import {
   Sheet,
   SheetContent,
@@ -59,10 +60,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleMobilePreview, showMobilePrevie
     <header className="h-14 border-b border-border bg-card flex items-center justify-between px-4 lg:px-6">
       {/* Logo */}
       <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-        <div className="p-2 rounded-lg bg-primary/10">
-          <FileText className="h-5 w-5 text-primary" />
-        </div>
-        <span className="font-semibold text-lg hidden sm:inline">MagiCV</span>
+        <img src={logoMagiCV} alt="MagiCV" className="h-8 w-auto" />
       </div>
 
       {/* Mobile Preview Toggle */}

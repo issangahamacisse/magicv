@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet-async';
-import { FileText, Star, Check, Download, Zap, Edit } from 'lucide-react';
+import { Star, Check, Download, Zap, Edit } from 'lucide-react';
+import logoMagiCV from '@/assets/logo-magicv.svg';
 import { useNavigate } from 'react-router-dom';
 import LoginModal from '@/components/auth/LoginModal';
 import SignUpModal from '@/components/auth/SignUpModal';
@@ -42,10 +43,7 @@ const Landing: React.FC = () => {
         <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <FileText className="h-5 w-5 text-primary" />
-              </div>
-              <span className="font-semibold text-lg">MagiCV</span>
+              <img src={logoMagiCV} alt="MagiCV" className="h-9 w-auto" />
             </div>
             <Button 
               variant="ghost" 

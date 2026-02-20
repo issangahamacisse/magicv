@@ -21,6 +21,7 @@ import {
   Plus, RefreshCw, BarChart3, Users, FileText, TrendingUp, Zap,
   Clock, Eye, Sparkles, Crown
 } from 'lucide-react';
+import logoMagiCV from '@/assets/logo-magicv.svg';
 
 interface Payment {
   id: string;
@@ -324,10 +325,7 @@ const AdminPortal: React.FC = () => {
               <ArrowLeft className="h-4 w-4" />
               Retour
             </Button>
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <h1 className="text-xl font-bold">MagiCV — Portail Admin</h1>
-            </div>
+            <img src={logoMagiCV} alt="MagiCV" className="h-8 w-auto" />
           </div>
           <Badge variant="outline" className="gap-1">
             <CheckCircle className="h-3 w-3 text-emerald-500" />

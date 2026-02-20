@@ -14,6 +14,7 @@ import {
   FileText, Plus, Trash2, Copy, ExternalLink, Loader2, LogOut,
   Crown, Clock, CheckCircle, XCircle, Download, Mail, Sparkles, Edit3
 } from 'lucide-react';
+import logoMagiCV from '@/assets/logo-magicv.svg';
 import { toast } from 'sonner';
 import { useCV } from '@/context/CVContext';
 
@@ -217,11 +218,8 @@ const Dashboard: React.FC = () => {
         {/* Top bar */}
         <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <button onClick={() => navigate('/')} className="flex items-center gap-2 font-bold text-lg">
-              <div className="p-1.5 rounded-lg bg-primary/10">
-                <FileText className="h-5 w-5 text-primary" />
-              </div>
-              MagiCV
+            <button onClick={() => navigate('/')} className="flex items-center gap-2">
+              <img src={logoMagiCV} alt="MagiCV" className="h-8 w-auto" />
             </button>
             <div className="flex items-center gap-3">
               <Button size="sm" onClick={() => navigate('/editor')} className="gap-2">
