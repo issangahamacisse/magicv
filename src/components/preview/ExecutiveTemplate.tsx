@@ -174,6 +174,7 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
         </div>
 
         {/* Sidebar */}
+        {hasSidebar && (
         <div className="border-l border-gray-200 flex flex-col" style={{ paddingLeft: layout.itemMargin, gap: layout.sectionMargin }}>
           {/* Skills */}
           {skills.length > 0 && (
