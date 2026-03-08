@@ -250,7 +250,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 w-full min-w-0">
               {/* Subscription */}
               <Card className={profile?.is_subscribed ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800' : ''}>
                 <CardContent className="p-3 sm:p-5 flex items-center gap-3 sm:gap-4">
