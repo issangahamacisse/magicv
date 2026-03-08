@@ -71,8 +71,8 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
   return (
     <div className="h-full flex flex-col bg-card">
       {/* Header */}
-      <div className="flex-shrink-0 p-4 border-b border-border bg-gradient-to-b from-background to-card">
-        <div className="flex items-center justify-between mb-3">
+      <div className="flex-shrink-0 p-3 sm:p-4 border-b border-border bg-gradient-to-b from-background to-card">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
           <h2 className="text-lg font-semibold text-foreground">Éditeur de CV</h2>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             {isSaving ? (
