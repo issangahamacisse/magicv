@@ -336,7 +336,7 @@ const Dashboard: React.FC = () => {
                     {resumes.map((resume) => (
                       <div
                         key={resume.id}
-                        className={`flex items-center justify-between p-4 rounded-lg border transition-colors hover:bg-muted/50 ${
+                        className={`flex items-center justify-between p-3 sm:p-4 rounded-lg border transition-colors hover:bg-muted/50 ${
                           resume.id === currentResumeId ? 'ring-2 ring-primary bg-primary/5' : ''
                         }`}
                       >
