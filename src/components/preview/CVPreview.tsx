@@ -2,7 +2,9 @@ import React, { useState, useRef, forwardRef, useImperativeHandle, useEffect } f
 import { useCV } from '@/context/CVContext';
 import { useAuth } from '@/context/AuthContext';
 import { usePdfExport } from '@/hooks/usePdfExport';
+import { useDocxExport } from '@/hooks/useDocxExport';
 import { useDownloadPermission } from '@/hooks/useDownloadPermission';
+import { usePublicShare } from '@/hooks/usePublicShare';
 import ModernTemplate from './ModernTemplate';
 import ClassicTemplate from './ClassicTemplate';
 import CreativeTemplate from './CreativeTemplate';
@@ -14,7 +16,7 @@ import TechTemplate from './TechTemplate';
 import ArtisticTemplate from './ArtisticTemplate';
 import CompactTemplate from './CompactTemplate';
 import { Button } from '@/components/ui/button';
-import { ZoomIn, ZoomOut, Download, FileText, Loader2, Share2, Check, Copy, Lock } from 'lucide-react';
+import { ZoomIn, ZoomOut, Download, FileText, Loader2, Share2, Check, Copy, Lock, Globe, GlobeLock, FileSpreadsheet } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -45,9 +47,20 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
     addWatermark,
   });
 
+  const { exportToDocx, isExporting: isExportingDocx } = useDocxExport();
+
   const { checkPermission, isChecking } = useDownloadPermission({
     resumeId: currentResumeId,
   });
+
+  const { isPublic, isLoading: isTogglingPublic, loadPublicStatus, togglePublic, getPublicUrl } = usePublicShare(currentResumeId);
+
+  // Load public status on mount
+  useEffect(() => {
+    if (currentResumeId && user) {
+      loadPublicStatus();
+    }
+  }, [currentResumeId, user, loadPublicStatus]);
 
   // Check permission on mount and when resumeId changes
   useEffect(() => {
@@ -116,14 +129,21 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
   const handleFreeDownload = () => handleDownload(false);
   const handlePremiumDownload = () => handleDownload(true);
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      toast.success('Lien copié dans le presse-papiers');
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error('Impossible de copier le lien');
+  const handleDocxDownload = () => {
+    exportToDocx(cvData);
+  };
+
+  const handleCopyPublicLink = async () => {
+    const url = getPublicUrl();
+    if (url) {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        toast.success('Lien public copié !');
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        toast.error('Impossible de copier le lien');
+      }
     }
   };
 
@@ -133,13 +153,13 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
         await navigator.share({
           title: `CV - ${cvData.personalInfo.fullName || 'Mon CV'}`,
           text: 'Découvrez mon CV professionnel',
-          url: window.location.href,
+          url: isPublic && getPublicUrl() ? getPublicUrl()! : window.location.href,
         });
       } catch (error) {
         // User cancelled share
       }
     } else {
-      handleCopyLink();
+      handleCopyPublicLink();
     }
   };
 
@@ -191,18 +211,35 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
                 <Share2 className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-56">
+              {user && currentResumeId && (
+                <>
+                  <DropdownMenuItem onClick={togglePublic} disabled={isTogglingPublic}>
+                    {isTogglingPublic ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : isPublic ? (
+                      <GlobeLock className="h-4 w-4 mr-2" />
+                    ) : (
+                      <Globe className="h-4 w-4 mr-2" />
+                    )}
+                    {isPublic ? 'Rendre privé' : 'Rendre public'}
+                  </DropdownMenuItem>
+                  {isPublic && (
+                    <DropdownMenuItem onClick={handleCopyPublicLink}>
+                      {copied ? (
+                        <Check className="h-4 w-4 mr-2" />
+                      ) : (
+                        <Copy className="h-4 w-4 mr-2" />
+                      )}
+                      Copier le lien public
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem onClick={handleShare}>
                 <Share2 className="h-4 w-4 mr-2" />
                 Partager
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleCopyLink}>
-                {copied ? (
-                  <Check className="h-4 w-4 mr-2" />
-                ) : (
-                  <Copy className="h-4 w-4 mr-2" />
-                )}
-                Copier le lien
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -210,8 +247,8 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
           {/* Download Buttons */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" className="gap-2" disabled={isExporting || isChecking || !permissionLoaded}>
-                {isExporting || isChecking ? (
+              <Button size="sm" className="gap-2" disabled={isExporting || isExportingDocx || isChecking || !permissionLoaded}>
+                {isExporting || isExportingDocx || isChecking ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Download className="h-4 w-4" />
@@ -224,7 +261,7 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
               {!usedAiImport ? (
                 <DropdownMenuItem onClick={handleFreeDownload}>
                   <Download className="h-4 w-4 mr-2" />
-                  Gratuit (avec filigrane)
+                  PDF Gratuit (avec filigrane)
                 </DropdownMenuItem>
               ) : (
                 <>
@@ -239,7 +276,12 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
               )}
               <DropdownMenuItem onClick={handlePremiumDownload}>
                 <FileText className="h-4 w-4 mr-2" />
-                {usedAiImport ? 'Télécharger (1000F)' : 'Premium (sans filigrane)'}
+                {usedAiImport ? 'PDF (1000F)' : 'PDF Premium (sans filigrane)'}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleDocxDownload} disabled={isExportingDocx}>
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Export Word (.docx)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
