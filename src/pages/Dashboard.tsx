@@ -234,7 +234,7 @@ const Dashboard: React.FC = () => {
         </header>
 
         <ScrollArea className="h-[calc(100vh-4rem)]">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+          <div className="max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-8">
             {/* Profile header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Avatar className="h-16 w-16">
@@ -250,10 +250,10 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
               {/* Subscription */}
               <Card className={profile?.is_subscribed ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800' : ''}>
-                <CardContent className="p-5 flex items-center gap-4">
+                <CardContent className="p-3 sm:p-5 flex items-center gap-3 sm:gap-4">
                   <div className={`p-3 rounded-xl ${profile?.is_subscribed ? 'bg-amber-100 dark:bg-amber-900/50' : 'bg-muted'}`}>
                     <Crown className={`h-6 w-6 ${profile?.is_subscribed ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`} />
                   </div>
@@ -282,7 +282,7 @@ const Dashboard: React.FC = () => {
 
               {/* AI Credits */}
               <Card>
-                <CardContent className="p-5 flex items-center gap-4">
+                <CardContent className="p-3 sm:p-5 flex items-center gap-3 sm:gap-4">
                   <div className="p-3 rounded-xl bg-primary/10">
                     <Sparkles className="h-6 w-6 text-primary" />
                   </div>
@@ -295,7 +295,7 @@ const Dashboard: React.FC = () => {
 
               {/* CVs count */}
               <Card>
-                <CardContent className="p-5 flex items-center gap-4">
+                <CardContent className="p-3 sm:p-5 flex items-center gap-3 sm:gap-4">
                   <div className="p-3 rounded-xl bg-primary/10">
                     <FileText className="h-6 w-6 text-primary" />
                   </div>
@@ -336,7 +336,7 @@ const Dashboard: React.FC = () => {
                     {resumes.map((resume) => (
                       <div
                         key={resume.id}
-                        className={`flex items-center justify-between p-4 rounded-lg border transition-colors hover:bg-muted/50 ${
+                        className={`flex items-center justify-between p-3 sm:p-4 rounded-lg border transition-colors hover:bg-muted/50 ${
                           resume.id === currentResumeId ? 'ring-2 ring-primary bg-primary/5' : ''
                         }`}
                       >
@@ -346,7 +346,7 @@ const Dashboard: React.FC = () => {
                             Modifié le {format(new Date(resume.updated_at), 'dd MMM yyyy', { locale: fr })}
                           </p>
                         </div>
-                        <div className="flex items-center gap-1 ml-4">
+                        <div className="flex items-center gap-0.5 sm:gap-1 ml-2 sm:ml-4 flex-shrink-0">
                           <Button size="icon" variant="ghost" onClick={() => handleOpenCV(resume.id)} title="Ouvrir">
                             <ExternalLink className="h-4 w-4" />
                           </Button>
@@ -390,29 +390,29 @@ const Dashboard: React.FC = () => {
 
             {/* Payment history */}
             <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5" /> Historique des demandes ({payments.length})
+              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+                <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> Historique des demandes ({payments.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6">
                 {payments.length === 0 ? (
                   <p className="text-center py-8 text-muted-foreground text-sm">Aucune demande de paiement</p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {payments.map((payment) => (
-                      <div key={payment.id} className="flex items-center justify-between gap-3 p-3 rounded-lg border overflow-hidden">
+                      <div key={payment.id} className="flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border overflow-hidden">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-medium text-sm">{getPaymentTypeLabel(payment.payment_type)}</p>
+                          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                            <p className="font-medium text-xs sm:text-sm">{getPaymentTypeLabel(payment.payment_type)}</p>
                             {getPaymentStatusBadge(payment.status)}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 truncate">
                             {payment.resume_title && `${payment.resume_title} • `}
                             {format(new Date(payment.created_at), 'dd MMM yyyy à HH:mm', { locale: fr })}
                           </p>
                         </div>
-                        <p className="text-sm font-semibold whitespace-nowrap">{payment.amount}F</p>
+                        <p className="text-xs sm:text-sm font-semibold whitespace-nowrap flex-shrink-0">{payment.amount}F</p>
                       </div>
                     ))}
                   </div>
