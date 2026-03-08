@@ -124,33 +124,17 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
     exportToDocx(cvData);
   };
 
-  const handleCopyPublicLink = async () => {
-    const url = getPublicUrl();
-    if (url) {
-      try {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        toast.success('Lien public copié !');
-        setTimeout(() => setCopied(false), 2000);
-      } catch {
-        toast.error('Impossible de copier le lien');
-      }
-    }
-  };
-
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
           title: `CV - ${cvData.personalInfo.fullName || 'Mon CV'}`,
           text: 'Découvrez mon CV professionnel',
-          url: isPublic && getPublicUrl() ? getPublicUrl()! : window.location.href,
+          url: window.location.href,
         });
       } catch (error) {
         // User cancelled share
       }
-    } else {
-      handleCopyPublicLink();
     }
   };
 
