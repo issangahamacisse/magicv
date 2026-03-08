@@ -79,9 +79,12 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
       )}
 
       {/* Two column layout */}
-      <div className="grid grid-cols-3 flex-grow" style={{ gap: layout.sectionMargin }}>
+      {(() => {
+        const hasSidebar = skills.length > 0 || languages.length > 0;
+        return (
+      <div className={`${hasSidebar ? 'grid grid-cols-3' : 'flex flex-col'} flex-grow`} style={{ gap: layout.sectionMargin }}>
         {/* Main Column */}
-        <div className="col-span-2 flex flex-col" style={{ gap: layout.sectionMargin }}>
+        <div className={`${hasSidebar ? 'col-span-2' : ''} flex flex-col`} style={{ gap: layout.sectionMargin }}>
           {/* Experience */}
           {experience.length > 0 && (
             <section className="flex-grow">
