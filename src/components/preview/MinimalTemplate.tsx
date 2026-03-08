@@ -176,6 +176,7 @@ const MinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
       </main>
 
       {/* Skills & Languages - fixed at bottom */}
+      {(skills.length > 0 || languages.length > 0) && (
       <footer className="flex-shrink-0 mt-auto" style={{ paddingTop: layout.sectionMargin, gap: layout.sectionMargin, display: 'flex' }}>
         {skills.length > 0 && (
           <section className="flex-1">
