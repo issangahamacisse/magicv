@@ -253,7 +253,7 @@ const Dashboard: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
               {/* Subscription */}
               <Card className={profile?.is_subscribed ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800' : ''}>
-                <CardContent className="p-5 flex items-center gap-4">
+                <CardContent className="p-3 sm:p-5 flex items-center gap-3 sm:gap-4">
                   <div className={`p-3 rounded-xl ${profile?.is_subscribed ? 'bg-amber-100 dark:bg-amber-900/50' : 'bg-muted'}`}>
                     <Crown className={`h-6 w-6 ${profile?.is_subscribed ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`} />
                   </div>
