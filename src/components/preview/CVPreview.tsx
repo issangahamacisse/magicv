@@ -166,14 +166,14 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <div className="h-full flex flex-col bg-muted/30">
       {/* Toolbar */}
-      <div className="flex-shrink-0 flex items-center justify-between p-3 border-b border-border bg-card">
-        <div className="flex items-center gap-2">
-          <FileText className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium">Aperçu</span>
+      <div className="flex-shrink-0 flex items-center justify-between p-2 sm:p-3 border-b border-border bg-card gap-2">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <span className="text-sm font-medium hidden sm:inline">Aperçu</span>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Zoom Controls */}
+        <div className="flex items-center gap-1.5 sm:gap-4">
+          {/* Zoom Controls - hidden on mobile */}
           <div className="hidden sm:flex items-center gap-2">
             <Button
               variant="ghost"
@@ -207,7 +207,7 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
           {/* Share Button */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2">
+              <Button variant="ghost" size="sm" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 p-0">
                 <Share2 className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -247,13 +247,14 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
           {/* Download Buttons */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" className="gap-2" disabled={isExporting || isExportingDocx || isChecking || !permissionLoaded}>
+              <Button size="sm" className="gap-1.5 text-xs sm:text-sm sm:gap-2 h-8 sm:h-9 px-2.5 sm:px-3" disabled={isExporting || isExportingDocx || isChecking || !permissionLoaded}>
                 {isExporting || isExportingDocx || isChecking ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
                 ) : (
-                  <Download className="h-4 w-4" />
+                  <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 )}
-                Télécharger
+                <span className="hidden sm:inline">Télécharger</span>
+                <span className="sm:hidden">PDF</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
@@ -289,7 +290,7 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
       </div>
 
       {/* Preview Area */}
-      <div className="flex-1 overflow-auto p-6 flex items-start justify-center">
+      <div className="flex-1 overflow-auto p-3 sm:p-6 flex items-start justify-center">
         <div 
           className="cv-paper transition-transform origin-top"
           style={{ 

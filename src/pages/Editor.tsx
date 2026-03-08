@@ -37,23 +37,23 @@ const Editor: React.FC = () => {
 
           {/* Preview Panel - Hidden on mobile when editing */}
           <div className={`
-            flex-1 overflow-hidden
+            w-full flex-1 overflow-hidden
             ${showMobilePreview ? 'block' : 'hidden lg:block'}
           `}>
             <CVPreview ref={cvPreviewRef} />
           </div>
 
           {/* Mobile Floating Button */}
-          <div className="lg:hidden fixed bottom-6 right-6 z-50">
+          <div className="lg:hidden fixed bottom-4 right-4 z-50">
             <Button
               size="lg"
               onClick={() => setShowMobilePreview(!showMobilePreview)}
-              className="rounded-full h-14 w-14 shadow-lg"
+              className="rounded-full h-12 w-12 shadow-lg shadow-primary/25"
             >
               {showMobilePreview ? (
-                <Edit3 className="h-6 w-6" />
+                <Edit3 className="h-5 w-5" />
               ) : (
-                <Eye className="h-6 w-6" />
+                <Eye className="h-5 w-5" />
               )}
             </Button>
           </div>

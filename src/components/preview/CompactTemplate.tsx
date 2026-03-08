@@ -84,9 +84,14 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
       )}
 
       {/* Three Column Layout for max density */}
+      {(() => {
+        const hasSkillsLangs = skills.length > 0 || languages.length > 0;
+        const hasExp = experience.length > 0;
+        const hasEdu = education.length > 0;
+        return (
       <div className="grid grid-cols-12 flex-grow" style={{ gap: layout.sectionMargin }}>
         {/* Experience Column */}
-        <div className="col-span-5 flex flex-col">
+        <div className={`${hasSkillsLangs ? 'col-span-5' : hasEdu ? 'col-span-6' : 'col-span-12'} flex flex-col`}>
           {experience.length > 0 && (
             <section className="flex-grow">
               <h2 
@@ -116,7 +121,8 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
         </div>
 
         {/* Education Column */}
-        <div className="col-span-4 flex flex-col">
+        {hasEdu && (
+        <div className={`${hasSkillsLangs ? 'col-span-4' : 'col-span-6'} flex flex-col`}>
           {education.length > 0 && (
             <section className="flex-grow">
               <h2 
@@ -137,8 +143,10 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
             </section>
           )}
         </div>
+        )}
 
         {/* Skills & Languages Column */}
+        {hasSkillsLangs && (
         <div className="col-span-3 flex flex-col" style={{ gap: layout.sectionMargin }}>
           {/* Skills */}
           {skills.length > 0 && (
@@ -199,7 +207,10 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
             </section>
           )}
         </div>
+        )}
       </div>
+      );
+      })()}
 
       {/* Projects & Certifications Row */}
       {(projects.length > 0 || certifications.length > 0) && (
