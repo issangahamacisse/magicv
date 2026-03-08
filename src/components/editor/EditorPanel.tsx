@@ -131,7 +131,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
           type="multiple" 
           value={openSections} 
           onValueChange={setOpenSections}
-          className="p-4"
+          className="p-2 sm:p-4"
         >
           {sections.map((section) => (
             <AccordionItem 
