@@ -282,7 +282,7 @@ const Dashboard: React.FC = () => {
 
               {/* AI Credits */}
               <Card>
-                <CardContent className="p-5 flex items-center gap-4">
+                <CardContent className="p-3 sm:p-5 flex items-center gap-3 sm:gap-4">
                   <div className="p-3 rounded-xl bg-primary/10">
                     <Sparkles className="h-6 w-6 text-primary" />
                   </div>
