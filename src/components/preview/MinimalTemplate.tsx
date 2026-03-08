@@ -221,6 +221,7 @@ const MinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
           </section>
         )}
       </footer>
+      )}
     </div>
   );
 });

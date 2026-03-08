@@ -312,7 +312,10 @@ const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref)
             </section>
           )}
         </div>
+        )}
       </div>
+        );
+      })()}
     </div>
   );
 });

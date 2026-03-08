@@ -274,7 +274,10 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
               </section>
             )}
           </div>
+          )}
         </div>
+        );
+        })()}
       </div>
     </div>
   );

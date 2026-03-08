@@ -236,7 +236,10 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
             </section>
           )}
         </div>
+        )}
       </div>
+      );
+      })()}
     </div>
   );
 });

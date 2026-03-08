@@ -330,7 +330,10 @@ const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
               </section>
             )}
           </div>
+          )}
         </div>
+        );
+        })()}
       </div>
     </div>
   );

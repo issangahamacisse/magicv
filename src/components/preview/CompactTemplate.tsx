@@ -207,7 +207,10 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
             </section>
           )}
         </div>
+        )}
       </div>
+      );
+      })()}
 
       {/* Projects & Certifications Row */}
       {(projects.length > 0 || certifications.length > 0) && (
