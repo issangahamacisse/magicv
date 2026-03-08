@@ -143,8 +143,10 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
             </section>
           )}
         </div>
+        )}
 
         {/* Skills & Languages Column */}
+        {hasSkillsLangs && (
         <div className="col-span-3 flex flex-col" style={{ gap: layout.sectionMargin }}>
           {/* Skills */}
           {skills.length > 0 && (
