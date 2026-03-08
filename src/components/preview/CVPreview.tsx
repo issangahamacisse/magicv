@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { usePdfExport } from '@/hooks/usePdfExport';
 import { useDocxExport } from '@/hooks/useDocxExport';
 import { useDownloadPermission } from '@/hooks/useDownloadPermission';
-import { usePublicShare } from '@/hooks/usePublicShare';
+
 import ModernTemplate from './ModernTemplate';
 import ClassicTemplate from './ClassicTemplate';
 import CreativeTemplate from './CreativeTemplate';
