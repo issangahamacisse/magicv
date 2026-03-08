@@ -14,7 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Payment from "./pages/Payment";
 import AdminPortal from "./pages/AdminPortal";
-import PublicCV from "./pages/PublicCV";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
