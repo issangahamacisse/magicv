@@ -209,6 +209,7 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
           </div>
 
           {/* Sidebar */}
+          {hasSidebar && (
           <div className="col-span-2 flex flex-col" style={{ gap: layout.sectionMargin }}>
             {/* Skills */}
             {skills.length > 0 && (
