@@ -390,9 +390,9 @@ const Dashboard: React.FC = () => {
 
             {/* Payment history */}
             <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5" /> Historique des demandes ({payments.length})
+              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+                <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> Historique des demandes ({payments.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
