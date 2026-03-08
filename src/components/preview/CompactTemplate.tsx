@@ -121,7 +121,8 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
         </div>
 
         {/* Education Column */}
-        <div className="col-span-4 flex flex-col">
+        {hasEdu && (
+        <div className={`${hasSkillsLangs ? 'col-span-4' : 'col-span-6'} flex flex-col`}>
           {education.length > 0 && (
             <section className="flex-grow">
               <h2 
