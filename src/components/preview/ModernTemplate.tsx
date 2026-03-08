@@ -215,6 +215,7 @@ const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref)
         </div>
 
         {/* Sidebar */}
+        {hasSidebar && (
         <div className="flex flex-col" style={{ gap: layout.sectionMargin }}>
           {/* Skills */}
           {skills.length > 0 && (
