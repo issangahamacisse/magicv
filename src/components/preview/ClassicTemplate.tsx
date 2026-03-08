@@ -176,6 +176,7 @@ const ClassicTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
       </main>
 
       {/* Footer - Skills & Languages */}
+      {(skills.length > 0 || languages.length > 0) && (
       <footer 
         className="flex-shrink-0 grid grid-cols-2 mt-auto"
         style={{ gap: layout.sectionMargin, paddingTop: layout.sectionMargin }}
