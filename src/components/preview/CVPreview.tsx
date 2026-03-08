@@ -53,15 +53,6 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
     resumeId: currentResumeId,
   });
 
-  const { isPublic, isLoading: isTogglingPublic, loadPublicStatus, togglePublic, getPublicUrl } = usePublicShare(currentResumeId);
-
-  // Load public status on mount
-  useEffect(() => {
-    if (currentResumeId && user) {
-      loadPublicStatus();
-    }
-  }, [currentResumeId, user, loadPublicStatus]);
-
   // Check permission on mount and when resumeId changes
   useEffect(() => {
     const loadPermission = async () => {
