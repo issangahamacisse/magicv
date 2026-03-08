@@ -395,24 +395,24 @@ const Dashboard: React.FC = () => {
                   <Clock className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> Historique des demandes ({payments.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6">
                 {payments.length === 0 ? (
                   <p className="text-center py-8 text-muted-foreground text-sm">Aucune demande de paiement</p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {payments.map((payment) => (
-                      <div key={payment.id} className="flex items-center justify-between gap-3 p-3 rounded-lg border overflow-hidden">
+                      <div key={payment.id} className="flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border overflow-hidden">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-medium text-sm">{getPaymentTypeLabel(payment.payment_type)}</p>
+                          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                            <p className="font-medium text-xs sm:text-sm">{getPaymentTypeLabel(payment.payment_type)}</p>
                             {getPaymentStatusBadge(payment.status)}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 truncate">
                             {payment.resume_title && `${payment.resume_title} • `}
                             {format(new Date(payment.created_at), 'dd MMM yyyy à HH:mm', { locale: fr })}
                           </p>
                         </div>
-                        <p className="text-sm font-semibold whitespace-nowrap">{payment.amount}F</p>
+                        <p className="text-xs sm:text-sm font-semibold whitespace-nowrap flex-shrink-0">{payment.amount}F</p>
                       </div>
                     ))}
                   </div>
