@@ -214,7 +214,7 @@ const Dashboard: React.FC = () => {
         <meta name="description" content="Gérez vos CV, votre abonnement et suivez vos téléchargements." />
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background overflow-x-hidden">
         {/* Top bar */}
         <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
