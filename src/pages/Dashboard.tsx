@@ -217,7 +217,7 @@ const Dashboard: React.FC = () => {
       <div className="min-h-screen bg-background overflow-x-hidden w-full max-w-[100vw]">
         {/* Top bar */}
         <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between w-full overflow-hidden">
             <button onClick={() => navigate('/')} className="flex items-center gap-2">
               <img src={logoMagiCV} alt="MagiCV" className="h-12 w-auto" />
             </button>
