@@ -98,7 +98,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
         <Button 
           variant="outline" 
           size="sm" 
-          className="w-full mb-3"
+          className="w-full mb-2 sm:mb-3 text-xs sm:text-sm"
           onClick={() => setIsImportModalOpen(true)}
         >
           <Upload className="h-4 w-4 mr-2" />
