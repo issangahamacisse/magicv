@@ -346,7 +346,7 @@ const Dashboard: React.FC = () => {
                             Modifié le {format(new Date(resume.updated_at), 'dd MMM yyyy', { locale: fr })}
                           </p>
                         </div>
-                        <div className="flex items-center gap-1 ml-4">
+                        <div className="flex items-center gap-0.5 sm:gap-1 ml-2 sm:ml-4 flex-shrink-0">
                           <Button size="icon" variant="ghost" onClick={() => handleOpenCV(resume.id)} title="Ouvrir">
                             <ExternalLink className="h-4 w-4" />
                           </Button>
