@@ -180,44 +180,9 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
           </div>
 
           {/* Share Button */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 p-0">
-                <Share2 className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {user && currentResumeId && (
-                <>
-                  <DropdownMenuItem onClick={togglePublic} disabled={isTogglingPublic}>
-                    {isTogglingPublic ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : isPublic ? (
-                      <GlobeLock className="h-4 w-4 mr-2" />
-                    ) : (
-                      <Globe className="h-4 w-4 mr-2" />
-                    )}
-                    {isPublic ? 'Rendre privé' : 'Rendre public'}
-                  </DropdownMenuItem>
-                  {isPublic && (
-                    <DropdownMenuItem onClick={handleCopyPublicLink}>
-                      {copied ? (
-                        <Check className="h-4 w-4 mr-2" />
-                      ) : (
-                        <Copy className="h-4 w-4 mr-2" />
-                      )}
-                      Copier le lien public
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                </>
-              )}
-              <DropdownMenuItem onClick={handleShare}>
-                <Share2 className="h-4 w-4 mr-2" />
-                Partager
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button variant="ghost" size="sm" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 p-0" onClick={handleShare}>
+            <Share2 className="h-4 w-4" />
+          </Button>
 
           {/* Download Buttons */}
           <DropdownMenu>
