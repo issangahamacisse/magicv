@@ -234,7 +234,7 @@ const Dashboard: React.FC = () => {
         </header>
 
         <ScrollArea className="h-[calc(100vh-4rem)]">
-          <div className="max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-8">
+          <div className="max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-8 w-full overflow-hidden">
             {/* Profile header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Avatar className="h-16 w-16">
