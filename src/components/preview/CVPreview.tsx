@@ -16,7 +16,7 @@ import TechTemplate from './TechTemplate';
 import ArtisticTemplate from './ArtisticTemplate';
 import CompactTemplate from './CompactTemplate';
 import { Button } from '@/components/ui/button';
-import { ZoomIn, ZoomOut, Download, FileText, Loader2, Share2, Check, Copy, Lock, Globe, GlobeLock, FileSpreadsheet } from 'lucide-react';
+import { ZoomIn, ZoomOut, Download, FileText, Loader2, Share2, Lock, FileSpreadsheet } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
