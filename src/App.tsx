@@ -14,7 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Payment from "./pages/Payment";
 import AdminPortal from "./pages/AdminPortal";
-import PublicCV from "./pages/PublicCV";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,7 +35,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="/admin-portal" element={<AdminRoute><AdminPortal /></AdminRoute>} />
-                <Route path="/cv/:slug" element={<PublicCV />} />
+                
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

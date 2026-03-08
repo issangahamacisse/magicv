@@ -241,8 +241,6 @@ export type Database = {
           content: Json
           created_at: string
           id: string
-          is_public: boolean
-          public_slug: string | null
           theme_config: Json
           title: string
           updated_at: string
@@ -252,8 +250,6 @@ export type Database = {
           content?: Json
           created_at?: string
           id?: string
-          is_public?: boolean
-          public_slug?: string | null
           theme_config?: Json
           title?: string
           updated_at?: string
@@ -263,8 +259,6 @@ export type Database = {
           content?: Json
           created_at?: string
           id?: string
-          is_public?: boolean
-          public_slug?: string | null
           theme_config?: Json
           title?: string
           updated_at?: string

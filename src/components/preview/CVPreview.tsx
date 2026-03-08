@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { usePdfExport } from '@/hooks/usePdfExport';
 import { useDocxExport } from '@/hooks/useDocxExport';
 import { useDownloadPermission } from '@/hooks/useDownloadPermission';
-import { usePublicShare } from '@/hooks/usePublicShare';
+
 import ModernTemplate from './ModernTemplate';
 import ClassicTemplate from './ClassicTemplate';
 import CreativeTemplate from './CreativeTemplate';
@@ -16,7 +16,7 @@ import TechTemplate from './TechTemplate';
 import ArtisticTemplate from './ArtisticTemplate';
 import CompactTemplate from './CompactTemplate';
 import { Button } from '@/components/ui/button';
-import { ZoomIn, ZoomOut, Download, FileText, Loader2, Share2, Check, Copy, Lock, Globe, GlobeLock, FileSpreadsheet } from 'lucide-react';
+import { ZoomIn, ZoomOut, Download, FileText, Loader2, Share2, Lock, FileSpreadsheet } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -52,15 +52,6 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
   const { checkPermission, isChecking } = useDownloadPermission({
     resumeId: currentResumeId,
   });
-
-  const { isPublic, isLoading: isTogglingPublic, loadPublicStatus, togglePublic, getPublicUrl } = usePublicShare(currentResumeId);
-
-  // Load public status on mount
-  useEffect(() => {
-    if (currentResumeId && user) {
-      loadPublicStatus();
-    }
-  }, [currentResumeId, user, loadPublicStatus]);
 
   // Check permission on mount and when resumeId changes
   useEffect(() => {
@@ -133,33 +124,17 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
     exportToDocx(cvData);
   };
 
-  const handleCopyPublicLink = async () => {
-    const url = getPublicUrl();
-    if (url) {
-      try {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        toast.success('Lien public copié !');
-        setTimeout(() => setCopied(false), 2000);
-      } catch {
-        toast.error('Impossible de copier le lien');
-      }
-    }
-  };
-
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
           title: `CV - ${cvData.personalInfo.fullName || 'Mon CV'}`,
           text: 'Découvrez mon CV professionnel',
-          url: isPublic && getPublicUrl() ? getPublicUrl()! : window.location.href,
+          url: window.location.href,
         });
       } catch (error) {
         // User cancelled share
       }
-    } else {
-      handleCopyPublicLink();
     }
   };
 
@@ -205,44 +180,9 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
           </div>
 
           {/* Share Button */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 p-0">
-                <Share2 className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {user && currentResumeId && (
-                <>
-                  <DropdownMenuItem onClick={togglePublic} disabled={isTogglingPublic}>
-                    {isTogglingPublic ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : isPublic ? (
-                      <GlobeLock className="h-4 w-4 mr-2" />
-                    ) : (
-                      <Globe className="h-4 w-4 mr-2" />
-                    )}
-                    {isPublic ? 'Rendre privé' : 'Rendre public'}
-                  </DropdownMenuItem>
-                  {isPublic && (
-                    <DropdownMenuItem onClick={handleCopyPublicLink}>
-                      {copied ? (
-                        <Check className="h-4 w-4 mr-2" />
-                      ) : (
-                        <Copy className="h-4 w-4 mr-2" />
-                      )}
-                      Copier le lien public
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                </>
-              )}
-              <DropdownMenuItem onClick={handleShare}>
-                <Share2 className="h-4 w-4 mr-2" />
-                Partager
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button variant="ghost" size="sm" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 p-0" onClick={handleShare}>
+            <Share2 className="h-4 w-4" />
+          </Button>
 
           {/* Download Buttons */}
           <DropdownMenu>
