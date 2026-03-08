@@ -214,10 +214,10 @@ const Dashboard: React.FC = () => {
         <meta name="description" content="Gérez vos CV, votre abonnement et suivez vos téléchargements." />
       </Helmet>
 
-      <div className="min-h-screen bg-background overflow-x-hidden">
+      <div className="min-h-screen bg-background overflow-x-hidden w-full max-w-[100vw]">
         {/* Top bar */}
         <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between w-full overflow-hidden">
             <button onClick={() => navigate('/')} className="flex items-center gap-2">
               <img src={logoMagiCV} alt="MagiCV" className="h-12 w-auto" />
             </button>
@@ -234,7 +234,7 @@ const Dashboard: React.FC = () => {
         </header>
 
         <ScrollArea className="h-[calc(100vh-4rem)]">
-          <div className="max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-8">
+          <div className="max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-8 w-full overflow-hidden">
             {/* Profile header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Avatar className="h-16 w-16">
@@ -250,7 +250,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 w-full min-w-0">
               {/* Subscription */}
               <Card className={profile?.is_subscribed ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800' : ''}>
                 <CardContent className="p-3 sm:p-5 flex items-center gap-3 sm:gap-4">
