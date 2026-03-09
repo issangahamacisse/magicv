@@ -23,6 +23,7 @@ import {
   Award,
   Upload,
   Sparkles,
+  Wand2,
 } from 'lucide-react';
 import PersonalInfoForm from './PersonalInfoForm';
 import ExperienceForm from './ExperienceForm';
@@ -34,6 +35,9 @@ import ProjectsForm from './ProjectsForm';
 import CertificationsForm from './CertificationsForm';
 import CVImportModal from './CVImportModal';
 import AISmartFillModal from './AISmartFillModal';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 interface EditorPanelProps {
   openSection?: string;
@@ -41,10 +45,12 @@ interface EditorPanelProps {
 }
 
 const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened }) => {
-  const { completionScore, isSaving, isCloudSynced } = useCV();
+  const { completionScore, isSaving, isCloudSynced, cvData, importCVData } = useCV();
+  const { user } = useAuth();
   const [openSections, setOpenSections] = useState<string[]>(['personal']);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isSmartFillOpen, setIsSmartFillOpen] = useState(false);
+  const [isRewriting, setIsRewriting] = useState(false);
 
   const sections = [
     { id: 'personal', icon: User, label: 'Informations personnelles', component: PersonalInfoForm },
