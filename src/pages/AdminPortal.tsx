@@ -17,9 +17,12 @@ import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+} from '@/components/ui/table';
+import {
   Shield, CreditCard, Gift, CheckCircle, XCircle, Loader2, ArrowLeft,
   Plus, RefreshCw, BarChart3, Users, FileText, TrendingUp, Zap,
-  Clock, Eye, Sparkles, Crown
+  Clock, Eye, Sparkles, Crown, Search, UserCog, Send
 } from 'lucide-react';
 import logoMagiCV from '@/assets/logo-magicv.svg';
 
