@@ -186,6 +186,25 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
             <Sparkles className="h-4 w-4 mr-2" />
             Remplissage intelligent IA ✨
           </Button>
+          <Button 
+            variant="outline"
+            size="sm" 
+            className="w-full text-xs sm:text-sm border-primary/30 text-primary hover:bg-primary/10"
+            onClick={handleRewriteAll}
+            disabled={isRewriting}
+          >
+            {isRewriting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Reformulation en cours...
+              </>
+            ) : (
+              <>
+                <Wand2 className="h-4 w-4 mr-2" />
+                Reformuler tout le CV ✨
+              </>
+            )}
+          </Button>
         </div>
 
         {/* Completion Score */}
