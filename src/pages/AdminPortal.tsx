@@ -304,6 +304,64 @@ const AdminPortal: React.FC = () => {
     } catch { toast.error('Erreur lors de la modification'); }
   };
 
+  // Users functions
+  const fetchUsers = async () => {
+    setUsersLoading(true);
+    try {
+      const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setUsers(data || []);
+    } catch {
+      toast.error('Erreur lors du chargement des utilisateurs');
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const handleAddCredits = async (userId: string) => {
+    try {
+      const profile = users.find(u => u.user_id === userId);
+      if (!profile) return;
+      const { error } = await supabase.from('profiles').update({ credits_ai: profile.credits_ai + creditAmount }).eq('user_id', userId);
+      if (error) throw error;
+      toast.success(`${creditAmount} crédit(s) IA ajouté(s)`);
+      setEditingUser(null);
+      fetchUsers(); fetchStats();
+    } catch { toast.error("Erreur lors de l'ajout des crédits"); }
+  };
+
+  const handleGrantSubscription = async (userId: string) => {
+    try {
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + subDays_amount);
+      const { error } = await supabase.from('profiles').update({
+        is_subscribed: true, subscription_status: 'active',
+        subscription_expires_at: expiresAt.toISOString(),
+      }).eq('user_id', userId);
+      if (error) throw error;
+      toast.success(`Abonnement de ${subDays_amount} jours accordé`);
+      setEditingUser(null);
+      fetchUsers(); fetchStats();
+    } catch { toast.error("Erreur lors de l'attribution"); }
+  };
+
+  const handleRevokeSubscription = async (userId: string) => {
+    try {
+      const { error } = await supabase.from('profiles').update({
+        is_subscribed: false, subscription_status: 'free', subscription_expires_at: null,
+      }).eq('user_id', userId);
+      if (error) throw error;
+      toast.success('Abonnement révoqué');
+      fetchUsers(); fetchStats();
+    } catch { toast.error('Erreur lors de la révocation'); }
+  };
+
+  const filteredUsers = users.filter(u => {
+    if (!userSearch.trim()) return true;
+    const q = userSearch.toLowerCase();
+    return (u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q));
+  });
+
   if (isLoading) return (
     <div className="min-h-screen flex items-center justify-center">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
