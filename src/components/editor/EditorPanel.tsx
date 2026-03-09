@@ -137,6 +137,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
 
       {/* Import Modal */}
       <CVImportModal open={isImportModalOpen} onOpenChange={setIsImportModalOpen} />
+      <AISmartFillModal open={isSmartFillOpen} onOpenChange={setIsSmartFillOpen} />
 
       {/* Sections */}
       <ScrollArea className="flex-1">
