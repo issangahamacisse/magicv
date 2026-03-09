@@ -43,6 +43,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
   const { completionScore, isSaving, isCloudSynced } = useCV();
   const [openSections, setOpenSections] = useState<string[]>(['personal']);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isSmartFillOpen, setIsSmartFillOpen] = useState(false);
 
   const sections = [
     { id: 'personal', icon: User, label: 'Informations personnelles', component: PersonalInfoForm },
