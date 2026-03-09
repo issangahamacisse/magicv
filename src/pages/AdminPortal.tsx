@@ -337,9 +337,8 @@ const AdminPortal: React.FC = () => {
       
       const { error } = await supabase.from('profiles').update({
         is_subscribed: true,
-        subscription_status: 'active',
         subscription_expires_at: expiresAt.toISOString(),
-      } as any).eq('user_id', userId);
+      }).eq('user_id', userId);
       
       if (error) {
         console.error('Subscription grant error:', error);
@@ -357,7 +356,7 @@ const AdminPortal: React.FC = () => {
   const handleRevokeSubscription = async (userId: string) => {
     try {
       const { error } = await supabase.from('profiles').update({
-        is_subscribed: false, subscription_status: 'free', subscription_expires_at: null,
+        is_subscribed: false, subscription_expires_at: null,
       }).eq('user_id', userId);
       if (error) throw error;
       toast.success('Abonnement révoqué');
