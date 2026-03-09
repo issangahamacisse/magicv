@@ -17,9 +17,12 @@ import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+} from '@/components/ui/table';
+import {
   Shield, CreditCard, Gift, CheckCircle, XCircle, Loader2, ArrowLeft,
   Plus, RefreshCw, BarChart3, Users, FileText, TrendingUp, Zap,
-  Clock, Eye, Sparkles, Crown
+  Clock, Eye, Sparkles, Crown, Search, UserCog, Send
 } from 'lucide-react';
 import logoMagiCV from '@/assets/logo-magicv.svg';
 
@@ -67,6 +70,18 @@ interface Stats {
   visits30days: number;
 }
 
+interface UserProfile {
+  id: string;
+  user_id: string;
+  email: string | null;
+  full_name: string | null;
+  credits_ai: number;
+  is_subscribed: boolean;
+  subscription_expires_at: string | null;
+  free_usage_count: number;
+  created_at: string;
+}
+
 const AdminPortal: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -89,6 +104,14 @@ const AdminPortal: React.FC = () => {
   const [statsLoading, setStatsLoading] = useState(false);
   const [revenuePeriod, setRevenuePeriod] = useState<7 | 30>(7);
 
+  // Users state
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [userSearch, setUserSearch] = useState('');
+  const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [creditAmount, setCreditAmount] = useState(1);
+  const [subDays_amount, setSubDaysAmount] = useState(30);
+
   useEffect(() => {
     checkAdminStatus();
   }, [user]);
@@ -102,6 +125,7 @@ const AdminPortal: React.FC = () => {
         fetchPayments();
         fetchCoupons();
         fetchStats();
+        fetchUsers();
       }
     } catch {
       setIsAdmin(false);
@@ -280,6 +304,64 @@ const AdminPortal: React.FC = () => {
     } catch { toast.error('Erreur lors de la modification'); }
   };
 
+  // Users functions
+  const fetchUsers = async () => {
+    setUsersLoading(true);
+    try {
+      const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setUsers(data || []);
+    } catch {
+      toast.error('Erreur lors du chargement des utilisateurs');
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const handleAddCredits = async (userId: string) => {
+    try {
+      const profile = users.find(u => u.user_id === userId);
+      if (!profile) return;
+      const { error } = await supabase.from('profiles').update({ credits_ai: profile.credits_ai + creditAmount }).eq('user_id', userId);
+      if (error) throw error;
+      toast.success(`${creditAmount} crédit(s) IA ajouté(s)`);
+      setEditingUser(null);
+      fetchUsers(); fetchStats();
+    } catch { toast.error("Erreur lors de l'ajout des crédits"); }
+  };
+
+  const handleGrantSubscription = async (userId: string) => {
+    try {
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + subDays_amount);
+      const { error } = await supabase.from('profiles').update({
+        is_subscribed: true, subscription_status: 'active',
+        subscription_expires_at: expiresAt.toISOString(),
+      }).eq('user_id', userId);
+      if (error) throw error;
+      toast.success(`Abonnement de ${subDays_amount} jours accordé`);
+      setEditingUser(null);
+      fetchUsers(); fetchStats();
+    } catch { toast.error("Erreur lors de l'attribution"); }
+  };
+
+  const handleRevokeSubscription = async (userId: string) => {
+    try {
+      const { error } = await supabase.from('profiles').update({
+        is_subscribed: false, subscription_status: 'free', subscription_expires_at: null,
+      }).eq('user_id', userId);
+      if (error) throw error;
+      toast.success('Abonnement révoqué');
+      fetchUsers(); fetchStats();
+    } catch { toast.error('Erreur lors de la révocation'); }
+  };
+
+  const filteredUsers = users.filter(u => {
+    if (!userSearch.trim()) return true;
+    const q = userSearch.toLowerCase();
+    return (u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q));
+  });
+
   if (isLoading) return (
     <div className="min-h-screen flex items-center justify-center">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -351,6 +433,10 @@ const AdminPortal: React.FC = () => {
             <TabsTrigger value="coupons" className="gap-2">
               <Gift className="h-4 w-4" />
               Coupons
+            </TabsTrigger>
+            <TabsTrigger value="users" className="gap-2">
+              <UserCog className="h-4 w-4" />
+              Utilisateurs
             </TabsTrigger>
           </TabsList>
 
@@ -800,6 +886,167 @@ const AdminPortal: React.FC = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* ===================== USERS TAB ===================== */}
+          <TabsContent value="users">
+            <Card>
+              <CardHeader className="flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <UserCog className="h-5 w-5" />
+                    Gestion des utilisateurs
+                  </CardTitle>
+                  <CardDescription>Recherchez des utilisateurs et gérez leurs crédits et abonnements</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={fetchUsers} disabled={usersLoading}>
+                  <RefreshCw className={`h-4 w-4 mr-2 ${usersLoading ? 'animate-spin' : ''}`} />
+                  Rafraîchir
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Rechercher par email ou nom..."
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+
+                {usersLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[600px]">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Utilisateur</TableHead>
+                          <TableHead>Crédits IA</TableHead>
+                          <TableHead>Abonnement</TableHead>
+                          <TableHead>Inscrit le</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredUsers.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                              {userSearch ? 'Aucun utilisateur trouvé' : 'Aucun utilisateur'}
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          filteredUsers.map((u) => (
+                            <React.Fragment key={u.user_id}>
+                              <TableRow>
+                                <TableCell>
+                                  <div>
+                                    <p className="font-medium">{u.full_name || 'Sans nom'}</p>
+                                    <p className="text-sm text-muted-foreground">{u.email || 'N/A'}</p>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="gap-1">
+                                    <Sparkles className="h-3 w-3" />
+                                    {u.credits_ai}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  {u.is_subscribed ? (
+                                    <div>
+                                      <Badge className="bg-amber-500/15 text-amber-600 border-amber-400/30">
+                                        <Crown className="h-3 w-3 mr-1" />
+                                        Abonné
+                                      </Badge>
+                                      {u.subscription_expires_at && (
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                          Expire: {format(new Date(u.subscription_expires_at), 'dd/MM/yyyy')}
+                                        </p>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <Badge variant="secondary">Gratuit</Badge>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-sm text-muted-foreground">
+                                  {format(new Date(u.created_at), 'dd/MM/yyyy')}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <Button
+                                    size="sm"
+                                    variant={editingUser === u.user_id ? 'default' : 'outline'}
+                                    onClick={() => setEditingUser(editingUser === u.user_id ? null : u.user_id)}
+                                  >
+                                    <UserCog className="h-4 w-4 mr-1" />
+                                    Gérer
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                              {editingUser === u.user_id && (
+                                <TableRow>
+                                  <TableCell colSpan={5}>
+                                    <div className="p-4 bg-muted/50 rounded-lg space-y-4">
+                                      <div className="grid sm:grid-cols-2 gap-4">
+                                        {/* Add credits */}
+                                        <div className="space-y-2">
+                                          <Label className="text-sm font-medium">Ajouter des crédits IA</Label>
+                                          <div className="flex gap-2">
+                                            <Input
+                                              type="number"
+                                              min={1}
+                                              value={creditAmount}
+                                              onChange={(e) => setCreditAmount(parseInt(e.target.value) || 1)}
+                                              className="w-24"
+                                            />
+                                            <Button size="sm" onClick={() => handleAddCredits(u.user_id)}>
+                                              <Plus className="h-4 w-4 mr-1" />
+                                              Ajouter
+                                            </Button>
+                                          </div>
+                                        </div>
+
+                                        {/* Grant/revoke subscription */}
+                                        <div className="space-y-2">
+                                          <Label className="text-sm font-medium">Abonnement</Label>
+                                          {u.is_subscribed ? (
+                                            <Button size="sm" variant="destructive" onClick={() => handleRevokeSubscription(u.user_id)}>
+                                              <XCircle className="h-4 w-4 mr-1" />
+                                              Révoquer l'abonnement
+                                            </Button>
+                                          ) : (
+                                            <div className="flex gap-2">
+                                              <Input
+                                                type="number"
+                                                min={1}
+                                                value={subDays_amount}
+                                                onChange={(e) => setSubDaysAmount(parseInt(e.target.value) || 30)}
+                                                className="w-24"
+                                                placeholder="Jours"
+                                              />
+                                              <Button size="sm" onClick={() => handleGrantSubscription(u.user_id)}>
+                                                <Crown className="h-4 w-4 mr-1" />
+                                                Abonner ({subDays_amount}j)
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </React.Fragment>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
