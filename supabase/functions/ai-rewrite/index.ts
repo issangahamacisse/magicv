@@ -130,6 +130,18 @@ serve(async (req) => {
         - Identifie les langues mentionnées`;
         useToolCalling = true;
         break;
+      case 'rewrite-all':
+        systemPrompt = `Tu es un expert en rédaction de CV professionnels. L'utilisateur va te fournir les données JSON de son CV existant.
+        Ta mission est de REFORMULER et AMÉLIORER tout le contenu textuel tout en gardant les mêmes informations factuelles.
+        - Corrige TOUTES les fautes d'orthographe et de grammaire
+        - Reformule le résumé professionnel pour le rendre plus percutant et accrocheur
+        - Transforme les descriptions d'expériences en bullet points impactants avec des verbes d'action forts
+        - Améliore les descriptions de formations
+        - Garde les mêmes dates, noms d'entreprises, postes, écoles, etc.
+        - Ne modifie PAS les compétences ni les langues (garde-les telles quelles)
+        - Quantifie les résultats quand possible`;
+        useToolCalling = true;
+        break;
       default:
         return new Response(JSON.stringify({ error: 'Invalid action type' }), {
           status: 400,
