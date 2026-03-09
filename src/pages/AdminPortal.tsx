@@ -434,6 +434,10 @@ const AdminPortal: React.FC = () => {
               <Gift className="h-4 w-4" />
               Coupons
             </TabsTrigger>
+            <TabsTrigger value="users" className="gap-2">
+              <UserCog className="h-4 w-4" />
+              Utilisateurs
+            </TabsTrigger>
           </TabsList>
 
           {/* ===================== STATISTICS TAB ===================== */}
