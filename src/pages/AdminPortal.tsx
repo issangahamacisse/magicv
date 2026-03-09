@@ -334,21 +334,29 @@ const AdminPortal: React.FC = () => {
     try {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + subDays_amount);
+      
       const { error } = await supabase.from('profiles').update({
-        is_subscribed: true, subscription_status: 'active',
+        is_subscribed: true,
         subscription_expires_at: expiresAt.toISOString(),
       }).eq('user_id', userId);
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Subscription grant error:', error);
+        throw error;
+      }
       toast.success(`Abonnement de ${subDays_amount} jours accordé`);
       setEditingUser(null);
       fetchUsers(); fetchStats();
-    } catch { toast.error("Erreur lors de l'attribution"); }
+    } catch (err) {
+      console.error('Subscription grant catch:', err);
+      toast.error("Erreur lors de l'attribution");
+    }
   };
 
   const handleRevokeSubscription = async (userId: string) => {
     try {
       const { error } = await supabase.from('profiles').update({
-        is_subscribed: false, subscription_status: 'free', subscription_expires_at: null,
+        is_subscribed: false, subscription_expires_at: null,
       }).eq('user_id', userId);
       if (error) throw error;
       toast.success('Abonnement révoqué');
