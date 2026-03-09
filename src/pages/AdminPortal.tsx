@@ -70,6 +70,18 @@ interface Stats {
   visits30days: number;
 }
 
+interface UserProfile {
+  id: string;
+  user_id: string;
+  email: string | null;
+  full_name: string | null;
+  credits_ai: number;
+  is_subscribed: boolean;
+  subscription_expires_at: string | null;
+  free_usage_count: number;
+  created_at: string;
+}
+
 const AdminPortal: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
