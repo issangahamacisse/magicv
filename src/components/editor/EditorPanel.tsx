@@ -97,15 +97,25 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
         </div>
 
         {/* Import Button */}
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="w-full mb-2 sm:mb-3 text-xs sm:text-sm"
-          onClick={() => setIsImportModalOpen(true)}
-        >
-          <Upload className="h-4 w-4 mr-2" />
-          Importer un CV (PDF/DOCX)
-        </Button>
+        <div className="flex flex-col gap-2 mb-2 sm:mb-3">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full text-xs sm:text-sm"
+            onClick={() => setIsImportModalOpen(true)}
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Importer un CV (PDF/DOCX)
+          </Button>
+          <Button 
+            size="sm" 
+            className="w-full text-xs sm:text-sm bg-gradient-to-r from-primary to-primary/80"
+            onClick={() => setIsSmartFillOpen(true)}
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Remplissage intelligent IA ✨
+          </Button>
+        </div>
 
         {/* Completion Score */}
         <div className="space-y-2">
