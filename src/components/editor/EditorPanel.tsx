@@ -32,6 +32,7 @@ import ThemeSelector from './ThemeSelector';
 import ProjectsForm from './ProjectsForm';
 import CertificationsForm from './CertificationsForm';
 import CVImportModal from './CVImportModal';
+import AISmartFillModal from './AISmartFillModal';
 
 interface EditorPanelProps {
   openSection?: string;
