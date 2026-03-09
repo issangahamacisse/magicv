@@ -125,6 +125,7 @@ const AdminPortal: React.FC = () => {
         fetchPayments();
         fetchCoupons();
         fetchStats();
+        fetchUsers();
       }
     } catch {
       setIsAdmin(false);
