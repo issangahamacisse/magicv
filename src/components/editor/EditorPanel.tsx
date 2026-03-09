@@ -22,6 +22,7 @@ import {
   FolderKanban,
   Award,
   Upload,
+  Sparkles,
 } from 'lucide-react';
 import PersonalInfoForm from './PersonalInfoForm';
 import ExperienceForm from './ExperienceForm';
