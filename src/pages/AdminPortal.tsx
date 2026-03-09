@@ -104,6 +104,14 @@ const AdminPortal: React.FC = () => {
   const [statsLoading, setStatsLoading] = useState(false);
   const [revenuePeriod, setRevenuePeriod] = useState<7 | 30>(7);
 
+  // Users state
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [userSearch, setUserSearch] = useState('');
+  const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [creditAmount, setCreditAmount] = useState(1);
+  const [subDays_amount, setSubDaysAmount] = useState(30);
+
   useEffect(() => {
     checkAdminStatus();
   }, [user]);
