@@ -52,6 +52,70 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
   const [isSmartFillOpen, setIsSmartFillOpen] = useState(false);
   const [isRewriting, setIsRewriting] = useState(false);
 
+  const handleRewriteAll = async () => {
+    if (!user) {
+      toast.error('Vous devez être connecté pour utiliser cette fonctionnalité');
+      return;
+    }
+
+    const hasContent = cvData.experience.length > 0 || cvData.education.length > 0 || cvData.personalInfo.summary;
+    if (!hasContent) {
+      toast.error('Votre CV est vide. Remplissez d\'abord quelques sections.');
+      return;
+    }
+
+    setIsRewriting(true);
+    try {
+      const cvText = JSON.stringify({
+        personalInfo: cvData.personalInfo,
+        experience: cvData.experience,
+        education: cvData.education,
+        skills: cvData.skills,
+        languages: cvData.languages,
+      });
+
+      const { data, error } = await supabase.functions.invoke('ai-rewrite', {
+        body: { text: cvText, action: 'rewrite-all' }
+      });
+
+      if (error) {
+        toast.error('Erreur lors de la reformulation');
+        return;
+      }
+
+      if (data?.error) {
+        if (data.requiresPayment) {
+          toast.error(data.error, {
+            action: { label: 'Acheter des crédits', onClick: () => window.location.href = '/payment' },
+          });
+        } else {
+          toast.error(data.error);
+        }
+        return;
+      }
+
+      if (data?.cvData) {
+        const addIds = (items: any[]) =>
+          items?.map((item: any) => ({ ...item, id: crypto.randomUUID() })) || [];
+
+        const importData: any = {};
+        if (data.cvData.personalInfo) importData.personalInfo = data.cvData.personalInfo;
+        if (data.cvData.experience?.length) importData.experience = addIds(data.cvData.experience);
+        if (data.cvData.education?.length) importData.education = addIds(data.cvData.education);
+        if (data.cvData.skills?.length) importData.skills = addIds(data.cvData.skills);
+        if (data.cvData.languages?.length) importData.languages = addIds(data.cvData.languages);
+
+        importCVData(importData);
+        toast.success('CV reformulé et amélioré avec succès !');
+      }
+    } catch (err) {
+      console.error('Rewrite all error:', err);
+      toast.error('Erreur lors de la communication avec l\'IA');
+    } finally {
+      setIsRewriting(false);
+    }
+  };
+
   const sections = [
     { id: 'personal', icon: User, label: 'Informations personnelles', component: PersonalInfoForm },
     { id: 'experience', icon: Briefcase, label: 'Expérience', component: ExperienceForm },
