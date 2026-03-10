@@ -48,6 +48,7 @@ interface EditorPanelProps {
 const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened }) => {
   const { completionScore, isSaving, isCloudSynced, cvData, importCVData } = useCV();
   const { user } = useAuth();
+  const adaptiveLayout = useAdaptiveLayout(cvData);
   const [openSections, setOpenSections] = useState<string[]>(['personal']);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isSmartFillOpen, setIsSmartFillOpen] = useState(false);
