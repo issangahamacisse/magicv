@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useAIRewrite } from '@/hooks/useAIRewrite';
 import AIRewriteModal from './AIRewriteModal';
 import PhotoUpload from './PhotoUpload';
+import SignaturePad from './SignaturePad';
 import { toast } from 'sonner';
 
 // Défini en dehors pour éviter la perte de focus
