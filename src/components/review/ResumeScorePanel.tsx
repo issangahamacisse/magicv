@@ -60,7 +60,7 @@ const ResumeScorePanel: React.FC<ResumeScorePanelProps> = ({
   onAutoFix,
 }) => {
   const { user } = useAuth();
-  const { cvData, setCVData } = useCV();
+  const { cvData, updatePersonalInfo } = useCV();
   const [atsLoading, setAtsLoading] = useState(false);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [atsResult, setAtsResult] = useState<ATSResult | null>(null);
