@@ -131,6 +131,20 @@ const SignaturePad: React.FC = () => {
         </div>
       </div>
 
+      {/* Signature size */}
+      <div className="flex items-center gap-3">
+        <Label className="text-xs text-muted-foreground whitespace-nowrap">Taille</Label>
+        <Slider
+          value={[cvData.theme.signatureSize || 50]}
+          onValueChange={([v]) => updateTheme('signatureSize', v)}
+          min={20}
+          max={120}
+          step={5}
+          className="flex-1"
+        />
+        <span className="text-xs text-muted-foreground w-8 text-right">{cvData.theme.signatureSize || 50}px</span>
+      </div>
+
       {/* Signature pad header */}
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium text-foreground/80 flex items-center gap-2">
