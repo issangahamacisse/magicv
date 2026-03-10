@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Project, Certification, CVData } from '@/types/cv';
+import { useCV } from '@/context/CVContext';
 
 interface ProjectsSectionProps {
   projects: Project[];
