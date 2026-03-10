@@ -61,6 +61,20 @@ function calculateDensity(data: CVData): number {
   return Math.min(100, score);
 }
 
+// Minimum print-safe sizes (in px)
+const MIN_BODY = 10;
+const MIN_TITLE = 11;
+const MIN_HEADER = 20;
+
+// Maximum sizes for sparse content
+const MAX_BODY = 14;
+const MAX_TITLE = 18;
+const MAX_HEADER = 38;
+
+function lerp(min: number, max: number, t: number): number {
+  return Math.round(min + (max - min) * t);
+}
+
 export function useAdaptiveLayout(data: CVData): AdaptiveLayoutResult {
   return useMemo(() => {
     const densityScore = calculateDensity(data);
@@ -75,59 +89,21 @@ export function useAdaptiveLayout(data: CVData): AdaptiveLayoutResult {
       contentDensity = 'dense';
     }
     
-    // Expansion factor: inversely proportional to content
-    // Less content = more expansion to fill the page
-    const expansionFactor = Math.max(1, 2.5 - (densityScore / 40));
+    // t goes from 1 (empty) to 0 (very full) — controls how much to expand
+    const t = Math.max(0, Math.min(1, 1 - densityScore / 80));
     
-    // Dynamic sizing based on density
-    let headerFontSize: string;
-    let titleFontSize: string;
-    let bodyFontSize: string;
-    let sectionMargin: string;
-    let itemMargin: string;
-    let contentPadding: string;
+    // Expansion factor for spacing multiplier
+    const expansionFactor = 1 + t * 1.8;
     
-    if (densityScore < 20) {
-      // Very sparse - maximize everything
-      headerFontSize = '36px';
-      titleFontSize = '16px';
-      bodyFontSize = '13px';
-      sectionMargin = `${Math.round(48 * expansionFactor)}px`;
-      itemMargin = `${Math.round(24 * expansionFactor)}px`;
-      contentPadding = `${Math.round(40 * expansionFactor)}px`;
-    } else if (densityScore < 35) {
-      // Sparse - enlarge moderately
-      headerFontSize = '32px';
-      titleFontSize = '14px';
-      bodyFontSize = '12px';
-      sectionMargin = `${Math.round(36 * expansionFactor)}px`;
-      itemMargin = `${Math.round(20 * expansionFactor)}px`;
-      contentPadding = `${Math.round(36 * expansionFactor)}px`;
-    } else if (densityScore < 55) {
-      // Normal
-      headerFontSize = '28px';
-      titleFontSize = '13px';
-      bodyFontSize = '11px';
-      sectionMargin = '28px';
-      itemMargin = '18px';
-      contentPadding = '32px';
-    } else if (densityScore < 75) {
-      // Dense
-      headerFontSize = '24px';
-      titleFontSize = '12px';
-      bodyFontSize = '10px';
-      sectionMargin = '20px';
-      itemMargin = '14px';
-      contentPadding = '24px';
-    } else {
-      // Very dense - compact everything
-      headerFontSize = '22px';
-      titleFontSize = '11px';
-      bodyFontSize = '9px';
-      sectionMargin = '16px';
-      itemMargin = '10px';
-      contentPadding = '20px';
-    }
+    // Font sizes: lerp between min (dense) and max (sparse), always print-safe
+    const headerFontSize = `${lerp(MIN_HEADER, MAX_HEADER, t)}px`;
+    const titleFontSize = `${lerp(MIN_TITLE, MAX_TITLE, t)}px`;
+    const bodyFontSize = `${lerp(MIN_BODY, MAX_BODY, t)}px`;
+    
+    // Spacing: base values scaled by expansion
+    const sectionMargin = `${Math.round(lerp(16, 48, t) * Math.min(expansionFactor, 2.2))}px`;
+    const itemMargin = `${Math.round(lerp(10, 24, t) * Math.min(expansionFactor, 2))}px`;
+    const contentPadding = `${Math.round(lerp(20, 42, t) * Math.min(expansionFactor, 2))}px`;
     
     return {
       contentDensity,
