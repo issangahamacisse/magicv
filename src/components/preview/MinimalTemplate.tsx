@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { cn } from '@/lib/utils';
+import { CVFooter } from './TemplateSections';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
 interface TemplateProps {
@@ -222,6 +223,7 @@ const MinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
         )}
       </footer>
       )}
+      <CVFooter data={data} />
     </div>
   );
 });

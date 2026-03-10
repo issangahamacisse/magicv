@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Globe, Linkedin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CVFooter } from './TemplateSections';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
 interface TemplateProps {
@@ -316,6 +317,7 @@ const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref)
       </div>
         );
       })()}
+      <CVFooter data={data} />
     </div>
   );
 });

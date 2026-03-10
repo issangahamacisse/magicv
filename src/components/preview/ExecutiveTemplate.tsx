@@ -2,7 +2,7 @@ import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { cn } from '@/lib/utils';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
-import { ProjectsSection, CertificationsSection } from './TemplateSections';
+import { ProjectsSection, CertificationsSection, CVFooter } from './TemplateSections';
 
 interface TemplateProps {
   data: CVData;
@@ -240,6 +240,7 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
       </div>
       );
       })()}
+      <CVFooter data={data} />
     </div>
   );
 });

@@ -8,6 +8,7 @@ export interface PersonalInfo {
   linkedin?: string;
   summary: string;
   photoUrl?: string;
+  signatureUrl?: string;
 }
 
 export interface Experience {
@@ -83,6 +84,10 @@ export interface CVTheme {
   accentColor: string;
   fontFamily: 'sans' | 'serif';
   spacing: 'compact' | 'normal' | 'spacious';
+  showLastUpdated?: boolean;
+  showSignature?: boolean;
+  signatureColor?: string;
+  signaturePosition?: { x: number; y: number };
 }
 
 export interface CVData {

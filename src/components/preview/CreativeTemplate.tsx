@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CVFooter } from './TemplateSections';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 import { ProjectsSection, CertificationsSection } from './TemplateSections';
 
@@ -267,6 +268,7 @@ const CreativeTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
           itemMargin={layout.itemMargin}
         />
       </div>
+      <CVFooter data={data} />
     </div>
   );
 });

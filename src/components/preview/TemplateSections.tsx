@@ -1,5 +1,5 @@
-import React from 'react';
-import { Project, Certification } from '@/types/cv';
+import React, { useState, useRef, useCallback } from 'react';
+import { Project, Certification, CVData } from '@/types/cv';
 
 interface ProjectsSectionProps {
   projects: Project[];
@@ -103,5 +103,82 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
         ))}
       </div>
     </section>
+  );
+};
+
+// CVFooter — optional last-updated date + draggable signature
+interface CVFooterProps {
+  data: CVData;
+  onUpdateSignaturePosition?: (pos: { x: number; y: number }) => void;
+}
+
+const formatFullDate = (dateStr?: string) => {
+  const date = dateStr ? new Date(dateStr) : new Date();
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+};
+
+export const CVFooter: React.FC<CVFooterProps> = ({ data, onUpdateSignaturePosition }) => {
+  const { theme, personalInfo } = data;
+  const showDate = theme.showLastUpdated;
+  const showSig = theme.showSignature && personalInfo.signatureUrl;
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const sigPos = theme.signaturePosition || { x: 70, y: 0 };
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging || !containerRef.current || !onUpdateSignaturePosition) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    onUpdateSignaturePosition({ x, y });
+  }, [isDragging, onUpdateSignaturePosition]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  if (!showDate && !showSig) return null;
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative mt-auto pt-4 border-t border-gray-200"
+      style={{ minHeight: showSig ? '80px' : 'auto' }}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
+      {showDate && (
+        <p className="text-gray-400" style={{ fontSize: '9px' }}>
+          Mis à jour le {formatFullDate(data.updatedAt)}
+        </p>
+      )}
+      
+      {showSig && (
+        <img
+          src={personalInfo.signatureUrl}
+          alt="Signature"
+          onMouseDown={handleMouseDown}
+          className="absolute select-none"
+          style={{
+            left: `${sigPos.x}%`,
+            top: `${sigPos.y}%`,
+            transform: 'translate(-50%, -50%)',
+            height: '50px',
+            cursor: isDragging ? 'grabbing' : 'grab',
+            filter: theme.signatureColor && theme.signatureColor !== '#000000' 
+              ? undefined 
+              : undefined,
+          }}
+          draggable={false}
+        />
+      )}
+    </div>
   );
 };

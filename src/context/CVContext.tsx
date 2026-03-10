@@ -18,7 +18,7 @@ interface ImportedCVData {
 interface CVContextType {
   cvData: CVData;
   updatePersonalInfo: (field: string, value: string) => void;
-  updateTheme: (field: string, value: string) => void;
+  updateTheme: (field: string, value: string | boolean | { x: number; y: number }) => void;
   addExperience: () => void;
   updateExperience: (id: string, field: string, value: string | boolean) => void;
   removeExperience: (id: string) => void;
@@ -286,7 +286,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }));
   }, []);
 
-  const updateTheme = useCallback((field: string, value: string) => {
+  const updateTheme = useCallback((field: string, value: string | boolean | { x: number; y: number }) => {
     setCVData(prev => ({
       ...prev,
       theme: { ...prev.theme, [field]: value }
