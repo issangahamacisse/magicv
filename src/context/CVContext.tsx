@@ -286,7 +286,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }));
   }, []);
 
-  const updateTheme = useCallback((field: string, value: string | boolean | { x: number; y: number }) => {
+  const updateTheme = useCallback((field: string, value: string | boolean | number | { x: number; y: number }) => {
     setCVData(prev => ({
       ...prev,
       theme: { ...prev.theme, [field]: value }
