@@ -52,8 +52,8 @@ serve(async (req) => {
           });
         }
 
-        // Check premium status for smart-fill and rewrite-all
-        if (action === 'smart-fill' || action === 'rewrite-all') {
+        // Check premium status for premium actions
+        if (action === 'smart-fill' || action === 'rewrite-all' || action === 'ats-keywords' || action === 'rewrite-summary') {
           const { data: profile } = await supabase
             .from('profiles')
             .select('is_subscribed, subscription_expires_at, credits_ai')
@@ -119,6 +119,24 @@ serve(async (req) => {
         - Si le texte est déjà correct, renvoie-le tel quel
         - Réponds UNIQUEMENT avec le texte corrigé, sans explication ni commentaire.`;
         break;
+      case 'ats-keywords':
+        systemPrompt = `Tu es un expert en recrutement et en systèmes ATS (Applicant Tracking System). Analyse le CV fourni en JSON et identifie les mots-clés manquants pour optimiser le passage des filtres ATS.
+        - Identifie le poste cible à partir du titre et du résumé
+        - Compare les compétences et descriptions avec les mots-clés standards du secteur
+        - Suggère 5-8 mots-clés manquants essentiels pour ce type de poste
+        - Pour chaque mot-clé, explique brièvement pourquoi il est important
+        - Donne un score ATS estimé de 0 à 100`;
+        useToolCalling = true;
+        break;
+      case 'rewrite-summary':
+        systemPrompt = `Tu es un expert en rédaction de CV professionnels. L'utilisateur va te fournir les données JSON de son CV.
+        Génère un résumé professionnel optimal (3-4 phrases percutantes) basé sur l'ensemble de son parcours.
+        - Mets en avant les compétences clés et les années d'expérience
+        - Utilise un ton professionnel et dynamique
+        - Adapte le résumé au poste cible mentionné
+        - Inclus des verbes d'action et des mots-clés pertinents pour l'ATS
+        - Réponds UNIQUEMENT avec le résumé, sans explication.`;
+        break;
       case 'smart-fill':
         systemPrompt = `Tu es un expert en rédaction de CV professionnels. L'utilisateur va te fournir du texte brut contenant des informations sur son parcours professionnel. 
         Analyse ce texte et extrais les informations structurées pour remplir un CV complet.
@@ -157,7 +175,44 @@ serve(async (req) => {
       ],
     };
 
-    if (useToolCalling) {
+    if (useToolCalling && action === 'ats-keywords') {
+      requestBody.tools = [
+        {
+          type: "function",
+          function: {
+            name: "analyze_ats_keywords",
+            description: "Analyse les mots-clés ATS manquants dans un CV",
+            parameters: {
+              type: "object",
+              properties: {
+                ats_score: { type: "number", description: "Score ATS estimé de 0 à 100" },
+                missing_keywords: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      keyword: { type: "string", description: "Le mot-clé manquant" },
+                      importance: { type: "string", enum: ["high", "medium"], description: "Niveau d'importance" },
+                      reason: { type: "string", description: "Pourquoi ce mot-clé est important (1 phrase)" },
+                    },
+                    required: ["keyword", "importance", "reason"],
+                    additionalProperties: false
+                  }
+                },
+                suggestions: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "2-3 conseils généraux pour améliorer le score ATS"
+                }
+              },
+              required: ["ats_score", "missing_keywords", "suggestions"],
+              additionalProperties: false
+            }
+          }
+        }
+      ];
+      requestBody.tool_choice = { type: "function", function: { name: "analyze_ats_keywords" } };
+    } else if (useToolCalling) {
       requestBody.tools = [
         {
           type: "function",
@@ -293,16 +348,22 @@ serve(async (req) => {
         throw new Error('No structured data returned from AI');
       }
       
-      let cvData;
+      let parsedData;
       try {
-        cvData = JSON.parse(toolCall.function.arguments);
+        parsedData = JSON.parse(toolCall.function.arguments);
       } catch {
         throw new Error('Failed to parse AI structured response');
       }
       
-      console.log(`AI smart-fill successful`);
+      if (action === 'ats-keywords') {
+        console.log(`ATS keywords analysis successful`);
+        return new Response(JSON.stringify({ atsData: parsedData }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       
-      return new Response(JSON.stringify({ cvData }), {
+      console.log(`AI smart-fill successful`);
+      return new Response(JSON.stringify({ cvData: parsedData }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
