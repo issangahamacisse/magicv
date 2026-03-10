@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { CVData } from '@/types/cv';
 import { Mail, Phone, MapPin, Linkedin, Code, Terminal, Database, Folder, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CVFooter } from './TemplateSections';
 import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 
 interface TemplateProps {
