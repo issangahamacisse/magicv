@@ -3,7 +3,8 @@ import { useCV } from '@/context/CVContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Eraser, Check, PenTool } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Eraser, Check, PenTool, CalendarDays } from 'lucide-react';
 
 const SignaturePad: React.FC = () => {
   const { cvData, updatePersonalInfo, updateTheme } = useCV();
@@ -101,12 +102,39 @@ const SignaturePad: React.FC = () => {
     updatePersonalInfo('signatureUrl', dataUrl);
   };
 
+  const { theme } = cvData;
+
   return (
     <div className="space-y-3 pt-4 border-t border-border">
+      {/* Toggles for signature & date */}
+      <div className="space-y-2 bg-muted/30 rounded-lg p-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <PenTool className="h-4 w-4 text-muted-foreground" />
+            <Label className="text-sm">Afficher la signature</Label>
+          </div>
+          <Switch
+            checked={theme.showSignature || false}
+            onCheckedChange={(checked) => updateTheme('showSignature', checked)}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            <Label className="text-sm">Date de mise à jour</Label>
+          </div>
+          <Switch
+            checked={theme.showLastUpdated || false}
+            onCheckedChange={(checked) => updateTheme('showLastUpdated', checked)}
+          />
+        </div>
+      </div>
+
+      {/* Signature pad header */}
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium text-foreground/80 flex items-center gap-2">
           <PenTool className="h-4 w-4" />
-          Signature
+          Dessiner la signature
         </Label>
         <div className="flex items-center gap-2">
           <Label className="text-xs text-muted-foreground">Couleur</Label>
