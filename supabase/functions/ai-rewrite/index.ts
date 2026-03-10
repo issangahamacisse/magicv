@@ -175,7 +175,44 @@ serve(async (req) => {
       ],
     };
 
-    if (useToolCalling) {
+    if (useToolCalling && action === 'ats-keywords') {
+      requestBody.tools = [
+        {
+          type: "function",
+          function: {
+            name: "analyze_ats_keywords",
+            description: "Analyse les mots-clés ATS manquants dans un CV",
+            parameters: {
+              type: "object",
+              properties: {
+                ats_score: { type: "number", description: "Score ATS estimé de 0 à 100" },
+                missing_keywords: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      keyword: { type: "string", description: "Le mot-clé manquant" },
+                      importance: { type: "string", enum: ["high", "medium"], description: "Niveau d'importance" },
+                      reason: { type: "string", description: "Pourquoi ce mot-clé est important (1 phrase)" },
+                    },
+                    required: ["keyword", "importance", "reason"],
+                    additionalProperties: false
+                  }
+                },
+                suggestions: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "2-3 conseils généraux pour améliorer le score ATS"
+                }
+              },
+              required: ["ats_score", "missing_keywords", "suggestions"],
+              additionalProperties: false
+            }
+          }
+        }
+      ];
+      requestBody.tool_choice = { type: "function", function: { name: "analyze_ats_keywords" } };
+    } else if (useToolCalling) {
       requestBody.tools = [
         {
           type: "function",
