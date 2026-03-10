@@ -228,6 +228,7 @@ const ClassicTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
         )}
       </footer>
       )}
+      <CVFooter data={data} />
     </div>
   );
 });

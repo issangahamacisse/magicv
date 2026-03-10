@@ -279,6 +279,7 @@ const TechTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
           </section>
         )}
       </main>
+      <CVFooter data={data} />
     </div>
   );
 });

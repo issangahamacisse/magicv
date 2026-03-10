@@ -262,6 +262,7 @@ const BoldTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref) =
           itemMargin={layout.itemMargin}
         />
       </main>
+      <CVFooter data={data} />
     </div>
   );
 });

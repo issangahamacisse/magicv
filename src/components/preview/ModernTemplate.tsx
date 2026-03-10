@@ -317,6 +317,7 @@ const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref)
       </div>
         );
       })()}
+      <CVFooter data={data} />
     </div>
   );
 });

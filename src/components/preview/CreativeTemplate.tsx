@@ -268,6 +268,7 @@ const CreativeTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
           itemMargin={layout.itemMargin}
         />
       </div>
+      <CVFooter data={data} />
     </div>
   );
 });

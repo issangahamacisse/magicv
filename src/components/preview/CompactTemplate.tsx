@@ -230,6 +230,7 @@ const CompactTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
           />
         </div>
       )}
+      <CVFooter data={data} />
     </div>
   );
 });

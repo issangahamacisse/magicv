@@ -336,6 +336,7 @@ const ElegantTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
         );
         })()}
       </div>
+      <CVFooter data={data} />
     </div>
   );
 });

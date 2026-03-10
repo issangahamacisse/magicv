@@ -223,6 +223,7 @@ const MinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, ref
         )}
       </footer>
       )}
+      <CVFooter data={data} />
     </div>
   );
 });

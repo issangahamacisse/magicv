@@ -240,6 +240,7 @@ const ExecutiveTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, r
       </div>
       );
       })()}
+      <CVFooter data={data} />
     </div>
   );
 });

@@ -280,6 +280,7 @@ const ArtisticTemplate = forwardRef<HTMLDivElement, TemplateProps>(({ data }, re
         );
         })()}
       </div>
+      <CVFooter data={data} />
     </div>
   );
 });
