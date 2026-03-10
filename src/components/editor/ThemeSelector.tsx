@@ -4,7 +4,6 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { TemplateId } from '@/types/cv';
 import SectionOrderPanel from './SectionOrderPanel';
@@ -20,9 +19,7 @@ import {
   Zap,
   Brush,
   FileText,
-  Check,
-  CalendarDays,
-  PenTool
+  Check
 } from 'lucide-react';
 
 interface TemplateOption {
