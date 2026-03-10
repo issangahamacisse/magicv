@@ -3,7 +3,8 @@ import { useCV } from '@/context/CVContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Eraser, Check, PenTool } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Eraser, Check, PenTool, CalendarDays } from 'lucide-react';
 
 const SignaturePad: React.FC = () => {
   const { cvData, updatePersonalInfo, updateTheme } = useCV();
