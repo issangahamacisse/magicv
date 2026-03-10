@@ -223,7 +223,14 @@ const PersonalInfoForm: React.FC = () => {
         onRegenerate={handleRegenerate}
         isRegenerating={isLoading}
       />
+
+      {/* Signature */}
+      <SignaturePad />
     </div>
+  );
+};
+
+export default PersonalInfoForm;
   );
 };
 
