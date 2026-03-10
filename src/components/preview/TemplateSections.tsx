@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Project, Certification, CVData } from '@/types/cv';
+import { useCV } from '@/context/CVContext';
 
 interface ProjectsSectionProps {
   projects: Project[];
@@ -109,7 +110,6 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
 // CVFooter — optional last-updated date + draggable signature
 interface CVFooterProps {
   data: CVData;
-  onUpdateSignaturePosition?: (pos: { x: number; y: number }) => void;
 }
 
 const formatFullDate = (dateStr?: string) => {
@@ -117,7 +117,8 @@ const formatFullDate = (dateStr?: string) => {
   return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
-export const CVFooter: React.FC<CVFooterProps> = ({ data, onUpdateSignaturePosition }) => {
+export const CVFooter: React.FC<CVFooterProps> = ({ data }) => {
+  const { updateTheme } = useCV();
   const { theme, personalInfo } = data;
   const showDate = theme.showLastUpdated;
   const showSig = theme.showSignature && personalInfo.signatureUrl;
@@ -132,12 +133,12 @@ export const CVFooter: React.FC<CVFooterProps> = ({ data, onUpdateSignaturePosit
   }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging || !containerRef.current || !onUpdateSignaturePosition) return;
+    if (!isDragging || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
     const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
-    onUpdateSignaturePosition({ x, y });
-  }, [isDragging, onUpdateSignaturePosition]);
+    updateTheme('signaturePosition', { x, y });
+  }, [isDragging, updateTheme]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
