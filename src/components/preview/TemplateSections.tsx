@@ -133,12 +133,12 @@ export const CVFooter: React.FC<CVFooterProps> = ({ data }) => {
   }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging || !containerRef.current || !onUpdateSignaturePosition) return;
+    if (!isDragging || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
     const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
-    onUpdateSignaturePosition({ x, y });
-  }, [isDragging, onUpdateSignaturePosition]);
+    updateTheme('signaturePosition', { x, y });
+  }, [isDragging, updateTheme]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
