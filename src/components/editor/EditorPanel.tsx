@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useCV } from '@/context/CVContext';
+import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 import {
   Accordion,
   AccordionContent,
