@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useCV } from '@/context/CVContext';
+import { useAdaptiveLayout } from '@/hooks/useAdaptiveLayout';
 import {
   Accordion,
   AccordionContent,
@@ -47,6 +48,7 @@ interface EditorPanelProps {
 const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened }) => {
   const { completionScore, isSaving, isCloudSynced, cvData, importCVData } = useCV();
   const { user } = useAuth();
+  const adaptiveLayout = useAdaptiveLayout(cvData);
   const [openSections, setOpenSections] = useState<string[]>(['personal']);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isSmartFillOpen, setIsSmartFillOpen] = useState(false);
@@ -221,6 +223,42 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ openSection, onSectionOpened 
               ? "Bon début ! Continuez à enrichir votre profil"
               : "Excellent ! Votre CV est presque parfait"}
           </p>
+        </div>
+
+        {/* Page Fill Indicator */}
+        <div className="space-y-2 mt-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Remplissage de la page</span>
+            <span className={`font-semibold ${
+              adaptiveLayout.contentDensity === 'sparse' ? 'text-amber-500' 
+              : adaptiveLayout.contentDensity === 'dense' ? 'text-primary' 
+              : 'text-emerald-500'
+            }`}>
+              {Math.round(adaptiveLayout.densityScore)}%
+            </span>
+          </div>
+          <div className="relative h-2 w-full overflow-hidden rounded-full bg-secondary">
+            <div 
+              className={`h-full rounded-full transition-all duration-500 ${
+                adaptiveLayout.contentDensity === 'sparse' ? 'bg-amber-500' 
+                : adaptiveLayout.contentDensity === 'dense' ? 'bg-primary' 
+                : 'bg-emerald-500'
+              }`}
+              style={{ width: `${Math.min(100, adaptiveLayout.densityScore)}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">
+              {adaptiveLayout.contentDensity === 'sparse' 
+                ? "📐 Texte agrandi pour remplir la page"
+                : adaptiveLayout.contentDensity === 'dense'
+                ? "📄 Contenu dense, texte compact"
+                : "✅ Bon équilibre de contenu"}
+            </p>
+            <span className="text-[10px] text-muted-foreground/60">
+              Corps: {adaptiveLayout.bodyFontSize}
+            </span>
+          </div>
         </div>
       </div>
 
