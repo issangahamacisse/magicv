@@ -230,8 +230,3 @@ const PersonalInfoForm: React.FC = () => {
   );
 };
 
-export default PersonalInfoForm;
-  );
-};
-
-export default PersonalInfoForm;
