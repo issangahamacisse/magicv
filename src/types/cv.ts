@@ -8,6 +8,7 @@ export interface PersonalInfo {
   linkedin?: string;
   summary: string;
   photoUrl?: string;
+  signatureUrl?: string;
 }
 
 export interface Experience {
