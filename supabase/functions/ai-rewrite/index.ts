@@ -119,6 +119,24 @@ serve(async (req) => {
         - Si le texte est déjà correct, renvoie-le tel quel
         - Réponds UNIQUEMENT avec le texte corrigé, sans explication ni commentaire.`;
         break;
+      case 'ats-keywords':
+        systemPrompt = `Tu es un expert en recrutement et en systèmes ATS (Applicant Tracking System). Analyse le CV fourni en JSON et identifie les mots-clés manquants pour optimiser le passage des filtres ATS.
+        - Identifie le poste cible à partir du titre et du résumé
+        - Compare les compétences et descriptions avec les mots-clés standards du secteur
+        - Suggère 5-8 mots-clés manquants essentiels pour ce type de poste
+        - Pour chaque mot-clé, explique brièvement pourquoi il est important
+        - Donne un score ATS estimé de 0 à 100`;
+        useToolCalling = true;
+        break;
+      case 'rewrite-summary':
+        systemPrompt = `Tu es un expert en rédaction de CV professionnels. L'utilisateur va te fournir les données JSON de son CV.
+        Génère un résumé professionnel optimal (3-4 phrases percutantes) basé sur l'ensemble de son parcours.
+        - Mets en avant les compétences clés et les années d'expérience
+        - Utilise un ton professionnel et dynamique
+        - Adapte le résumé au poste cible mentionné
+        - Inclus des verbes d'action et des mots-clés pertinents pour l'ATS
+        - Réponds UNIQUEMENT avec le résumé, sans explication.`;
+        break;
       case 'smart-fill':
         systemPrompt = `Tu es un expert en rédaction de CV professionnels. L'utilisateur va te fournir du texte brut contenant des informations sur son parcours professionnel. 
         Analyse ce texte et extrais les informations structurées pour remplir un CV complet.
