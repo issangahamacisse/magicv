@@ -52,8 +52,8 @@ serve(async (req) => {
           });
         }
 
-        // Check premium status for smart-fill and rewrite-all
-        if (action === 'smart-fill' || action === 'rewrite-all') {
+        // Check premium status for premium actions
+        if (action === 'smart-fill' || action === 'rewrite-all' || action === 'ats-keywords' || action === 'rewrite-summary') {
           const { data: profile } = await supabase
             .from('profiles')
             .select('is_subscribed, subscription_expires_at, credits_ai')
