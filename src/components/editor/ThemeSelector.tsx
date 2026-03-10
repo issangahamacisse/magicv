@@ -503,7 +503,7 @@ const ThemeSelector: React.FC = () => {
             </div>
             <Switch
               checked={theme.showSignature || false}
-              onCheckedChange={(checked) => updateTheme('showSignature', checked as unknown as string)}
+              onCheckedChange={(checked) => updateTheme('showSignature', checked)}
             />
           </div>
 
