@@ -88,6 +88,7 @@ export interface CVTheme {
   showSignature?: boolean;
   signatureColor?: string;
   signaturePosition?: { x: number; y: number };
+  signatureSize?: number;
 }
 
 export interface CVData {
