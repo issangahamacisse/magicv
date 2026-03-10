@@ -470,57 +470,6 @@ const ThemeSelector: React.FC = () => {
 
       <Separator className="my-6" />
 
-      {/* Document Options */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <FileText className="h-4 w-4 text-primary" />
-          </div>
-          <div>
-            <Label className="text-sm font-semibold">Options du document</Label>
-            <p className="text-xs text-muted-foreground">Éléments optionnels</p>
-          </div>
-        </div>
-
-        <div className="space-y-3 bg-muted/30 rounded-xl p-4">
-          {/* Show Last Updated */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-muted-foreground" />
-              <Label className="text-sm">Date de mise à jour</Label>
-            </div>
-            <Switch
-              checked={theme.showLastUpdated || false}
-              onCheckedChange={(checked) => updateTheme('showLastUpdated', checked)}
-            />
-          </div>
-
-          {/* Show Signature */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <PenTool className="h-4 w-4 text-muted-foreground" />
-              <Label className="text-sm">Signature</Label>
-            </div>
-            <Switch
-              checked={theme.showSignature || false}
-              onCheckedChange={(checked) => updateTheme('showSignature', checked)}
-            />
-          </div>
-
-          {/* Signature Color (only if signature enabled) */}
-          {theme.showSignature && (
-            <div className="flex items-center justify-between pl-6">
-              <Label className="text-xs text-muted-foreground">Couleur de la signature</Label>
-              <Input
-                type="color"
-                value={theme.signatureColor || '#000000'}
-                onChange={(e) => updateTheme('signatureColor', e.target.value)}
-                className="w-8 h-8 p-0.5 rounded cursor-pointer"
-              />
-            </div>
-          )}
-        </div>
-      </div>
 
       <Separator className="my-6" />
 
