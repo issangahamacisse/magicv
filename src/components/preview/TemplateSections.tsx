@@ -171,7 +171,7 @@ export const CVFooter: React.FC<CVFooterProps> = ({ data }) => {
             left: `${sigPos.x}%`,
             top: `${sigPos.y}%`,
             transform: 'translate(-50%, -50%)',
-            height: '50px',
+            height: `${theme.signatureSize || 50}px`,
             cursor: isDragging ? 'grabbing' : 'grab',
             filter: theme.signatureColor && theme.signatureColor !== '#000000' 
               ? undefined 

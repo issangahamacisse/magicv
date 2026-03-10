@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { Eraser, Check, PenTool, CalendarDays } from 'lucide-react';
 
 const SignaturePad: React.FC = () => {
@@ -128,6 +129,20 @@ const SignaturePad: React.FC = () => {
             onCheckedChange={(checked) => updateTheme('showLastUpdated', checked)}
           />
         </div>
+      </div>
+
+      {/* Signature size */}
+      <div className="flex items-center gap-3">
+        <Label className="text-xs text-muted-foreground whitespace-nowrap">Taille</Label>
+        <Slider
+          value={[cvData.theme.signatureSize || 50]}
+          onValueChange={([v]) => updateTheme('signatureSize', v)}
+          min={20}
+          max={120}
+          step={5}
+          className="flex-1"
+        />
+        <span className="text-xs text-muted-foreground w-8 text-right">{cvData.theme.signatureSize || 50}px</span>
       </div>
 
       {/* Signature pad header */}
