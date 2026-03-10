@@ -348,16 +348,22 @@ serve(async (req) => {
         throw new Error('No structured data returned from AI');
       }
       
-      let cvData;
+      let parsedData;
       try {
-        cvData = JSON.parse(toolCall.function.arguments);
+        parsedData = JSON.parse(toolCall.function.arguments);
       } catch {
         throw new Error('Failed to parse AI structured response');
       }
       
-      console.log(`AI smart-fill successful`);
+      if (action === 'ats-keywords') {
+        console.log(`ATS keywords analysis successful`);
+        return new Response(JSON.stringify({ atsData: parsedData }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       
-      return new Response(JSON.stringify({ cvData }), {
+      console.log(`AI smart-fill successful`);
+      return new Response(JSON.stringify({ cvData: parsedData }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
