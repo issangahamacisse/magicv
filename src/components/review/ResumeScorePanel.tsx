@@ -173,13 +173,7 @@ const ResumeScorePanel: React.FC<ResumeScorePanelProps> = ({
 
   const applySummary = () => {
     if (!generatedSummary) return;
-    setCVData({
-      ...cvData,
-      personalInfo: {
-        ...cvData.personalInfo,
-        summary: generatedSummary,
-      },
-    });
+    updatePersonalInfo('summary', generatedSummary);
     setGeneratedSummary(null);
     toast.success('Résumé appliqué à votre CV !');
   };
